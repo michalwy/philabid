@@ -14,8 +14,12 @@ public class Category {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private String catalogName;
+    private Integer catalogIssueYear;
+
     // Constructors
-    public Category() {}
+    public Category() {
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -64,6 +68,22 @@ public class Category {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getCatalogName() {
+        return catalogName;
+    }
+
+    public void setCatalogName(String catalogName) {
+        this.catalogName = catalogName;
+    }
+
+    public Integer getCatalogIssueYear() {
+        return catalogIssueYear;
+    }
+
+    public void setCatalogIssueYear(Integer catalogIssueYear) {
+        this.catalogIssueYear = catalogIssueYear;
     }
 
     @Override
