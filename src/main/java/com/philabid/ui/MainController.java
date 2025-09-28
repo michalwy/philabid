@@ -2,19 +2,27 @@ package com.philabid.ui;
 
 import com.philabid.database.DatabaseManager;
 import com.philabid.i18n.I18nManager;
+import com.philabid.service.AuctionHouseService;
 import com.philabid.service.ConfigurationService;
+import com.philabid.service.CurrencyService;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.controlsfx.control.StatusBar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +36,7 @@ public class MainController implements Initializable {
     
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     
+    // FXML Injected Fields from main.fxml
     @FXML private BorderPane rootPane;
     @FXML private MenuBar menuBar;
     @FXML private Menu fileMenu;
@@ -37,6 +46,7 @@ public class MainController implements Initializable {
     @FXML private Menu helpMenu;
     @FXML private MenuItem exitMenuItem;
     @FXML private MenuItem aboutMenuItem;
+    @FXML private MenuItem auctionHousesMenuItem;
     @FXML private TabPane mainTabPane;
     @FXML private Tab dashboardTab;
     @FXML private Tab auctionsTab;
@@ -45,10 +55,13 @@ public class MainController implements Initializable {
     @FXML private StatusBar statusBar;
     @FXML private Label welcomeLabel;
     @FXML private TextArea logTextArea;
-    
+
+    // Services
     private DatabaseManager databaseManager;
     private I18nManager i18nManager;
     private ConfigurationService configurationService;
+    private AuctionHouseService auctionHouseService;
+    private CurrencyService currencyService;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -74,10 +87,13 @@ public class MainController implements Initializable {
      * Sets the application services. Called after FXML loading.
      */
     public void setServices(DatabaseManager databaseManager, I18nManager i18nManager, 
-                           ConfigurationService configurationService) {
+                           ConfigurationService configurationService, AuctionHouseService auctionHouseService,
+                           CurrencyService currencyService) {
         this.databaseManager = databaseManager;
         this.i18nManager = i18nManager;
         this.configurationService = configurationService;
+        this.auctionHouseService = auctionHouseService;
+        this.currencyService = currencyService;
         
         // Update UI with localized strings
         updateLocalizedStrings();
@@ -114,6 +130,46 @@ public class MainController implements Initializable {
         if (aboutMenuItem != null) {
             aboutMenuItem.setOnAction(e -> handleAbout());
         }
+
+        if (auctionHousesMenuItem != null) {
+            auctionHousesMenuItem.setOnAction(e -> handleShowAuctionHouses());
+        }
+    }
+
+    /**
+     * Handles showing the Auction Houses view in a modal dialog.
+     */
+    private void handleShowAuctionHouses() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/AuctionHouseView.fxml"));
+            loader.setResources(i18nManager.getResourceBundle());
+
+            Parent auctionHouseView = loader.load();
+
+            AuctionHouseController controller = loader.getController();
+            controller.setServices(auctionHouseService, currencyService, i18nManager);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(i18nManager.getString("auctionHouses.title"));
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(rootPane.getScene().getWindow());
+            
+            Scene scene = new Scene(auctionHouseView);
+            dialogStage.setScene(scene);
+            
+            dialogStage.showAndWait();
+            logger.info("Closed Auction Houses dialog.");
+
+        } catch (IOException e) {
+            logger.error("Failed to load AuctionHouseView.fxml", e);
+            // Show an error alert to the user
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Could not open Auction Houses view");
+            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
+            alert.showAndWait();
+        }
     }
     
     /**
@@ -133,6 +189,7 @@ public class MainController implements Initializable {
             // Update menu items
             if (exitMenuItem != null) exitMenuItem.setText(i18nManager.getString("menu.file.exit"));
             if (aboutMenuItem != null) aboutMenuItem.setText(i18nManager.getString("menu.help.about"));
+            if (auctionHousesMenuItem != null) auctionHousesMenuItem.setText(i18nManager.getString("menu.tools.auctionHouses"));
             
             // Update tab labels
             if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));

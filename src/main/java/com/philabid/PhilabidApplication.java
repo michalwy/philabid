@@ -1,8 +1,12 @@
 package com.philabid;
 
+import com.philabid.database.AuctionHouseRepository;
+import com.philabid.database.CurrencyRepository;
 import com.philabid.database.DatabaseManager;
 import com.philabid.i18n.I18nManager;
+import com.philabid.service.AuctionHouseService;
 import com.philabid.service.ConfigurationService;
+import com.philabid.service.CurrencyService;
 import com.philabid.ui.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -27,16 +31,26 @@ public class PhilabidApplication extends Application {
     private DatabaseManager databaseManager;
     private I18nManager i18nManager;
     private ConfigurationService configurationService;
+    private AuctionHouseService auctionHouseService;
+    private CurrencyService currencyService;
     
     @Override
     public void init() throws Exception {
         super.init();
         logger.info("Initializing Philabid application...");
         
-        // Initialize core services
-        configurationService = new ConfigurationService();
+        // Initialize core managers and services
         i18nManager = new I18nManager();
         databaseManager = new DatabaseManager();
+        
+        // Initialize repositories
+        AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
+        CurrencyRepository currencyRepository = new CurrencyRepository(databaseManager);
+        
+        // Initialize services
+        configurationService = new ConfigurationService();
+        auctionHouseService = new AuctionHouseService(auctionHouseRepository);
+        currencyService = new CurrencyService(currencyRepository);
         
         // Initialize database
         databaseManager.initialize();
@@ -57,7 +71,7 @@ public class PhilabidApplication extends Application {
             getClass().getResource("/css/application.css")).toExternalForm());
         
         MainController controller = fxmlLoader.getController();
-        controller.setServices(databaseManager, i18nManager, configurationService);
+        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService);
         
         primaryStage.setTitle(i18nManager.getString("app.title"));
         primaryStage.setScene(scene);

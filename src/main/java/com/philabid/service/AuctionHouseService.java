@@ -1,0 +1,92 @@
+package com.philabid.service;
+
+import com.philabid.database.AuctionHouseRepository;
+import com.philabid.model.AuctionHouse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service layer for managing auction houses.
+ * Encapsulates business logic and separates it from the UI and database layers.
+ */
+public class AuctionHouseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuctionHouseService.class);
+    private final AuctionHouseRepository auctionHouseRepository;
+
+    public AuctionHouseService(AuctionHouseRepository auctionHouseRepository) {
+        this.auctionHouseRepository = auctionHouseRepository;
+    }
+
+    /**
+     * Retrieves all auction houses.
+     *
+     * @return A list of all auction houses, or an empty list in case of an error.
+     */
+    public List<AuctionHouse> getAllAuctionHouses() {
+        try {
+            return auctionHouseRepository.findAll();
+        } catch (SQLException e) {
+            logger.error("Failed to retrieve all auction houses", e);
+            // In a real application, you might show an error to the user.
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Finds an auction house by its ID.
+     *
+     * @param id The ID of the auction house.
+     * @return An Optional containing the auction house, or empty if not found or on error.
+     */
+    public Optional<AuctionHouse> getAuctionHouseById(long id) {
+        try {
+            return auctionHouseRepository.findById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to find auction house with ID: {}", id, e);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Saves an auction house (creates a new one or updates an existing one).
+     * You could add validation logic here.
+     *
+     * @param auctionHouse The auction house to save.
+     * @return An Optional containing the saved auction house, or empty on failure.
+     */
+    public Optional<AuctionHouse> saveAuctionHouse(AuctionHouse auctionHouse) {
+        // Example of business logic: ensure name is not null or empty.
+        if (auctionHouse.getName() == null || auctionHouse.getName().trim().isEmpty()) {
+            logger.warn("Attempted to save an auction house with an empty name.");
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(auctionHouseRepository.save(auctionHouse));
+        } catch (SQLException e) {
+            logger.error("Failed to save auction house: {}", auctionHouse.getName(), e);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Deletes an auction house by its ID.
+     *
+     * @param id The ID of the auction house to delete.
+     * @return true if deletion was successful, false otherwise.
+     */
+    public boolean deleteAuctionHouse(long id) {
+        try {
+            return auctionHouseRepository.deleteById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to delete auction house with ID: {}", id, e);
+            return false;
+        }
+    }
+}
