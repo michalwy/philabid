@@ -20,7 +20,7 @@ dependencies {
     implementation("org.controlsfx:controlsfx:11.2.1")
 
     // ICU4J for internationalization
-    implementation("com.ibm.icu:icu4j:73.2")
+    implementation("com.ibm.icu:icu4j:77.1")
 
     // Moneta for monetary handling
     implementation("org.javamoney:moneta:1.4.2")
