@@ -3,6 +3,7 @@ package com.philabid.ui;
 import com.philabid.database.DatabaseManager;
 import com.philabid.i18n.I18nManager;
 import com.philabid.service.AuctionHouseService;
+import com.philabid.service.CatalogService;
 import com.philabid.service.ConfigurationService;
 import com.philabid.service.CurrencyService;
 import javafx.animation.KeyFrame;
@@ -47,6 +48,7 @@ public class MainController implements Initializable {
     @FXML private MenuItem exitMenuItem;
     @FXML private MenuItem aboutMenuItem;
     @FXML private MenuItem auctionHousesMenuItem;
+    @FXML private MenuItem catalogsMenuItem;
     @FXML private TabPane mainTabPane;
     @FXML private Tab dashboardTab;
     @FXML private Tab auctionsTab;
@@ -62,6 +64,7 @@ public class MainController implements Initializable {
     private ConfigurationService configurationService;
     private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
+    private CatalogService catalogService;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -88,12 +91,13 @@ public class MainController implements Initializable {
      */
     public void setServices(DatabaseManager databaseManager, I18nManager i18nManager, 
                            ConfigurationService configurationService, AuctionHouseService auctionHouseService,
-                           CurrencyService currencyService) {
+                           CurrencyService currencyService, CatalogService catalogService) {
         this.databaseManager = databaseManager;
         this.i18nManager = i18nManager;
         this.configurationService = configurationService;
         this.auctionHouseService = auctionHouseService;
         this.currencyService = currencyService;
+        this.catalogService = catalogService;
         
         // Update UI with localized strings
         updateLocalizedStrings();
@@ -134,6 +138,10 @@ public class MainController implements Initializable {
         if (auctionHousesMenuItem != null) {
             auctionHousesMenuItem.setOnAction(e -> handleShowAuctionHouses());
         }
+
+        if (catalogsMenuItem != null) {
+            catalogsMenuItem.setOnAction(e -> handleShowCatalogs());
+        }
     }
 
     /**
@@ -171,6 +179,41 @@ public class MainController implements Initializable {
             alert.showAndWait();
         }
     }
+
+    /**
+     * Handles showing the Catalogs view in a modal dialog.
+     */
+    private void handleShowCatalogs() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/CatalogView.fxml"));
+            loader.setResources(i18nManager.getResourceBundle());
+
+            Parent catalogView = loader.load();
+
+            CatalogController controller = loader.getController();
+            controller.setServices(catalogService, currencyService, i18nManager);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(i18nManager.getString("catalogs.title"));
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(rootPane.getScene().getWindow());
+
+            Scene scene = new Scene(catalogView);
+            dialogStage.setScene(scene);
+
+            dialogStage.showAndWait();
+            logger.info("Closed Catalogs dialog.");
+
+        } catch (IOException e) {
+            logger.error("Failed to load CatalogView.fxml", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Could not open Catalogs view");
+            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
+            alert.showAndWait();
+        }
+    }
     
     /**
      * Updates UI strings with localized versions.
@@ -190,6 +233,7 @@ public class MainController implements Initializable {
             if (exitMenuItem != null) exitMenuItem.setText(i18nManager.getString("menu.file.exit"));
             if (aboutMenuItem != null) aboutMenuItem.setText(i18nManager.getString("menu.help.about"));
             if (auctionHousesMenuItem != null) auctionHousesMenuItem.setText(i18nManager.getString("menu.tools.auctionHouses"));
+            if (catalogsMenuItem != null) catalogsMenuItem.setText(i18nManager.getString("menu.tools.catalogs"));
             
             // Update tab labels
             if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));

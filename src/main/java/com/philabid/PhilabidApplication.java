@@ -1,10 +1,12 @@
 package com.philabid;
 
 import com.philabid.database.AuctionHouseRepository;
+import com.philabid.database.CatalogRepository;
 import com.philabid.database.CurrencyRepository;
 import com.philabid.database.DatabaseManager;
 import com.philabid.i18n.I18nManager;
 import com.philabid.service.AuctionHouseService;
+import com.philabid.service.CatalogService;
 import com.philabid.service.ConfigurationService;
 import com.philabid.service.CurrencyService;
 import com.philabid.ui.MainController;
@@ -33,6 +35,7 @@ public class PhilabidApplication extends Application {
     private ConfigurationService configurationService;
     private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
+    private CatalogService catalogService;
     
     @Override
     public void init() throws Exception {
@@ -46,11 +49,13 @@ public class PhilabidApplication extends Application {
         // Initialize repositories
         AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
         CurrencyRepository currencyRepository = new CurrencyRepository(databaseManager);
+        CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
         
         // Initialize services
         configurationService = new ConfigurationService();
         auctionHouseService = new AuctionHouseService(auctionHouseRepository);
         currencyService = new CurrencyService(currencyRepository);
+        catalogService = new CatalogService(catalogRepository);
         
         // Initialize database
         databaseManager.initialize();
@@ -71,7 +76,7 @@ public class PhilabidApplication extends Application {
             getClass().getResource("/css/application.css")).toExternalForm());
         
         MainController controller = fxmlLoader.getController();
-        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService);
+        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService, catalogService);
         
         primaryStage.setTitle(i18nManager.getString("app.title"));
         primaryStage.setScene(scene);
