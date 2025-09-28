@@ -92,6 +92,7 @@ tasks.register<JavaExec>("runApp") {
         "--module-path", configurations.runtimeClasspath.get().asPath,
         "--add-modules", "javafx.controls,javafx.fxml",
         "--enable-native-access=org.xerial.sqlitejdbc",
-        "--enable-native-access=javafx.graphics"
+        "--enable-native-access=javafx.graphics",
+        "--add-reads=org.xerial.sqlitejdbc=ALL-UNNAMED"
     )
 }
