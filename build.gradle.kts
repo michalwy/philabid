@@ -17,32 +17,32 @@ dependencies {
     implementation("org.openjfx:javafx-fxml:21.0.1")
 
     // ControlsFX for enhanced UI controls
-    implementation("org.controlsfx:controlsfx:11.2.1")
+    implementation("org.controlsfx:controlsfx:11.2.2")
 
     // ICU4J for internationalization
     implementation("com.ibm.icu:icu4j:73.2")
 
     // Moneta for monetary handling
-    implementation("org.javamoney:moneta:1.4.2")
+    implementation("org.javamoney:moneta:1.4.5")
 
     // SQLite database
-    implementation("org.xerial:sqlite-jdbc:3.43.2.2")
+    implementation("org.xerial:sqlite-jdbc:3.50.3.0")
 
     // Flyway for database migrations
     implementation("org.flywaydb:flyway-core:9.22.3")
 
     // Logging
-    implementation("org.slf4j:slf4j-api:2.0.9")
-    implementation("ch.qos.logback:logback-classic:1.4.11")
+    implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
+    implementation("ch.qos.logback:logback-classic:1.5.18")
 
     // JSON processing for configuration
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.mockito:mockito-core:5.6.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.6.0")
+    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
     testImplementation("org.testfx:testfx-core:4.0.18")
     testImplementation("org.testfx:testfx-junit5:4.0.18")
 }
