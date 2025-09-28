@@ -18,36 +18,37 @@ repositories {
 }
 
 dependencies {
-    // JavaFX
-    implementation("org.openjfx:javafx-controls:21.0.1")
-    implementation("org.openjfx:javafx-fxml:21.0.1")
+    // JavaFX - upgraded to latest version
+    implementation("org.openjfx:javafx-controls:23.0.1")
+    implementation("org.openjfx:javafx-fxml:23.0.1")
     
     // ControlsFX for enhanced UI controls
     implementation("org.controlsfx:controlsfx:11.2.1")
     
-    // ICU4J for internationalization
-    implementation("com.ibm.icu:icu4j:73.2")
+    // ICU4J for internationalization - updated to latest
+    implementation("com.ibm.icu:icu4j:76.1")
     
     // Moneta for monetary handling
-    implementation("org.javamoney:moneta:1.4.2")
+    implementation("org.javamoney:moneta:1.4.4")
     
-    // SQLite database
-    implementation("org.xerial:sqlite-jdbc:3.43.2.2")
+    // SQLite database - updated to latest
+    implementation("org.xerial:sqlite-jdbc:3.46.1.0")
     
-    // Flyway for database migrations
+    // Flyway for database migrations - keeping compatible version
     implementation("org.flywaydb:flyway-core:9.22.3")
     
-    // Logging
-    implementation("org.slf4j:slf4j-api:2.0.9")
-    implementation("ch.qos.logback:logback-classic:1.4.11")
+    // Logging - updated to latest
+    implementation("org.slf4j:slf4j-api:2.0.16")
+    implementation("ch.qos.logback:logback-classic:1.5.8")
     
-    // JSON processing for configuration
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
+    // JSON processing for configuration - updated to latest
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.0")
     
-    // Testing
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("org.mockito:mockito-core:5.6.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.6.0")
+    // Testing - updated to latest with platform engine
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.mockito:mockito-core:5.14.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
     testImplementation("org.testfx:testfx-core:4.0.18")
     testImplementation("org.testfx:testfx-junit5:4.0.18")
 }
@@ -58,7 +59,7 @@ application {
 }
 
 javafx {
-    version = "21.0.1"
+    version = "23.0.1"
     modules("javafx.controls", "javafx.fxml")
 }
 
