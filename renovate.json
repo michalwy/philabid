@@ -2,9 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base",
-    "group:allNonMajor",
-    "schedule:weekdays",
-    ":dependencyDashboard"
+    "group:allNonMajor"
   ],
   "automerge": false,
   "platformAutomerge": false,
