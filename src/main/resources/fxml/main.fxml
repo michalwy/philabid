@@ -33,6 +33,7 @@
                  <MenuItem mnemonicParsing="false" text="%menu.tools.database" />
                  <MenuItem fx:id="auctionHousesMenuItem" mnemonicParsing="false" text="%menu.tools.auctionHouses" />
                  <MenuItem fx:id="catalogsMenuItem" mnemonicParsing="false" text="%menu.tools.catalogs" />
+                 <MenuItem fx:id="categoriesMenuItem" mnemonicParsing="false" text="%menu.tools.categories" />
                </items>
              </Menu>
              <Menu fx:id="helpMenu" mnemonicParsing="false" text="%menu.help">
