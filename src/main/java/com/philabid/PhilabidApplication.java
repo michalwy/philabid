@@ -31,6 +31,7 @@ public class PhilabidApplication extends Application {
     private CurrencyService currencyService;
     private CatalogService catalogService;
     private CategoryService categoryService;
+    private ConditionService conditionService;
     
     @Override
     public void init() throws Exception {
@@ -46,6 +47,7 @@ public class PhilabidApplication extends Application {
         CurrencyRepository currencyRepository = new CurrencyRepository(databaseManager);
         CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
         CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
+        ConditionRepository conditionRepository = new ConditionRepository(databaseManager);
         
         // Initialize services
         configurationService = new ConfigurationService();
@@ -53,6 +55,7 @@ public class PhilabidApplication extends Application {
         currencyService = new CurrencyService(currencyRepository);
         catalogService = new CatalogService(catalogRepository);
         categoryService = new CategoryService(categoryRepository);
+        conditionService = new ConditionService(conditionRepository);
         
         // Initialize database
         databaseManager.initialize();
@@ -73,7 +76,7 @@ public class PhilabidApplication extends Application {
             getClass().getResource("/css/application.css")).toExternalForm());
         
         MainController controller = fxmlLoader.getController();
-        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService, catalogService, categoryService);
+        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService, catalogService, categoryService, conditionService);
         
         primaryStage.setTitle(i18nManager.getString("app.title"));
         primaryStage.setScene(scene);
