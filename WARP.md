@@ -59,7 +59,7 @@ When running single tests, use the JavaFX headless properties:
 ## Project Architecture
 
 ### Technology Stack
-- **Java 21** with modern features (records, pattern matching, modules)
+- **Java 25** with modern features (records, pattern matching, modules)
 - **JavaFX 21** for desktop UI with FXML
 - **Gradle 9.1.0** with Kotlin DSL for build automation
 - **SQLite** with **Flyway** for database migrations
