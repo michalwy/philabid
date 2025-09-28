@@ -10,7 +10,7 @@ We are committed to providing a welcoming and inclusive environment for all cont
 
 ### Development Environment Setup
 
-1. **Java 21**: Install Java 21 JDK (Temurin recommended)
+1. **Java 21**: Install Java 21 JDK (Temurin recommended, LTS version)
 2. **IDE**: IntelliJ IDEA, Eclipse, or VS Code with Java extensions
 3. **Git**: For version control
 

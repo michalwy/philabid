@@ -146,9 +146,9 @@ src/
 
 ### Key Technologies
 
-- **Java 21**: Modern Java with records, pattern matching, and virtual threads
-- **JavaFX 21**: Rich desktop UI framework
-- **Gradle 8.5**: Build automation with Kotlin DSL
+- **Java 21**: Modern Java with records, pattern matching, and virtual threads (LTS)
+- **JavaFX 23**: Rich desktop UI framework with latest features
+- **Gradle 9.0**: Build automation with Kotlin DSL and enhanced performance
 - **ControlsFX**: Enhanced UI controls and dialogs
 - **ICU4J**: Advanced internationalization and Unicode support
 - **Moneta**: JSR 354 implementation for monetary calculations

@@ -7,9 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Gradle upgraded to 9.0.0** - Build system updated with latest features and performance improvements
+- **JavaFX upgraded to 23.0.1** - Latest JavaFX version with enhanced features and bug fixes
+- **Major dependency updates**:
+  - ICU4J: 73.2 → 76.1 (latest internationalization features)
+  - Moneta: 1.4.2 → 1.4.4 (monetary calculation improvements)
+  - SQLite JDBC: 3.43.2.2 → 3.46.1.0 (database driver updates)
+  - SLF4J: 2.0.9 → 2.0.16 (logging framework updates)
+  - Logback: 1.4.11 → 1.5.8 (logging implementation updates)
+  - Jackson: 2.15.3 → 2.18.0 (JSON processing improvements)
+  - JUnit: 5.10.0 → 5.11.2 (testing framework updates)
+  - Mockito: 5.6.0 → 5.14.2 (testing mock framework updates)
+- **Enhanced toolchain management** with Foojay resolver for better JDK auto-provisioning
+- **CI/CD pipeline updated** to use Gradle 9.0.0
+
 ### Added
-- Initial project structure with Java 21 and JavaFX 21
-- Gradle build system with Kotlin DSL
+- Initial project structure with Java 21 and JavaFX 23
+- Gradle build system with Kotlin DSL and Gradle 9.0 features
 - Multilingual support (English, German, French, Polish) using ICU4J
 - SQLite database with automatic migrations via Flyway
 - Modern JavaFX UI with ControlsFX enhancements
