@@ -40,6 +40,7 @@ dependencies {
     
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.mockito:mockito-core:5.6.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.6.0")
     testImplementation("org.testfx:testfx-core:4.0.18")
@@ -79,16 +80,4 @@ tasks.javadoc {
 flyway {
     url = "jdbc:sqlite:philabid.db"
     locations = arrayOf("classpath:db/migration")
-}
-
-// Custom task to run with JavaFX modules
-tasks.register<JavaExec>("runApp") {
-    group = "application"
-    description = "Run the application with proper JavaFX module path"
-    classpath = sourceSets.main.get().runtimeClasspath
-    mainClass = "com.philabid.PhilabidApplication"
-    jvmArgs = listOf(
-        "--module-path", configurations.runtimeClasspath.get().asPath,
-        "--add-modules", "javafx.controls,javafx.fxml"
-    )
 }
