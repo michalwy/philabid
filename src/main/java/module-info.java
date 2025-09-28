@@ -4,7 +4,6 @@ module philabid {
     requires org.controlsfx.controls;
     requires java.sql;
     requires org.xerial.sqlitejdbc;
-    requires org.flywaydb.core;
     requires com.ibm.icu;
     requires org.javamoney.moneta;
     requires java.money;

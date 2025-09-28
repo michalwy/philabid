@@ -66,6 +66,11 @@ tasks.test {
 
 tasks.compileJava {
     options.encoding = "UTF-8"
+    options.compilerArgs.addAll(
+        listOf(
+            "--add-reads", "philabid=ALL-UNNAMED"
+        )
+    )
 }
 
 tasks.compileTestJava {
