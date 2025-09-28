@@ -47,6 +47,7 @@ public class MainController implements Initializable {
     @FXML private MenuItem auctionHousesMenuItem;
     @FXML private MenuItem catalogsMenuItem;
     @FXML private MenuItem categoriesMenuItem;
+    @FXML private MenuItem conditionsMenuItem;
     @FXML private TabPane mainTabPane;
     @FXML private Tab dashboardTab;
     @FXML private Tab auctionsTab;
@@ -64,6 +65,7 @@ public class MainController implements Initializable {
     private CurrencyService currencyService;
     private CatalogService catalogService;
     private CategoryService categoryService;
+    private ConditionService conditionService;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -91,7 +93,7 @@ public class MainController implements Initializable {
     public void setServices(DatabaseManager databaseManager, I18nManager i18nManager, 
                            ConfigurationService configurationService, AuctionHouseService auctionHouseService,
                            CurrencyService currencyService, CatalogService catalogService,
-                           CategoryService categoryService) {
+                           CategoryService categoryService, ConditionService conditionService) {
         this.databaseManager = databaseManager;
         this.i18nManager = i18nManager;
         this.configurationService = configurationService;
@@ -99,6 +101,7 @@ public class MainController implements Initializable {
         this.currencyService = currencyService;
         this.catalogService = catalogService;
         this.categoryService = categoryService;
+        this.conditionService = conditionService;
         
         // Update UI with localized strings
         updateLocalizedStrings();
@@ -146,6 +149,10 @@ public class MainController implements Initializable {
 
         if (categoriesMenuItem != null) {
             categoriesMenuItem.setOnAction(e -> handleShowCategories());
+        }
+
+        if (conditionsMenuItem != null) {
+            conditionsMenuItem.setOnAction(e -> handleShowConditions());
         }
     }
 
@@ -254,6 +261,41 @@ public class MainController implements Initializable {
             alert.showAndWait();
         }
     }
+
+    /**
+     * Handles showing the Conditions view in a modal dialog.
+     */
+    private void handleShowConditions() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/ConditionView.fxml"));
+            loader.setResources(i18nManager.getResourceBundle());
+
+            Parent conditionView = loader.load();
+
+            ConditionController controller = loader.getController();
+            controller.setServices(conditionService, i18nManager);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(i18nManager.getString("conditions.title"));
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(rootPane.getScene().getWindow());
+
+            Scene scene = new Scene(conditionView);
+            dialogStage.setScene(scene);
+
+            dialogStage.showAndWait();
+            logger.info("Closed Conditions dialog.");
+
+        } catch (IOException e) {
+            logger.error("Failed to load ConditionView.fxml", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Could not open Conditions view");
+            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
+            alert.showAndWait();
+        }
+    }
     
     /**
      * Updates UI strings with localized versions.
@@ -275,6 +317,7 @@ public class MainController implements Initializable {
             if (auctionHousesMenuItem != null) auctionHousesMenuItem.setText(i18nManager.getString("menu.tools.auctionHouses"));
             if (catalogsMenuItem != null) catalogsMenuItem.setText(i18nManager.getString("menu.tools.catalogs"));
             if (categoriesMenuItem != null) categoriesMenuItem.setText(i18nManager.getString("menu.tools.categories"));
+            if (conditionsMenuItem != null) conditionsMenuItem.setText(i18nManager.getString("menu.tools.conditions"));
             
             // Update tab labels
             if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));
