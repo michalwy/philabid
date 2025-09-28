@@ -1,14 +1,8 @@
 package com.philabid;
 
-import com.philabid.database.AuctionHouseRepository;
-import com.philabid.database.CatalogRepository;
-import com.philabid.database.CurrencyRepository;
-import com.philabid.database.DatabaseManager;
+import com.philabid.database.*;
 import com.philabid.i18n.I18nManager;
-import com.philabid.service.AuctionHouseService;
-import com.philabid.service.CatalogService;
-import com.philabid.service.ConfigurationService;
-import com.philabid.service.CurrencyService;
+import com.philabid.service.*;
 import com.philabid.ui.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -36,6 +30,7 @@ public class PhilabidApplication extends Application {
     private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
     private CatalogService catalogService;
+    private CategoryService categoryService;
     
     @Override
     public void init() throws Exception {
@@ -50,12 +45,14 @@ public class PhilabidApplication extends Application {
         AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
         CurrencyRepository currencyRepository = new CurrencyRepository(databaseManager);
         CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
+        CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
         
         // Initialize services
         configurationService = new ConfigurationService();
         auctionHouseService = new AuctionHouseService(auctionHouseRepository);
         currencyService = new CurrencyService(currencyRepository);
         catalogService = new CatalogService(catalogRepository);
+        categoryService = new CategoryService(categoryRepository);
         
         // Initialize database
         databaseManager.initialize();
@@ -76,7 +73,7 @@ public class PhilabidApplication extends Application {
             getClass().getResource("/css/application.css")).toExternalForm());
         
         MainController controller = fxmlLoader.getController();
-        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService, catalogService);
+        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService, catalogService, categoryService);
         
         primaryStage.setTitle(i18nManager.getString("app.title"));
         primaryStage.setScene(scene);

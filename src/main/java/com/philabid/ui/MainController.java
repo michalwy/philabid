@@ -2,10 +2,7 @@ package com.philabid.ui;
 
 import com.philabid.database.DatabaseManager;
 import com.philabid.i18n.I18nManager;
-import com.philabid.service.AuctionHouseService;
-import com.philabid.service.CatalogService;
-import com.philabid.service.ConfigurationService;
-import com.philabid.service.CurrencyService;
+import com.philabid.service.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -49,6 +46,7 @@ public class MainController implements Initializable {
     @FXML private MenuItem aboutMenuItem;
     @FXML private MenuItem auctionHousesMenuItem;
     @FXML private MenuItem catalogsMenuItem;
+    @FXML private MenuItem categoriesMenuItem;
     @FXML private TabPane mainTabPane;
     @FXML private Tab dashboardTab;
     @FXML private Tab auctionsTab;
@@ -65,6 +63,7 @@ public class MainController implements Initializable {
     private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
     private CatalogService catalogService;
+    private CategoryService categoryService;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -91,13 +90,15 @@ public class MainController implements Initializable {
      */
     public void setServices(DatabaseManager databaseManager, I18nManager i18nManager, 
                            ConfigurationService configurationService, AuctionHouseService auctionHouseService,
-                           CurrencyService currencyService, CatalogService catalogService) {
+                           CurrencyService currencyService, CatalogService catalogService,
+                           CategoryService categoryService) {
         this.databaseManager = databaseManager;
         this.i18nManager = i18nManager;
         this.configurationService = configurationService;
         this.auctionHouseService = auctionHouseService;
         this.currencyService = currencyService;
         this.catalogService = catalogService;
+        this.categoryService = categoryService;
         
         // Update UI with localized strings
         updateLocalizedStrings();
@@ -141,6 +142,10 @@ public class MainController implements Initializable {
 
         if (catalogsMenuItem != null) {
             catalogsMenuItem.setOnAction(e -> handleShowCatalogs());
+        }
+
+        if (categoriesMenuItem != null) {
+            categoriesMenuItem.setOnAction(e -> handleShowCategories());
         }
     }
 
@@ -214,6 +219,41 @@ public class MainController implements Initializable {
             alert.showAndWait();
         }
     }
+
+    /**
+     * Handles showing the Categories view in a modal dialog.
+     */
+    private void handleShowCategories() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/CategoryView.fxml"));
+            loader.setResources(i18nManager.getResourceBundle());
+
+            Parent categoryView = loader.load();
+
+            CategoryController controller = loader.getController();
+            controller.setServices(categoryService, catalogService, i18nManager);
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(i18nManager.getString("categories.title"));
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(rootPane.getScene().getWindow());
+
+            Scene scene = new Scene(categoryView);
+            dialogStage.setScene(scene);
+
+            dialogStage.showAndWait();
+            logger.info("Closed Categories dialog.");
+
+        } catch (IOException e) {
+            logger.error("Failed to load CategoryView.fxml", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Could not open Categories view");
+            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
+            alert.showAndWait();
+        }
+    }
     
     /**
      * Updates UI strings with localized versions.
@@ -234,6 +274,7 @@ public class MainController implements Initializable {
             if (aboutMenuItem != null) aboutMenuItem.setText(i18nManager.getString("menu.help.about"));
             if (auctionHousesMenuItem != null) auctionHousesMenuItem.setText(i18nManager.getString("menu.tools.auctionHouses"));
             if (catalogsMenuItem != null) catalogsMenuItem.setText(i18nManager.getString("menu.tools.catalogs"));
+            if (categoriesMenuItem != null) categoriesMenuItem.setText(i18nManager.getString("menu.tools.categories"));
             
             // Update tab labels
             if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));

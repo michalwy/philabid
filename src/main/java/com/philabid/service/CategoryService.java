@@ -1,0 +1,57 @@
+package com.philabid.service;
+
+import com.philabid.database.CategoryRepository;
+import com.philabid.model.Category;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service layer for managing Categories.
+ */
+public class CategoryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
+    private final CategoryRepository categoryRepository;
+
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
+    public List<Category> getAllCategories() {
+        try {
+            return categoryRepository.findAll();
+        } catch (SQLException e) {
+            logger.error("Failed to retrieve all categories", e);
+            return Collections.emptyList();
+        }
+    }
+
+    public Optional<Category> saveCategory(Category category) {
+        if (category.getName() == null || category.getName().trim().isEmpty() ||
+            category.getCode() == null || category.getCode().trim().isEmpty()) {
+            logger.warn("Attempted to save a category with an empty name or code.");
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(categoryRepository.save(category));
+        } catch (SQLException e) {
+            logger.error("Failed to save category: {}", category.getName(), e);
+            return Optional.empty();
+        }
+    }
+
+    public boolean deleteCategory(long id) {
+        try {
+            return categoryRepository.deleteById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to delete category with ID: {}", id, e);
+            return false;
+        }
+    }
+}
