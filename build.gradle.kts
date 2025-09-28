@@ -13,8 +13,8 @@ repositories {
 
 dependencies {
     // JavaFX
-    implementation("org.openjfx:javafx-controls:21.0.1")
-    implementation("org.openjfx:javafx-fxml:21.0.1")
+    implementation("org.openjfx:javafx-controls:26-ea+7")
+    implementation("org.openjfx:javafx-fxml:26-ea+7")
 
     // ControlsFX for enhanced UI controls
     implementation("org.controlsfx:controlsfx:11.2.1")
