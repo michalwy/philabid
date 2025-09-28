@@ -1,7 +1,6 @@
 package com.philabid.ui;
 
 import com.philabid.i18n.I18nManager;
-import com.philabid.model.Catalog;
 import com.philabid.model.Category;
 import com.philabid.service.CatalogService;
 import com.philabid.service.CategoryService;
@@ -11,7 +10,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -20,10 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Controller for the Category management view (CategoryView.fxml).
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
 public class CategoryController {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
-
+    private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
     @FXML
     private TableView<Category> categoryTable;
     @FXML
@@ -40,12 +39,9 @@ public class CategoryController {
     private TableColumn<Category, String> codeColumn;
     @FXML
     private TableColumn<Category, String> catalogColumn;
-
     private CategoryService categoryService;
     private CatalogService catalogService;
     private I18nManager i18nManager;
-    private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
-    private Map<Long, Catalog> catalogCache;
 
     @FXML
     private void initialize() {
@@ -55,14 +51,8 @@ public class CategoryController {
         // Custom cell value factory to display formatted catalog name and year
         catalogColumn.setCellValueFactory(cellData -> {
             Category category = cellData.getValue();
-            Long catalogId = category.getCatalogId();
-            if (catalogId != null && catalogCache != null) {
-                Catalog catalog = catalogCache.get(catalogId);
-                if (catalog != null) {
-                    return new SimpleStringProperty(String.format("%s (%d)", catalog.getName(), catalog.getIssueYear()));
-                }
-            }
-            return new SimpleStringProperty("");
+            return new SimpleStringProperty(String.format("%s (%d)", category.getCatalogName(),
+                    category.getCatalogIssueYear()));
         });
 
         categoryTable.setItems(categoryList);
@@ -72,13 +62,6 @@ public class CategoryController {
         this.categoryService = categoryService;
         this.catalogService = catalogService;
         this.i18nManager = i18nManager;
-
-        // Populate the catalog cache for efficient lookup
-        if (this.catalogService != null) {
-            this.catalogCache = this.catalogService.getAllCatalogs().stream()
-                    .collect(Collectors.toMap(Catalog::getId, Function.identity()));
-            logger.debug("Catalog cache populated with {} items.", this.catalogCache.size());
-        }
 
         loadCategories();
     }

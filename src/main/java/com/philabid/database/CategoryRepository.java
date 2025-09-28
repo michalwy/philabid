@@ -31,7 +31,8 @@ public class CategoryRepository {
     }
 
     public Optional<Category> findById(long id) throws SQLException {
-        String sql = "SELECT * FROM categories WHERE id = ?";
+        String sql = "SELECT cat.*, c.name AS catalog_name, c.issue_year AS catalog_issue_year FROM categories cat " +
+                "LEFT JOIN catalogs c ON cat.catalog_id = c.id WHERE cat.id = ?";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, id);
@@ -48,7 +49,8 @@ public class CategoryRepository {
     }
 
     public List<Category> findAll() throws SQLException {
-        String sql = "SELECT * FROM categories ORDER BY name";
+        String sql = "SELECT cat.*, c.name AS catalog_name, c.issue_year AS catalog_issue_year FROM categories cat " +
+                "LEFT JOIN catalogs c ON cat.catalog_id = c.id ORDER BY name";
         List<Category> categories = new ArrayList<>();
         try (Connection conn = databaseManager.getConnection();
              Statement stmt = conn.createStatement();
@@ -136,6 +138,8 @@ public class CategoryRepository {
         category.setName(rs.getString("name"));
         category.setCode(rs.getString("code"));
         category.setCatalogId(rs.getObject("catalog_id", Long.class));
+        category.setCatalogName(rs.getString("catalog_name"));
+        category.setCatalogIssueYear(rs.getObject("catalog_issue_year", Integer.class));
         category.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         category.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         return category;
