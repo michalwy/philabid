@@ -1,0 +1,92 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    "group:allNonMajor",
+    "schedule:weekdays",
+    ":dependencyDashboard"
+  ],
+  "timezone": "UTC",
+  "schedule": [
+    "after 2am and before 4am on Monday and Thursday"
+  ],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5,
+  "automerge": false,
+  "platformAutomerge": false,
+  "rebaseWhen": "conflicted",
+  "labels": [
+    "dependencies"
+  ],
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "packageRules": [
+    {
+      "description": "Group security updates together",
+      "matchPackagePatterns": ["*"],
+      "vulnerabilityAlerts": true,
+      "labels": ["security"],
+      "groupName": "security updates",
+      "schedule": ["at any time"],
+      "prPriority": 10
+    },
+    {
+      "description": "Group all non-major updates together",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "all non-major dependencies",
+      "labels": ["dependencies", "non-major"]
+    },
+    {
+      "description": "Handle major updates separately with manual approval",
+      "matchUpdateTypes": ["major"],
+      "labels": ["dependencies", "major"],
+      "automerge": false,
+      "schedule": ["at any time"]
+    },
+    {
+      "description": "Java/Maven specific rules",
+      "matchManagers": ["maven"],
+      "labels": ["java", "maven"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Gradle specific rules",
+      "matchManagers": ["gradle", "gradle-wrapper"],
+      "labels": ["java", "gradle"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Docker image updates",
+      "matchManagers": ["docker-compose", "dockerfile"],
+      "labels": ["docker"],
+      "automerge": false
+    },
+    {
+      "description": "GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "labels": ["github-actions"],
+      "automerge": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["security", "vulnerability"],
+    "schedule": ["at any time"],
+    "prPriority": 20
+  },
+  "assignees": [],
+  "reviewers": [],
+  "separateMinorPatch": false,
+  "separateMajorMinor": true,
+  "separateMultipleMajor": true,
+  "ignoreUnstable": true,
+  "respectLatest": true,
+  "followTag": "latest",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on Monday"],
+    "commitMessageAction": "update",
+    "commitMessageTopic": "lock file maintenance"
+  }
+}
