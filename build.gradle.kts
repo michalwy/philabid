@@ -15,29 +15,29 @@ dependencies {
     // JavaFX
     implementation("org.openjfx:javafx-controls:21.0.1")
     implementation("org.openjfx:javafx-fxml:21.0.1")
-    
+
     // ControlsFX for enhanced UI controls
     implementation("org.controlsfx:controlsfx:11.2.1")
-    
+
     // ICU4J for internationalization
     implementation("com.ibm.icu:icu4j:73.2")
-    
+
     // Moneta for monetary handling
     implementation("org.javamoney:moneta:1.4.2")
-    
+
     // SQLite database
     implementation("org.xerial:sqlite-jdbc:3.43.2.2")
-    
+
     // Flyway for database migrations
     implementation("org.flywaydb:flyway-core:9.22.3")
-    
+
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("ch.qos.logback:logback-classic:1.4.11")
-    
+
     // JSON processing for configuration
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.3")
-    
+
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -80,4 +80,18 @@ tasks.javadoc {
 flyway {
     url = "jdbc:sqlite:philabid.db"
     locations = arrayOf("classpath:db/migration")
+}
+
+// Custom task to run with JavaFX modules
+tasks.register<JavaExec>("runApp") {
+    group = "application"
+    description = "Run the application with proper JavaFX module path"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "com.philabid.PhilabidApplication"
+    jvmArgs = listOf(
+        "--module-path", configurations.runtimeClasspath.get().asPath,
+        "--add-modules", "javafx.controls,javafx.fxml",
+        "--enable-native-access=org.xerial.sqlitejdbc",
+        "--enable-native-access=javafx.graphics"
+    )
 }
