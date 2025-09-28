@@ -1,0 +1,167 @@
+/* Philabid Application Styles */
+
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 12px;
+    -fx-background-color: #f4f4f4;
+}
+
+/* Menu Bar */
+.menu-bar {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #e0e0e0);
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.menu {
+    -fx-padding: 5 10 5 10;
+}
+
+.menu:hover {
+    -fx-background-color: #e8f4ff;
+}
+
+.menu-item {
+    -fx-padding: 5 20 5 20;
+}
+
+.menu-item:hover {
+    -fx-background-color: #e8f4ff;
+}
+
+/* Tab Pane */
+.tab-pane {
+    -fx-background-color: #ffffff;
+}
+
+.tab {
+    -fx-background-color: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1 1 0 1;
+    -fx-padding: 5 15 5 15;
+}
+
+.tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1 1 0 1;
+}
+
+.tab .tab-label {
+    -fx-font-weight: normal;
+}
+
+.tab:selected .tab-label {
+    -fx-font-weight: bold;
+}
+
+/* Tables */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1;
+}
+
+.table-view .column-header {
+    -fx-background-color: linear-gradient(to bottom, #f8f8f8, #e8e8e8);
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 0 1 1 0;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: transparent;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8f8ff;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #0078d4;
+    -fx-text-fill: white;
+}
+
+/* Text Areas */
+.text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1;
+    -fx-font-family: "Consolas", "Monaco", monospace;
+    -fx-font-size: 11px;
+}
+
+.text-area .content {
+    -fx-background-color: #ffffff;
+}
+
+/* Text Fields */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+}
+
+.text-field:focused {
+    -fx-border-color: #0078d4;
+    -fx-border-width: 2;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #e0e0e0);
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 5 15 5 15;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #e8f4ff, #c8e8ff);
+    -fx-border-color: #0078d4;
+}
+
+.button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #c8e8ff, #a8d8ff);
+}
+
+/* Status Bar */
+.status-bar {
+    -fx-background-color: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+    -fx-border-color: #c0c0c0;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 5 10 5 10;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #333333;
+}
+
+/* Separators */
+.separator {
+    -fx-background-color: #c0c0c0;
+}
+
+/* Welcome message styling */
+.welcome-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c5282;
+}
+
+/* Dashboard statistics */
+.stat-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2d3748;
+}
+
+.stat-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0078d4;
+}
