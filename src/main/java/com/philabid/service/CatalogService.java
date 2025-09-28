@@ -1,0 +1,56 @@
+package com.philabid.service;
+
+import com.philabid.database.CatalogRepository;
+import com.philabid.model.Catalog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service layer for managing catalogs.
+ */
+public class CatalogService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CatalogService.class);
+    private final CatalogRepository catalogRepository;
+
+    public CatalogService(CatalogRepository catalogRepository) {
+        this.catalogRepository = catalogRepository;
+    }
+
+    public List<Catalog> getAllCatalogs() {
+        try {
+            return catalogRepository.findAll();
+        } catch (SQLException e) {
+            logger.error("Failed to retrieve all catalogs", e);
+            return Collections.emptyList();
+        }
+    }
+
+    public Optional<Catalog> saveCatalog(Catalog catalog) {
+        if (catalog.getName() == null || catalog.getName().trim().isEmpty()) {
+            logger.warn("Attempted to save a catalog with an empty name.");
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(catalogRepository.save(catalog));
+        } catch (SQLException e) {
+            logger.error("Failed to save catalog: {}", catalog.getName(), e);
+            return Optional.empty();
+        }
+    }
+
+    public boolean deleteCatalog(long id) {
+        try {
+            return catalogRepository.deleteById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to delete catalog with ID: {}", id, e);
+            return false;
+        }
+    }
+}
