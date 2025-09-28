@@ -188,8 +188,10 @@ public class AuctionHouseRepository {
         ah.setAddress(rs.getString("address"));
         ah.setCountry(rs.getString("country"));
         ah.setCurrency(rs.getString("currency"));
-        ah.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        ah.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+        Timestamp createdAtTs = rs.getTimestamp("created_at");
+        ah.setCreatedAt(createdAtTs != null ? createdAtTs.toLocalDateTime() : null);
+        Timestamp updatedAtTs = rs.getTimestamp("updated_at");
+        ah.setUpdatedAt(updatedAtTs != null ? updatedAtTs.toLocalDateTime() : null);
         return ah;
     }
 }
