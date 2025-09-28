@@ -31,6 +31,7 @@
              <Menu fx:id="toolsMenu" mnemonicParsing="false" text="%menu.tools">
                <items>
                  <MenuItem mnemonicParsing="false" text="%menu.tools.database" />
+                 <MenuItem fx:id="auctionHousesMenuItem" mnemonicParsing="false" text="%menu.tools.auctionHouses" />
                </items>
              </Menu>
              <Menu fx:id="helpMenu" mnemonicParsing="false" text="%menu.help">
