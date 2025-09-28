@@ -1,7 +1,7 @@
 plugins {
     application
     id("org.openjfx.javafxplugin") version "0.1.0"
-    id("org.flywaydb.flyway") version "9.22.3"
+    id("org.flywaydb.flyway") version "11.13.2"
 }
 
 group = "com.philabid"
@@ -29,7 +29,7 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.50.3.0")
 
     // Flyway for database migrations
-    implementation("org.flywaydb:flyway-core:9.22.3")
+    implementation("org.flywaydb:flyway-core:11.13.2")
 
     // Logging
     implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
@@ -66,6 +66,11 @@ tasks.test {
 
 tasks.compileJava {
     options.encoding = "UTF-8"
+    options.compilerArgs.addAll(
+        listOf(
+            "--add-reads", "philabid=ALL-UNNAMED"
+        )
+    )
 }
 
 tasks.compileTestJava {
