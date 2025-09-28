@@ -9,7 +9,8 @@ public class Currency {
     private String symbol;
 
     // Constructors
-    public Currency() {}
+    public Currency() {
+    }
 
     public Currency(String code, String name, String symbol) {
         this.code = code;
@@ -47,6 +48,8 @@ public class Currency {
      */
     @Override
     public String toString() {
-        return name + " (" + code + ")";
+        String displayCode = (code != null) ? code : "N/A";
+        String displayName = (name != null) ? name : "Unknown Currency";
+        return displayName + " (" + displayCode + ")";
     }
 }
