@@ -1,6 +1,5 @@
 package com.philabid.ui;
 
-import com.philabid.database.DatabaseManager;
 import com.philabid.i18n.I18nManager;
 import com.philabid.service.*;
 import javafx.animation.KeyFrame;
@@ -31,91 +30,123 @@ import java.util.ResourceBundle;
  * Handles the primary UI interactions and coordinates between different services.
  */
 public class MainController implements Initializable {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-    
+
     // FXML Injected Fields from main.fxml
-    @FXML private BorderPane rootPane;
-    @FXML private MenuBar menuBar;
-    @FXML private Menu fileMenu;
-    @FXML private Menu editMenu;
-    @FXML private Menu viewMenu;
-    @FXML private Menu toolsMenu;
-    @FXML private Menu helpMenu;
-    @FXML private MenuItem exitMenuItem;
-    @FXML private MenuItem aboutMenuItem;
-    @FXML private MenuItem auctionHousesMenuItem;
-    @FXML private MenuItem catalogsMenuItem;
-    @FXML private MenuItem categoriesMenuItem;
-    @FXML private MenuItem conditionsMenuItem;
-    @FXML private TabPane mainTabPane;
-    @FXML private Tab dashboardTab;
-    @FXML private Tab auctionsTab;
-    @FXML private Tab catalogTab;
-    @FXML private Tab bidsTab;
-    @FXML private StatusBar statusBar;
-    @FXML private Label welcomeLabel;
-    @FXML private TextArea logTextArea;
+    @FXML
+    private BorderPane rootPane;
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private Menu fileMenu;
+    @FXML
+    private Menu editMenu;
+    @FXML
+    private Menu viewMenu;
+    @FXML
+    private Menu toolsMenu;
+    @FXML
+    private Menu helpMenu;
+    @FXML
+    private MenuItem exitMenuItem;
+    @FXML
+    private MenuItem aboutMenuItem;
+    @FXML
+    private MenuItem auctionHousesMenuItem;
+    @FXML
+    private MenuItem catalogsMenuItem;
+    @FXML
+    private MenuItem categoriesMenuItem;
+    @FXML
+    private MenuItem conditionsMenuItem;
+    @FXML
+    private TabPane mainTabPane;
+    @FXML
+    private Tab dashboardTab;
+    @FXML
+    private Tab auctionsTab;
+    @FXML
+    private Tab catalogTab;
+    @FXML
+    private Tab bidsTab;
+    @FXML
+    private Tab auctionItemsTab; // New tab for Auction Items
+    @FXML
+    private StatusBar statusBar;
+    @FXML
+    private Label welcomeLabel;
+    @FXML
+    private TextArea logTextArea;
+
+    // Injected controller from the included FXML (fx:id="auctionItemView")
+    @FXML
+    private AuctionItemController auctionItemViewController;
 
     // Services
-    private DatabaseManager databaseManager;
     private I18nManager i18nManager;
-    private ConfigurationService configurationService;
     private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
     private CatalogService catalogService;
     private CategoryService categoryService;
     private ConditionService conditionService;
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.info("Initializing MainController");
-        
+
         // Initialize UI components
         setupStatusBar();
         setupMenuActions();
-        
+
         // Add welcome message
         if (welcomeLabel != null) {
             welcomeLabel.setText("Welcome to Philabid - Stamp Auction Bidding Assistant");
         }
-        
+
         // Setup log area
         if (logTextArea != null) {
             logTextArea.setEditable(false);
             addLogMessage("Application started successfully");
         }
     }
-    
+
     /**
      * Sets the application services. Called after FXML loading.
      */
-    public void setServices(DatabaseManager databaseManager, I18nManager i18nManager, 
-                           ConfigurationService configurationService, AuctionHouseService auctionHouseService,
-                           CurrencyService currencyService, CatalogService catalogService,
-                           CategoryService categoryService, ConditionService conditionService) {
-        this.databaseManager = databaseManager;
+    public void setServices(I18nManager i18nManager, AuctionHouseService auctionHouseService,
+                            CurrencyService currencyService, CatalogService catalogService,
+                            CategoryService categoryService, ConditionService conditionService,
+                            AuctionItemService auctionItemService) {
         this.i18nManager = i18nManager;
-        this.configurationService = configurationService;
         this.auctionHouseService = auctionHouseService;
         this.currencyService = currencyService;
         this.catalogService = catalogService;
         this.categoryService = categoryService;
         this.conditionService = conditionService;
-        
+
+        // Inject services into AuctionItemController
+        if (auctionItemViewController != null) {
+            auctionItemViewController.setServices(auctionItemService, this.categoryService, this.catalogService,
+                    this.i18nManager);
+            logger.info("Services injected into AuctionItemController.");
+        } else {
+            logger.error("AuctionItemViewController is null. Cannot inject services.");
+        }
+
         // Update UI with localized strings
         updateLocalizedStrings();
-        
+
         logger.info("Services set for MainController");
     }
-    
+
     /**
      * Sets up the status bar with initial information.
      */
     private void setupStatusBar() {
         if (statusBar != null) {
             statusBar.setText("Ready");
-            
+
             // Add current time to status bar
             Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
                 String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
@@ -126,7 +157,7 @@ public class MainController implements Initializable {
             timeline.play();
         }
     }
-    
+
     /**
      * Sets up menu item actions.
      */
@@ -134,7 +165,7 @@ public class MainController implements Initializable {
         if (exitMenuItem != null) {
             exitMenuItem.setOnAction(e -> handleExit());
         }
-        
+
         if (aboutMenuItem != null) {
             aboutMenuItem.setOnAction(e -> handleAbout());
         }
@@ -174,13 +205,12 @@ public class MainController implements Initializable {
             dialogStage.setTitle(i18nManager.getString("auctionHouses.title"));
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(rootPane.getScene().getWindow());
-            
+
             Scene scene = new Scene(auctionHouseView);
             dialogStage.setScene(scene);
-            
+
             dialogStage.showAndWait();
             logger.info("Closed Auction Houses dialog.");
-
         } catch (IOException e) {
             logger.error("Failed to load AuctionHouseView.fxml", e);
             // Show an error alert to the user
@@ -216,7 +246,6 @@ public class MainController implements Initializable {
 
             dialogStage.showAndWait();
             logger.info("Closed Catalogs dialog.");
-
         } catch (IOException e) {
             logger.error("Failed to load CatalogView.fxml", e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -251,7 +280,6 @@ public class MainController implements Initializable {
 
             dialogStage.showAndWait();
             logger.info("Closed Categories dialog.");
-
         } catch (IOException e) {
             logger.error("Failed to load CategoryView.fxml", e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -286,7 +314,6 @@ public class MainController implements Initializable {
 
             dialogStage.showAndWait();
             logger.info("Closed Conditions dialog.");
-
         } catch (IOException e) {
             logger.error("Failed to load ConditionView.fxml", e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -296,13 +323,13 @@ public class MainController implements Initializable {
             alert.showAndWait();
         }
     }
-    
+
     /**
      * Updates UI strings with localized versions.
      */
     private void updateLocalizedStrings() {
         if (i18nManager == null) return;
-        
+
         try {
             // Update menu labels
             if (fileMenu != null) fileMenu.setText(i18nManager.getString("menu.file"));
@@ -310,31 +337,33 @@ public class MainController implements Initializable {
             if (viewMenu != null) viewMenu.setText(i18nManager.getString("menu.view"));
             if (toolsMenu != null) toolsMenu.setText(i18nManager.getString("menu.tools"));
             if (helpMenu != null) helpMenu.setText(i18nManager.getString("menu.help"));
-            
+
             // Update menu items
             if (exitMenuItem != null) exitMenuItem.setText(i18nManager.getString("menu.file.exit"));
             if (aboutMenuItem != null) aboutMenuItem.setText(i18nManager.getString("menu.help.about"));
-            if (auctionHousesMenuItem != null) auctionHousesMenuItem.setText(i18nManager.getString("menu.tools.auctionHouses"));
+            if (auctionHousesMenuItem != null)
+                auctionHousesMenuItem.setText(i18nManager.getString("menu.tools.auctionHouses"));
             if (catalogsMenuItem != null) catalogsMenuItem.setText(i18nManager.getString("menu.tools.catalogs"));
             if (categoriesMenuItem != null) categoriesMenuItem.setText(i18nManager.getString("menu.tools.categories"));
             if (conditionsMenuItem != null) conditionsMenuItem.setText(i18nManager.getString("menu.tools.conditions"));
-            
+
             // Update tab labels
             if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));
             if (auctionsTab != null) auctionsTab.setText(i18nManager.getString("tab.auctions"));
             if (catalogTab != null) catalogTab.setText(i18nManager.getString("tab.catalog"));
             if (bidsTab != null) bidsTab.setText(i18nManager.getString("tab.bids"));
-            
+            if (auctionItemsTab != null)
+                auctionItemsTab.setText(i18nManager.getString("tab.auctionItems")); // New tab title
+
             // Update welcome message
             if (welcomeLabel != null) {
                 welcomeLabel.setText(i18nManager.getString("welcome.message"));
             }
-            
         } catch (Exception e) {
             logger.warn("Error updating localized strings", e);
         }
     }
-    
+
     /**
      * Handles application exit.
      */
@@ -343,7 +372,7 @@ public class MainController implements Initializable {
         logger.info("Exit requested by user");
         Platform.exit();
     }
-    
+
     /**
      * Handles about dialog.
      */
@@ -353,15 +382,15 @@ public class MainController implements Initializable {
         alert.setTitle(i18nManager != null ? i18nManager.getString("about.title") : "About");
         alert.setHeaderText("Philabid");
         alert.setContentText(
-            "Philabid - Stamp Auction Bidding Assistant\n" +
-            "Version: 1.0-SNAPSHOT\n" +
-            "License: Apache 2.0\n\n" +
-            "An open-source, multilingual JavaFX desktop application\n" +
-            "for stamp auction bidding assistance."
+                "Philabid - Stamp Auction Bidding Assistant\n" +
+                        "Version: 1.0-SNAPSHOT\n" +
+                        "License: Apache 2.0\n\n" +
+                        "An open-source, multilingual JavaFX desktop application\n" +
+                        "for stamp auction bidding assistance."
         );
         alert.showAndWait();
     }
-    
+
     /**
      * Adds a message to the log area.
      */

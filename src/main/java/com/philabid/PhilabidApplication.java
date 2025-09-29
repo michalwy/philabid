@@ -21,95 +21,97 @@ import java.util.Objects;
  * without requiring external services.
  */
 public class PhilabidApplication extends Application {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(PhilabidApplication.class);
-    
+
     private DatabaseManager databaseManager;
     private I18nManager i18nManager;
-    private ConfigurationService configurationService;
     private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
     private CatalogService catalogService;
     private CategoryService categoryService;
     private ConditionService conditionService;
-    
+    private AuctionItemService auctionItemService;
+
+    public static void main(String[] args) {
+        logger.info("Launching Philabid application with args: {}", java.util.Arrays.toString(args));
+        launch(args);
+    }
+
     @Override
     public void init() throws Exception {
         super.init();
         logger.info("Initializing Philabid application...");
-        
+
         // Initialize core managers and services
         i18nManager = new I18nManager();
         databaseManager = new DatabaseManager();
-        
+
         // Initialize repositories
         AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
         CurrencyRepository currencyRepository = new CurrencyRepository(databaseManager);
         CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
         CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
         ConditionRepository conditionRepository = new ConditionRepository(databaseManager);
-        
+        AuctionItemRepository auctionItemRepository = new AuctionItemRepository(databaseManager);
+
         // Initialize services
-        configurationService = new ConfigurationService();
         auctionHouseService = new AuctionHouseService(auctionHouseRepository);
         currencyService = new CurrencyService(currencyRepository);
         catalogService = new CatalogService(catalogRepository);
         categoryService = new CategoryService(categoryRepository);
         conditionService = new ConditionService(conditionRepository);
-        
+        auctionItemService = new AuctionItemService(auctionItemRepository);
+
         // Initialize database
         databaseManager.initialize();
-        
+
         logger.info("Application initialization completed successfully");
     }
-    
+
     @Override
     public void start(Stage primaryStage) throws IOException {
         logger.info("Starting Philabid application UI...");
-        
+
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
         fxmlLoader.setResources(i18nManager.getResourceBundle());
-        
+
         Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         scene.getStylesheets().add(Objects.requireNonNull(
-            getClass().getResource("/css/application.css")).toExternalForm());
-        
+                getClass().getResource("/css/application.css")).toExternalForm());
+
         MainController controller = fxmlLoader.getController();
-        controller.setServices(databaseManager, i18nManager, configurationService, auctionHouseService, currencyService, catalogService, categoryService, conditionService);
-        
+        controller.setServices(i18nManager, auctionHouseService, currencyService, catalogService, categoryService,
+                conditionService, auctionItemService);
+
         primaryStage.setTitle(i18nManager.getString("app.title"));
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
-        
+
         // Set application icon
         try {
             Image icon = new Image(Objects.requireNonNull(
-                getClass().getResourceAsStream("/images/philabid-icon.png")));
+                    getClass().getResourceAsStream("/images/philabid-icon.png")));
             primaryStage.getIcons().add(icon);
         } catch (Exception e) {
             logger.warn("Could not load application icon: {}", e.getMessage());
         }
-        
+
         primaryStage.show();
         logger.info("Application UI started successfully");
     }
-    
+
     @Override
     public void stop() throws Exception {
         logger.info("Shutting down Philabid application...");
-        
+
         if (databaseManager != null) {
             databaseManager.shutdown();
         }
-        
+
         super.stop();
         logger.info("Application shutdown completed");
-    }
-    
-    public static void main(String[] args) {
-        logger.info("Launching Philabid application with args: {}", java.util.Arrays.toString(args));
-        launch(args);
     }
 }

@@ -53,4 +53,13 @@ public class CatalogService {
             return false;
         }
     }
+
+    public Optional<Catalog> getCatalogById(long id) {
+        try {
+            return catalogRepository.findById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to find catalog with ID: {}", id, e);
+            return Optional.empty();
+        }
+    }
 }

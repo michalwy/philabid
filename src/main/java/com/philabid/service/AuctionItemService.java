@@ -1,0 +1,56 @@
+package com.philabid.service;
+
+import com.philabid.database.AuctionItemRepository;
+import com.philabid.model.AuctionItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service layer for managing Auction Items.
+ */
+public class AuctionItemService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuctionItemService.class);
+    private final AuctionItemRepository auctionItemRepository;
+
+    public AuctionItemService(AuctionItemRepository auctionItemRepository) {
+        this.auctionItemRepository = auctionItemRepository;
+    }
+
+    public List<AuctionItem> getAllAuctionItems() {
+        try {
+            return auctionItemRepository.findAll();
+        } catch (SQLException e) {
+            logger.error("Failed to retrieve all auction items", e);
+            return Collections.emptyList();
+        }
+    }
+
+    public Optional<AuctionItem> saveAuctionItem(AuctionItem auctionItem) {
+        if (auctionItem.getCatalogNumber() == null || auctionItem.getCatalogNumber().trim().isEmpty()) {
+            logger.warn("Attempted to save an auction item with an empty catalog number.");
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(auctionItemRepository.save(auctionItem));
+        } catch (SQLException e) {
+            logger.error("Failed to save auction item: {}", auctionItem.getCatalogNumber(), e);
+            return Optional.empty();
+        }
+    }
+
+    public boolean deleteAuctionItem(long id) {
+        try {
+            return auctionItemRepository.deleteById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to delete auction item with ID: {}", id, e);
+            return false;
+        }
+    }
+}
