@@ -3,6 +3,7 @@ package com.philabid.ui;
 import com.philabid.model.AuctionHouse;
 import com.philabid.model.Currency;
 import com.philabid.service.CurrencyService;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -49,6 +50,7 @@ public class AuctionHouseEditDialogController {
 
     @FXML
     private void initialize() {
+        Platform.runLater(() -> nameField.requestFocus());
         logger.debug("AuctionHouseEditDialogController initialized.");
     }
 
@@ -103,7 +105,7 @@ public class AuctionHouseEditDialogController {
             auctionHouse.setContactPhone(phoneField.getText());
             auctionHouse.setAddress(addressField.getText());
             auctionHouse.setCountry(countryField.getText());
-            
+
             Currency selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
             if (selectedCurrency != null) {
                 auctionHouse.setCurrency(selectedCurrency.getCode());
