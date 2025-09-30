@@ -4,6 +4,7 @@ import com.philabid.model.Catalog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.money.Monetary;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -77,7 +78,8 @@ public class CatalogRepository {
     }
 
     private Catalog insert(Catalog catalog) throws SQLException {
-        String sql = "INSERT INTO catalogs(name, issue_year, currency_code, is_active, created_at, updated_at) VALUES(?,?,?,?,?,?)";
+        String sql = "INSERT INTO catalogs(name, issue_year, currency_code, is_active, created_at, updated_at) VALUES" +
+                "(?,?,?,?,?,?)";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -86,7 +88,7 @@ public class CatalogRepository {
 
             pstmt.setString(1, catalog.getName());
             pstmt.setObject(2, catalog.getIssueYear());
-            pstmt.setString(3, catalog.getCurrencyCode());
+            pstmt.setString(3, catalog.getCurrency().getCurrencyCode());
             pstmt.setInt(4, catalog.isActive() ? 1 : 0);
             pstmt.setTimestamp(5, Timestamp.valueOf(catalog.getCreatedAt()));
             pstmt.setTimestamp(6, Timestamp.valueOf(catalog.getUpdatedAt()));
@@ -111,7 +113,8 @@ public class CatalogRepository {
     }
 
     private Catalog update(Catalog catalog) throws SQLException {
-        String sql = "UPDATE catalogs SET name = ?, issue_year = ?, currency_code = ?, is_active = ?, updated_at = ? WHERE id = ?";
+        String sql = "UPDATE catalogs SET name = ?, issue_year = ?, currency_code = ?, is_active = ?, updated_at = ? " +
+                "WHERE id = ?";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -119,7 +122,7 @@ public class CatalogRepository {
 
             pstmt.setString(1, catalog.getName());
             pstmt.setObject(2, catalog.getIssueYear());
-            pstmt.setString(3, catalog.getCurrencyCode());
+            pstmt.setString(3, catalog.getCurrency().getCurrencyCode());
             pstmt.setInt(4, catalog.isActive() ? 1 : 0);
             pstmt.setTimestamp(5, Timestamp.valueOf(catalog.getUpdatedAt()));
             pstmt.setLong(6, catalog.getId());
@@ -137,7 +140,7 @@ public class CatalogRepository {
         catalog.setId(rs.getLong("id"));
         catalog.setName(rs.getString("name"));
         catalog.setIssueYear(rs.getObject("issue_year", Integer.class));
-        catalog.setCurrencyCode(rs.getString("currency_code"));
+        catalog.setCurrency(Monetary.getCurrency(rs.getString("currency_code")));
         catalog.setActive(rs.getInt("is_active") == 1);
         catalog.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         catalog.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());

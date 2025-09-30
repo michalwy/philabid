@@ -97,6 +97,11 @@
                         <fx:include fx:id="auctionItemView" source="AuctionItemView.fxml"/>
                     </content>
                 </Tab>
+                <Tab fx:id="catalogValuesTab" text="%tab.catalogValues">
+                    <content>
+                        <fx:include fx:id="catalogValueView" source="CatalogValueView.fxml"/>
+                    </content>
+                </Tab>
             </tabs>
         </TabPane>
     </center>

@@ -1,12 +1,15 @@
 package com.philabid.model;
 
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents an item that can be put up for auction.
  */
 public class AuctionItem {
 
+    private final static Pattern ORDER_NUMBER_PATTERN = Pattern.compile("\\d+");
     private Long id;
     private Long categoryId;
     private String catalogNumber;
@@ -14,7 +17,6 @@ public class AuctionItem {
     private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
     // Fields for joined data from Category and Catalog
     private String categoryName;
     private String categoryCode;
@@ -23,6 +25,21 @@ public class AuctionItem {
 
     // Constructors
     public AuctionItem() {
+    }
+
+    public static Long calculateOrderNumber(String catalogNumber) {
+        if (catalogNumber == null || catalogNumber.isBlank()) {
+            return 0L;
+        }
+
+        // This regex finds the first sequence of one or more digits.
+        Matcher matcher = ORDER_NUMBER_PATTERN.matcher(catalogNumber);
+
+        if (matcher.find()) {
+            return Long.parseLong(matcher.group(0));
+        }
+
+        return 0L;
     }
 
     // Getters and Setters

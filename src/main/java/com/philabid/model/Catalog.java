@@ -1,5 +1,7 @@
 package com.philabid.model;
 
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +12,7 @@ public class Catalog {
     private Long id;
     private String name;
     private Integer issueYear;
-    private String currencyCode;
+    private CurrencyUnit currency;
     private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -45,12 +47,16 @@ public class Catalog {
         this.issueYear = issueYear;
     }
 
-    public String getCurrencyCode() {
-        return currencyCode;
+    public CurrencyUnit getCurrency() {
+        return currency;
     }
 
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
+    public void setCurrency(CurrencyUnit currency) {
+        this.currency = currency;
+    }
+
+    public void setCurrency(String currencyCode) {
+        this.currency = Monetary.getCurrency(currencyCode);
     }
 
     public boolean isActive() {

@@ -5,9 +5,9 @@ import com.philabid.model.AuctionItem;
 import com.philabid.service.AuctionItemService;
 import com.philabid.service.CatalogService;
 import com.philabid.service.CategoryService;
+import com.philabid.ui.util.CatalogNumberColumnValue;
+import com.philabid.ui.util.CellValueFactoryProvider;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -54,26 +54,17 @@ public class AuctionItemController {
 
     @FXML
     private void initialize() {
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("categoryCode"));
+        categoryColumn.setCellValueFactory(CellValueFactoryProvider.forCategoryInfo(
+                AuctionItem::getCategoryCode, AuctionItem::getCategoryName));
         notesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
 
-        catalogNumberColumn.setCellValueFactory(cellData -> {
-            AuctionItem item = cellData.getValue();
-            return new SimpleObjectProperty<>(new CatalogNumberColumnValue(item.getCatalogNumber(),
-                    item.getOrderNumber()));
-        });
+        // Use the provider for the complex catalog number column
+        catalogNumberColumn.setCellValueFactory(CellValueFactoryProvider.forCatalogNumber(
+                AuctionItem::getCatalogNumber, AuctionItem::getOrderNumber));
         catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
 
-        catalogInfoColumn.setCellValueFactory(cellData -> {
-            AuctionItem item = cellData.getValue();
-            if (item.getCatalogName() != null && item.getCatalogIssueYear() != null) {
-                return new SimpleStringProperty(String.format("%s (%d)", item.getCatalogName(),
-                        item.getCatalogIssueYear()));
-            } else if (item.getCatalogName() != null) {
-                return new SimpleStringProperty(item.getCatalogName());
-            }
-            return new SimpleStringProperty("");
-        });
+        catalogInfoColumn.setCellValueFactory(CellValueFactoryProvider.forCatalogInfo(
+                AuctionItem::getCatalogName, AuctionItem::getCatalogIssueYear));
 
         auctionItemTable.setItems(auctionItemList);
 
@@ -193,8 +184,5 @@ public class AuctionItemController {
             logger.error("Failed to load the auction item edit dialog.", e);
             return new EditDialogResult(false, false);
         }
-    }
-
-    private record EditDialogResult(boolean saveClicked, boolean addAnother) {
     }
 }

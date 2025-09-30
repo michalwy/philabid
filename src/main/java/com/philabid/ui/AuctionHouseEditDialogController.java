@@ -1,7 +1,6 @@
 package com.philabid.ui;
 
 import com.philabid.model.AuctionHouse;
-import com.philabid.model.Currency;
 import com.philabid.service.CurrencyService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -14,7 +13,7 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import javax.money.CurrencyUnit;
 
 /**
  * Controller for the auction house edit dialog.
@@ -37,7 +36,7 @@ public class AuctionHouseEditDialogController {
     @FXML
     private TextField countryField;
     @FXML
-    private ComboBox<Currency> currencyComboBox;
+    private ComboBox<CurrencyUnit> currencyComboBox;
     @FXML
     private Button saveButton;
     @FXML
@@ -45,13 +44,19 @@ public class AuctionHouseEditDialogController {
 
     private Stage dialogStage;
     private AuctionHouse auctionHouse;
-    private CurrencyService currencyService;
     private boolean saveClicked = false;
+
+    private CurrencyService currencyService;
 
     @FXML
     private void initialize() {
         Platform.runLater(() -> nameField.requestFocus());
         logger.debug("AuctionHouseEditDialogController initialized.");
+    }
+
+    public void setServices(CurrencyService currencyService) {
+        this.currencyService = currencyService;
+        populateCurrencyComboBox();
     }
 
     public void setDialogStage(Stage dialogStage) {
@@ -70,26 +75,13 @@ public class AuctionHouseEditDialogController {
 
         // Select the current currency in the ComboBox
         if (auctionHouse.getCurrency() != null && currencyComboBox.getItems() != null) {
-            currencyComboBox.getItems().stream()
-                    .filter(c -> c.getCode().equals(auctionHouse.getCurrency()))
-                    .findFirst()
-                    .ifPresent(currencyComboBox.getSelectionModel()::select);
+            currencyComboBox.getSelectionModel().select(auctionHouse.getCurrency());
         }
-    }
-
-    public void setServices(CurrencyService currencyService) {
-        this.currencyService = currencyService;
-        populateCurrencyComboBox();
     }
 
     private void populateCurrencyComboBox() {
-        if (currencyService != null) {
-            List<Currency> currencies = currencyService.getAllCurrencies();
-            currencyComboBox.setItems(FXCollections.observableArrayList(currencies));
-            logger.debug("Populated currency ComboBox with {} items.", currencies.size());
-        } else {
-            logger.warn("CurrencyService is not available. Cannot populate currency ComboBox.");
-        }
+        currencyComboBox.setItems(FXCollections.observableArrayList(currencyService.getCurrencies()));
+        logger.debug("Populated currency ComboBox with {} items.", currencyComboBox.getItems().size());
     }
 
     public boolean isSaveClicked() {
@@ -106,10 +98,8 @@ public class AuctionHouseEditDialogController {
             auctionHouse.setAddress(addressField.getText());
             auctionHouse.setCountry(countryField.getText());
 
-            Currency selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
-            if (selectedCurrency != null) {
-                auctionHouse.setCurrency(selectedCurrency.getCode());
-            }
+            CurrencyUnit selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
+            auctionHouse.setCurrency(selectedCurrency);
 
             saveClicked = true;
             dialogStage.close();

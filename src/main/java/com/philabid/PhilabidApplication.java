@@ -26,12 +26,13 @@ public class PhilabidApplication extends Application {
 
     private DatabaseManager databaseManager;
     private I18nManager i18nManager;
-    private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
+    private AuctionHouseService auctionHouseService;
     private CatalogService catalogService;
     private CategoryService categoryService;
     private ConditionService conditionService;
     private AuctionItemService auctionItemService;
+    private CatalogValueService catalogValueService;
 
     public static void main(String[] args) {
         logger.info("Launching Philabid application with args: {}", java.util.Arrays.toString(args));
@@ -49,19 +50,20 @@ public class PhilabidApplication extends Application {
 
         // Initialize repositories
         AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
-        CurrencyRepository currencyRepository = new CurrencyRepository(databaseManager);
         CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
         CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
         ConditionRepository conditionRepository = new ConditionRepository(databaseManager);
         AuctionItemRepository auctionItemRepository = new AuctionItemRepository(databaseManager);
+        CatalogValueRepository catalogValueRepository = new CatalogValueRepository(databaseManager);
 
         // Initialize services
+        currencyService = new CurrencyService();
         auctionHouseService = new AuctionHouseService(auctionHouseRepository);
-        currencyService = new CurrencyService(currencyRepository);
         catalogService = new CatalogService(catalogRepository);
         categoryService = new CategoryService(categoryRepository);
         conditionService = new ConditionService(conditionRepository);
         auctionItemService = new AuctionItemService(auctionItemRepository);
+        catalogValueService = new CatalogValueService(catalogValueRepository);
 
         // Initialize database
         databaseManager.initialize();
@@ -82,8 +84,8 @@ public class PhilabidApplication extends Application {
                 getClass().getResource("/css/application.css")).toExternalForm());
 
         MainController controller = fxmlLoader.getController();
-        controller.setServices(i18nManager, auctionHouseService, currencyService, catalogService, categoryService,
-                conditionService, auctionItemService);
+        controller.setServices(i18nManager, currencyService, auctionHouseService, catalogService, categoryService,
+                conditionService, auctionItemService, catalogValueService);
 
         primaryStage.setTitle(i18nManager.getString("app.title"));
         primaryStage.setScene(scene);

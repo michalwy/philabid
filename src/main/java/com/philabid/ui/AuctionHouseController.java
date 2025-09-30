@@ -27,7 +27,7 @@ import java.util.Optional;
 public class AuctionHouseController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionHouseController.class);
-
+    private final ObservableList<AuctionHouse> auctionHouseList = FXCollections.observableArrayList();
     @FXML
     private TableView<AuctionHouse> auctionHouseTable;
     @FXML
@@ -44,11 +44,9 @@ public class AuctionHouseController {
     private Button editButton;
     @FXML
     private Button deleteButton;
-
     private AuctionHouseService auctionHouseService;
     private CurrencyService currencyService;
     private I18nManager i18nManager;
-    private final ObservableList<AuctionHouse> auctionHouseList = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
@@ -61,13 +59,14 @@ public class AuctionHouseController {
 
         editButton.disableProperty().bind(auctionHouseTable.getSelectionModel().selectedItemProperty().isNull());
         deleteButton.disableProperty().bind(auctionHouseTable.getSelectionModel().selectedItemProperty().isNull());
-        
+
         logger.debug("AuctionHouseController initialized.");
     }
 
-    public void setServices(AuctionHouseService auctionHouseService, CurrencyService currencyService, I18nManager i18nManager) {
-        this.auctionHouseService = auctionHouseService;
+    public void setServices(CurrencyService currencyService, AuctionHouseService auctionHouseService,
+                            I18nManager i18nManager) {
         this.currencyService = currencyService;
+        this.auctionHouseService = auctionHouseService;
         this.i18nManager = i18nManager;
         loadAuctionHouses();
     }
@@ -129,7 +128,8 @@ public class AuctionHouseController {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                     errorAlert.setTitle("Deletion Failed");
                     errorAlert.setHeaderText("Could not delete the auction house.");
-                    errorAlert.setContentText("An error occurred while trying to delete the auction house. Please check the logs for more details.");
+                    errorAlert.setContentText("An error occurred while trying to delete the auction house. Please " +
+                            "check the logs for more details.");
                     errorAlert.showAndWait();
                 }
             }

@@ -71,7 +71,9 @@ public class MainController implements Initializable {
     @FXML
     private Tab bidsTab;
     @FXML
-    private Tab auctionItemsTab; // New tab for Auction Items
+    private Tab auctionItemsTab;
+    @FXML
+    private Tab catalogValuesTab;
     @FXML
     private StatusBar statusBar;
     @FXML
@@ -79,21 +81,33 @@ public class MainController implements Initializable {
     @FXML
     private TextArea logTextArea;
 
-    // Injected controller from the included FXML (fx:id="auctionItemView")
+    // Injected controllers from included FXML files
     @FXML
     private AuctionItemController auctionItemViewController;
+    @FXML
+    private CatalogValueController catalogValueViewController;
 
     // Services
     private I18nManager i18nManager;
     private AuctionHouseService auctionHouseService;
-    private CurrencyService currencyService;
     private CatalogService catalogService;
     private CategoryService categoryService;
     private ConditionService conditionService;
+    private AuctionItemService auctionItemService;
+    private CatalogValueService catalogValueService;
+    private CurrencyService currencyService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.info("Initializing MainController");
+
+        // Maximize window on startup
+        Platform.runLater(() -> {
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            if (stage != null) {
+                stage.setMaximized(true);
+            }
+        });
 
         // Initialize UI components
         setupStatusBar();
@@ -114,24 +128,31 @@ public class MainController implements Initializable {
     /**
      * Sets the application services. Called after FXML loading.
      */
-    public void setServices(I18nManager i18nManager, AuctionHouseService auctionHouseService,
-                            CurrencyService currencyService, CatalogService catalogService,
-                            CategoryService categoryService, ConditionService conditionService,
-                            AuctionItemService auctionItemService) {
+    public void setServices(I18nManager i18nManager, CurrencyService currencyService,
+                            AuctionHouseService auctionHouseService,
+                            CatalogService catalogService, CategoryService categoryService,
+                            ConditionService conditionService, AuctionItemService auctionItemService,
+                            CatalogValueService catalogValueService) {
         this.i18nManager = i18nManager;
-        this.auctionHouseService = auctionHouseService;
         this.currencyService = currencyService;
+        this.auctionHouseService = auctionHouseService;
         this.catalogService = catalogService;
         this.categoryService = categoryService;
         this.conditionService = conditionService;
+        this.auctionItemService = auctionItemService;
+        this.catalogValueService = catalogValueService;
 
-        // Inject services into AuctionItemController
+        // Inject services into child controllers
         if (auctionItemViewController != null) {
-            auctionItemViewController.setServices(auctionItemService, this.categoryService, this.catalogService,
+            auctionItemViewController.setServices(this.auctionItemService, this.categoryService, this.catalogService,
                     this.i18nManager);
             logger.info("Services injected into AuctionItemController.");
-        } else {
-            logger.error("AuctionItemViewController is null. Cannot inject services.");
+        }
+        if (catalogValueViewController != null) {
+            catalogValueViewController.setServices(this.currencyService, this.catalogValueService,
+                    this.auctionItemService, this.conditionService, this.catalogService, this.categoryService,
+                    this.i18nManager);
+            logger.info("Services injected into CatalogValueController.");
         }
 
         // Update UI with localized strings
@@ -187,158 +208,87 @@ public class MainController implements Initializable {
         }
     }
 
-    /**
-     * Handles showing the Auction Houses view in a modal dialog.
-     */
     private void handleShowAuctionHouses() {
         try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/AuctionHouseView.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
-
-            Parent auctionHouseView = loader.load();
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AuctionHouseView.fxml"),
+                    i18nManager.getResourceBundle());
+            Parent view = loader.load();
             AuctionHouseController controller = loader.getController();
-            controller.setServices(auctionHouseService, currencyService, i18nManager);
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(i18nManager.getString("auctionHouses.title"));
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(rootPane.getScene().getWindow());
-
-            Scene scene = new Scene(auctionHouseView);
-            dialogStage.setScene(scene);
-
-            dialogStage.showAndWait();
-            logger.info("Closed Auction Houses dialog.");
+            controller.setServices(currencyService, auctionHouseService, i18nManager);
+            showInModalDialog(view, i18nManager.getString("auctionHouses.title"));
         } catch (IOException e) {
-            logger.error("Failed to load AuctionHouseView.fxml", e);
-            // Show an error alert to the user
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Could not open Auction Houses view");
-            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
-            alert.showAndWait();
+            showErrorDialog("Could not open Auction Houses view", e);
         }
     }
 
-    /**
-     * Handles showing the Catalogs view in a modal dialog.
-     */
     private void handleShowCatalogs() {
         try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/CatalogView.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
-
-            Parent catalogView = loader.load();
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CatalogView.fxml"),
+                    i18nManager.getResourceBundle());
+            Parent view = loader.load();
             CatalogController controller = loader.getController();
-            controller.setServices(catalogService, currencyService, i18nManager);
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(i18nManager.getString("catalogs.title"));
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(rootPane.getScene().getWindow());
-
-            Scene scene = new Scene(catalogView);
-            dialogStage.setScene(scene);
-
-            dialogStage.showAndWait();
-            logger.info("Closed Catalogs dialog.");
+            controller.setServices(currencyService, catalogService, i18nManager);
+            showInModalDialog(view, i18nManager.getString("catalogs.title"));
         } catch (IOException e) {
-            logger.error("Failed to load CatalogView.fxml", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Could not open Catalogs view");
-            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
-            alert.showAndWait();
+            showErrorDialog("Could not open Catalogs view", e);
         }
     }
 
-    /**
-     * Handles showing the Categories view in a modal dialog.
-     */
     private void handleShowCategories() {
         try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/CategoryView.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
-
-            Parent categoryView = loader.load();
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CategoryView.fxml"),
+                    i18nManager.getResourceBundle());
+            Parent view = loader.load();
             CategoryController controller = loader.getController();
             controller.setServices(categoryService, catalogService, i18nManager);
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(i18nManager.getString("categories.title"));
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(rootPane.getScene().getWindow());
-
-            Scene scene = new Scene(categoryView);
-            dialogStage.setScene(scene);
-
-            dialogStage.showAndWait();
-            logger.info("Closed Categories dialog.");
+            showInModalDialog(view, i18nManager.getString("categories.title"));
         } catch (IOException e) {
-            logger.error("Failed to load CategoryView.fxml", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Could not open Categories view");
-            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
-            alert.showAndWait();
+            showErrorDialog("Could not open Categories view", e);
         }
     }
 
-    /**
-     * Handles showing the Conditions view in a modal dialog.
-     */
     private void handleShowConditions() {
         try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/ConditionView.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
-
-            Parent conditionView = loader.load();
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ConditionView.fxml"),
+                    i18nManager.getResourceBundle());
+            Parent view = loader.load();
             ConditionController controller = loader.getController();
             controller.setServices(conditionService, i18nManager);
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(i18nManager.getString("conditions.title"));
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(rootPane.getScene().getWindow());
-
-            Scene scene = new Scene(conditionView);
-            dialogStage.setScene(scene);
-
-            dialogStage.showAndWait();
-            logger.info("Closed Conditions dialog.");
+            showInModalDialog(view, i18nManager.getString("conditions.title"));
         } catch (IOException e) {
-            logger.error("Failed to load ConditionView.fxml", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Could not open Conditions view");
-            alert.setContentText("An error occurred while trying to load the view. Please check the logs.");
-            alert.showAndWait();
+            showErrorDialog("Could not open Conditions view", e);
         }
     }
 
-    /**
-     * Updates UI strings with localized versions.
-     */
+    private void showInModalDialog(Parent view, String title) {
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle(title);
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.initOwner(rootPane.getScene().getWindow());
+        Scene scene = new Scene(view);
+        dialogStage.setScene(scene);
+        dialogStage.showAndWait();
+    }
+
+    private void showErrorDialog(String header, Exception e) {
+        logger.error(header, e);
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText("An error occurred. Please check the logs.");
+        alert.showAndWait();
+    }
+
     private void updateLocalizedStrings() {
         if (i18nManager == null) return;
 
         try {
-            // Update menu labels
             if (fileMenu != null) fileMenu.setText(i18nManager.getString("menu.file"));
             if (editMenu != null) editMenu.setText(i18nManager.getString("menu.edit"));
             if (viewMenu != null) viewMenu.setText(i18nManager.getString("menu.view"));
             if (toolsMenu != null) toolsMenu.setText(i18nManager.getString("menu.tools"));
             if (helpMenu != null) helpMenu.setText(i18nManager.getString("menu.help"));
 
-            // Update menu items
             if (exitMenuItem != null) exitMenuItem.setText(i18nManager.getString("menu.file.exit"));
             if (aboutMenuItem != null) aboutMenuItem.setText(i18nManager.getString("menu.help.about"));
             if (auctionHousesMenuItem != null)
@@ -347,15 +297,13 @@ public class MainController implements Initializable {
             if (categoriesMenuItem != null) categoriesMenuItem.setText(i18nManager.getString("menu.tools.categories"));
             if (conditionsMenuItem != null) conditionsMenuItem.setText(i18nManager.getString("menu.tools.conditions"));
 
-            // Update tab labels
             if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));
             if (auctionsTab != null) auctionsTab.setText(i18nManager.getString("tab.auctions"));
             if (catalogTab != null) catalogTab.setText(i18nManager.getString("tab.catalog"));
             if (bidsTab != null) bidsTab.setText(i18nManager.getString("tab.bids"));
-            if (auctionItemsTab != null)
-                auctionItemsTab.setText(i18nManager.getString("tab.auctionItems")); // New tab title
+            if (auctionItemsTab != null) auctionItemsTab.setText(i18nManager.getString("tab.auctionItems"));
+            if (catalogValuesTab != null) catalogValuesTab.setText(i18nManager.getString("tab.catalogValues"));
 
-            // Update welcome message
             if (welcomeLabel != null) {
                 welcomeLabel.setText(i18nManager.getString("welcome.message"));
             }
@@ -364,36 +312,24 @@ public class MainController implements Initializable {
         }
     }
 
-    /**
-     * Handles application exit.
-     */
     @FXML
     private void handleExit() {
-        logger.info("Exit requested by user");
         Platform.exit();
     }
 
-    /**
-     * Handles about dialog.
-     */
     @FXML
     private void handleAbout() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(i18nManager != null ? i18nManager.getString("about.title") : "About");
         alert.setHeaderText("Philabid");
-        alert.setContentText(
-                "Philabid - Stamp Auction Bidding Assistant\n" +
-                        "Version: 1.0-SNAPSHOT\n" +
-                        "License: Apache 2.0\n\n" +
-                        "An open-source, multilingual JavaFX desktop application\n" +
-                        "for stamp auction bidding assistance."
-        );
+        alert.setContentText("Philabid - Stamp Auction Bidding Assistant\n" +
+                "Version: 1.0-SNAPSHOT\n" +
+                "License: Apache 2.0\n\n" +
+                "An open-source, multilingual JavaFX desktop application\n" +
+                "for stamp auction bidding assistance.");
         alert.showAndWait();
     }
 
-    /**
-     * Adds a message to the log area.
-     */
     private void addLogMessage(String message) {
         if (logTextArea != null) {
             Platform.runLater(() -> {

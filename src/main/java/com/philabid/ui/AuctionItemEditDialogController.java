@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Controller for the auction item edit dialog.
@@ -190,17 +188,6 @@ public class AuctionItemEditDialogController {
      * @param catalogNumber The text from the catalog number field.
      */
     private void updateOrderNumberFromCatalogNumber(String catalogNumber) {
-        if (catalogNumber == null || catalogNumber.isBlank()) {
-            orderNumberField.clear();
-            return;
-        }
-
-        // This regex finds the first sequence of one or more digits.
-        Pattern pattern = Pattern.compile("\\d+");
-        Matcher matcher = pattern.matcher(catalogNumber);
-
-        if (matcher.find()) {
-            orderNumberField.setText(matcher.group(0));
-        }
+        orderNumberField.setText(AuctionItem.calculateOrderNumber(catalogNumber).toString());
     }
 }

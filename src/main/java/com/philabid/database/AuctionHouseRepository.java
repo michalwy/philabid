@@ -107,11 +107,12 @@ public class AuctionHouseRepository {
     }
 
     private AuctionHouse insert(AuctionHouse auctionHouse) throws SQLException {
-        String sql = "INSERT INTO auction_houses(name, website, contact_email, contact_phone, address, country, currency, created_at, updated_at) VALUES(?,?,?,?,?,?,?,?,?)";
-        
+        String sql = "INSERT INTO auction_houses(name, website, contact_email, contact_phone, address, country, " +
+                "currency, created_at, updated_at) VALUES(?,?,?,?,?,?,?,?,?)";
+
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            
+
             auctionHouse.setCreatedAt(LocalDateTime.now());
             auctionHouse.setUpdatedAt(LocalDateTime.now());
 
@@ -121,10 +122,10 @@ public class AuctionHouseRepository {
             pstmt.setString(4, auctionHouse.getContactPhone());
             pstmt.setString(5, auctionHouse.getAddress());
             pstmt.setString(6, auctionHouse.getCountry());
-            pstmt.setString(7, auctionHouse.getCurrency());
+            pstmt.setString(7, auctionHouse.getCurrency().getCurrencyCode());
             pstmt.setTimestamp(8, Timestamp.valueOf(auctionHouse.getCreatedAt()));
             pstmt.setTimestamp(9, Timestamp.valueOf(auctionHouse.getUpdatedAt()));
-            
+
             int affectedRows = pstmt.executeUpdate();
 
             if (affectedRows == 0) {
@@ -147,8 +148,9 @@ public class AuctionHouseRepository {
     }
 
     private AuctionHouse update(AuctionHouse auctionHouse) throws SQLException {
-        String sql = "UPDATE auction_houses SET name = ?, website = ?, contact_email = ?, contact_phone = ?, address = ?, country = ?, currency = ?, updated_at = ? WHERE id = ?";
-        
+        String sql = "UPDATE auction_houses SET name = ?, website = ?, contact_email = ?, contact_phone = ?, address " +
+                "= ?, country = ?, currency = ?, updated_at = ? WHERE id = ?";
+
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -160,12 +162,12 @@ public class AuctionHouseRepository {
             pstmt.setString(4, auctionHouse.getContactPhone());
             pstmt.setString(5, auctionHouse.getAddress());
             pstmt.setString(6, auctionHouse.getCountry());
-            pstmt.setString(7, auctionHouse.getCurrency());
+            pstmt.setString(7, auctionHouse.getCurrency().getCurrencyCode());
             pstmt.setTimestamp(8, Timestamp.valueOf(auctionHouse.getUpdatedAt()));
             pstmt.setLong(9, auctionHouse.getId());
 
             int affectedRows = pstmt.executeUpdate();
-            
+
             if (affectedRows > 0) {
                 logger.info("Updated auction house with ID: {}", auctionHouse.getId());
                 return auctionHouse;

@@ -1,10 +1,10 @@
-package com.philabid.ui;
+package com.philabid.ui.util;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
-record CatalogNumberColumnValue(String catalogNumber, Long orderNumber) {
+public record CatalogNumberColumnValue(String catalogNumber, Long orderNumber) {
 
     public static Comparator<CatalogNumberColumnValue> SORT_COMPARATOR =
             Comparator.comparingLong(CatalogNumberColumnValue::orderNumber);

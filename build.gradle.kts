@@ -98,6 +98,7 @@ tasks.register<JavaExec>("runApp") {
         "--add-modules", "javafx.controls,javafx.fxml",
         "--enable-native-access=org.xerial.sqlitejdbc",
         "--enable-native-access=javafx.graphics",
-        "--add-reads=org.xerial.sqlitejdbc=ALL-UNNAMED"
+        "--add-reads=org.xerial.sqlitejdbc=ALL-UNNAMED",
+        "--add-opens=javafx.base/com.sun.javafx.event=ALL-UNNAMED"
     )
 }

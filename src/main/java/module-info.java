@@ -10,6 +10,8 @@ module philabid {
     requires org.slf4j;
     requires ch.qos.logback.classic;
     requires com.fasterxml.jackson.databind;
+    requires javafx.graphics;
+    requires javafx.base;
 
     opens com.philabid to javafx.fxml;
     opens com.philabid.ui to javafx.fxml;

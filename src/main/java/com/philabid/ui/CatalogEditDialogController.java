@@ -1,20 +1,15 @@
 package com.philabid.ui;
 
 import com.philabid.model.Catalog;
-import com.philabid.model.Currency;
 import com.philabid.service.CurrencyService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import javax.money.CurrencyUnit;
 
 /**
  * Controller for the catalog edit dialog.
@@ -28,7 +23,7 @@ public class CatalogEditDialogController {
     @FXML
     private TextField issueYearField;
     @FXML
-    private ComboBox<Currency> currencyComboBox;
+    private ComboBox<CurrencyUnit> currencyComboBox;
     @FXML
     private CheckBox activeCheckBox;
     @FXML
@@ -38,21 +33,23 @@ public class CatalogEditDialogController {
 
     private Stage dialogStage;
     private Catalog catalog;
-    private CurrencyService currencyService;
     private boolean saveClicked = false;
+
+    private CurrencyService currencyService;
 
     @FXML
     private void initialize() {
-        logger.debug("CatalogEditDialogController initialized.");
-    }
 
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
+        logger.debug("CatalogEditDialogController initialized.");
     }
 
     public void setServices(CurrencyService currencyService) {
         this.currencyService = currencyService;
         populateCurrencyComboBox();
+    }
+
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
     }
 
     public void setCatalog(Catalog catalog) {
@@ -64,22 +61,16 @@ public class CatalogEditDialogController {
         }
         activeCheckBox.setSelected(catalog.isActive());
 
-        if (catalog.getCurrencyCode() != null && currencyComboBox.getItems() != null) {
+        if (catalog.getCurrency() != null && currencyComboBox.getItems() != null) {
             currencyComboBox.getItems().stream()
-                    .filter(c -> c.getCode().equals(catalog.getCurrencyCode()))
+                    .filter(c -> c.equals(catalog.getCurrency()))
                     .findFirst()
                     .ifPresent(currencyComboBox.getSelectionModel()::select);
         }
     }
 
     private void populateCurrencyComboBox() {
-        if (currencyService != null) {
-            List<Currency> currencies = currencyService.getAllCurrencies();
-            currencyComboBox.setItems(FXCollections.observableArrayList(currencies));
-            logger.debug("Populated currency ComboBox with {} items.", currencies.size());
-        } else {
-            logger.warn("CurrencyService is not available. Cannot populate currency ComboBox.");
-        }
+        currencyComboBox.setItems(FXCollections.observableArrayList(currencyService.getCurrencies()));
     }
 
     public boolean isSaveClicked() {
@@ -95,11 +86,9 @@ public class CatalogEditDialogController {
             } catch (NumberFormatException e) {
                 catalog.setIssueYear(null); // Or handle error
             }
-            
-            Currency selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
-            if (selectedCurrency != null) {
-                catalog.setCurrencyCode(selectedCurrency.getCode());
-            }
+
+            CurrencyUnit selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
+            catalog.setCurrency(selectedCurrency);
             catalog.setActive(activeCheckBox.isSelected());
 
             saveClicked = true;
@@ -129,7 +118,7 @@ public class CatalogEditDialogController {
             errorMessage += "No currency selected!\n";
         }
 
-        if (errorMessage.length() == 0) {
+        if (errorMessage.isEmpty()) {
             return true;
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);

@@ -53,4 +53,13 @@ public class AuctionItemService {
             return false;
         }
     }
+
+    public Optional<AuctionItem> getAuctionItemById(Long id) {
+        try {
+            return auctionItemRepository.findById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to retrieve auction item with ID: {}", id, e);
+            return Optional.empty();
+        }
+    }
 }

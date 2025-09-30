@@ -27,7 +27,7 @@ import java.util.Optional;
 public class CatalogController {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogController.class);
-
+    private final ObservableList<Catalog> catalogList = FXCollections.observableArrayList();
     @FXML
     private TableView<Catalog> catalogTable;
     @FXML
@@ -44,17 +44,15 @@ public class CatalogController {
     private Button editButton;
     @FXML
     private Button deleteButton;
-
-    private CatalogService catalogService;
     private CurrencyService currencyService;
+    private CatalogService catalogService;
     private I18nManager i18nManager;
-    private final ObservableList<Catalog> catalogList = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         issueYearColumn.setCellValueFactory(new PropertyValueFactory<>("issueYear"));
-        currencyColumn.setCellValueFactory(new PropertyValueFactory<>("currencyCode"));
+        currencyColumn.setCellValueFactory(new PropertyValueFactory<>("currency"));
         activeColumn.setCellValueFactory(new PropertyValueFactory<>("active"));
 
         // Custom cell factory for the 'active' column to display a checkmark
@@ -82,13 +80,13 @@ public class CatalogController {
 
         editButton.disableProperty().bind(catalogTable.getSelectionModel().selectedItemProperty().isNull());
         deleteButton.disableProperty().bind(catalogTable.getSelectionModel().selectedItemProperty().isNull());
-        
+
         logger.debug("CatalogController initialized.");
     }
 
-    public void setServices(CatalogService catalogService, CurrencyService currencyService, I18nManager i18nManager) {
-        this.catalogService = catalogService;
+    public void setServices(CurrencyService currencyService, CatalogService catalogService, I18nManager i18nManager) {
         this.currencyService = currencyService;
+        this.catalogService = catalogService;
         this.i18nManager = i18nManager;
         loadCatalogs();
     }
