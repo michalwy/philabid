@@ -1,5 +1,6 @@
 package com.philabid.database;
 
+import javax.money.Monetary;
 import com.philabid.model.AuctionHouse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,11 +190,25 @@ public class AuctionHouseRepository {
         ah.setContactPhone(rs.getString("contact_phone"));
         ah.setAddress(rs.getString("address"));
         ah.setCountry(rs.getString("country"));
-        ah.setCurrency(rs.getString("currency"));
+        ah.setCurrency(Monetary.getCurrency(rs.getString("currency")));
         Timestamp createdAtTs = rs.getTimestamp("created_at");
         ah.setCreatedAt(createdAtTs != null ? createdAtTs.toLocalDateTime() : null);
         Timestamp updatedAtTs = rs.getTimestamp("updated_at");
         ah.setUpdatedAt(updatedAtTs != null ? updatedAtTs.toLocalDateTime() : null);
         return ah;
+    }
+
+    public Optional<AuctionHouse> findByName(String name) throws SQLException {
+        String sql = "SELECT * FROM auction_houses WHERE name = ? COLLATE NOCASE";
+        try (Connection conn = databaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapRowToAuctionHouse(rs));
+                }
+            }
+        }
+        return Optional.empty();
     }
 }

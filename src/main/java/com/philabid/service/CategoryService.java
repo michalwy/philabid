@@ -33,7 +33,7 @@ public class CategoryService {
 
     public Optional<Category> saveCategory(Category category) {
         if (category.getName() == null || category.getName().trim().isEmpty() ||
-            category.getCode() == null || category.getCode().trim().isEmpty()) {
+                category.getCode() == null || category.getCode().trim().isEmpty()) {
             logger.warn("Attempted to save a category with an empty name or code.");
             return Optional.empty();
         }
@@ -52,6 +52,15 @@ public class CategoryService {
         } catch (SQLException e) {
             logger.error("Failed to delete category with ID: {}", id, e);
             return false;
+        }
+    }
+
+    public Optional<Category> getCategoryById(long id) {
+        try {
+            return categoryRepository.findById(id);
+        } catch (SQLException e) {
+            logger.error("Failed to get category with ID: {}", id, e);
+            return Optional.empty();
         }
     }
 }

@@ -2,6 +2,9 @@ package com.philabid;
 
 import com.philabid.database.*;
 import com.philabid.i18n.I18nManager;
+import com.philabid.parsing.UrlParsingService;
+import com.philabid.parsing.impl.AllegroUrlParser;
+import com.philabid.parsing.impl.EbayUrlParser;
 import com.philabid.service.*;
 import com.philabid.ui.MainController;
 import javafx.application.Application;
@@ -13,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,7 +36,9 @@ public class PhilabidApplication extends Application {
     private CategoryService categoryService;
     private ConditionService conditionService;
     private AuctionItemService auctionItemService;
+    private AuctionService auctionService;
     private CatalogValueService catalogValueService;
+    private UrlParsingService urlParsingService;
 
     public static void main(String[] args) {
         logger.info("Launching Philabid application with args: {}", java.util.Arrays.toString(args));
@@ -54,6 +60,7 @@ public class PhilabidApplication extends Application {
         CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
         ConditionRepository conditionRepository = new ConditionRepository(databaseManager);
         AuctionItemRepository auctionItemRepository = new AuctionItemRepository(databaseManager);
+        AuctionRepository auctionRepository = new AuctionRepository(databaseManager);
         CatalogValueRepository catalogValueRepository = new CatalogValueRepository(databaseManager);
 
         // Initialize services
@@ -63,7 +70,10 @@ public class PhilabidApplication extends Application {
         categoryService = new CategoryService(categoryRepository);
         conditionService = new ConditionService(conditionRepository);
         auctionItemService = new AuctionItemService(auctionItemRepository);
+        auctionService = new AuctionService(auctionRepository);
         catalogValueService = new CatalogValueService(catalogValueRepository);
+        urlParsingService =
+                new UrlParsingService(List.of(new AllegroUrlParser(), new EbayUrlParser()), auctionHouseService);
 
         // Initialize database
         databaseManager.initialize();
@@ -85,7 +95,8 @@ public class PhilabidApplication extends Application {
 
         MainController controller = fxmlLoader.getController();
         controller.setServices(i18nManager, currencyService, auctionHouseService, catalogService, categoryService,
-                conditionService, auctionItemService, catalogValueService);
+                conditionService, auctionItemService, auctionService, catalogValueService, urlParsingService,
+                getHostServices());
 
         primaryStage.setTitle(i18nManager.getString("app.title"));
         primaryStage.setScene(scene);

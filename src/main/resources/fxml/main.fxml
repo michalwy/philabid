@@ -92,6 +92,16 @@
                         </VBox>
                     </content>
                 </Tab>
+                <Tab fx:id="activeAuctionsTab" text="%tab.auctions.active">
+                    <content>
+                        <fx:include source="AuctionView.fxml" fx:id="activeAuctionView"/>
+                    </content>
+                </Tab>
+                <Tab fx:id="archivedAuctionsTab" text="%tab.auctions.archived">
+                    <content>
+                        <fx:include source="AuctionView.fxml" fx:id="archivedAuctionView"/>
+                    </content>
+                </Tab>
                 <Tab fx:id="auctionItemsTab" text="%tab.auctionItems">
                     <content>
                         <fx:include fx:id="auctionItemView" source="AuctionItemView.fxml"/>

@@ -86,10 +86,9 @@ public class CatalogValueController {
         this.catalogService = catalogService;
         this.categoryService = categoryService;
         this.i18nManager = i18nManager;
-        loadCatalogValues();
     }
 
-    private void loadCatalogValues() {
+    public void loadCatalogValues() {
         if (catalogValueService != null) {
             catalogValueList.setAll(catalogValueService.getAllCatalogValues());
             catalogValueTable.sort();

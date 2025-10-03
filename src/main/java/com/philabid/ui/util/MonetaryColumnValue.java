@@ -15,7 +15,11 @@ public record MonetaryColumnValue(MonetaryAmount monetaryAmount) {
     @NotNull
     @Override
     public String toString() {
-        MonetaryAmountFormat format = MonetaryFormats.getAmountFormat(Locale.getDefault());
-        return format.format(monetaryAmount);
+        if (monetaryAmount != null) {
+            MonetaryAmountFormat format = MonetaryFormats.getAmountFormat(Locale.getDefault());
+            return format.format(monetaryAmount);
+        } else {
+            return "";
+        }
     }
 }

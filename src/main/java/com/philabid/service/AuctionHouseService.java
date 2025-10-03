@@ -89,4 +89,19 @@ public class AuctionHouseService {
             return false;
         }
     }
+
+    /**
+     * Finds an auction house by its name (case-insensitive).
+     *
+     * @param name The name of the auction house.
+     * @return An Optional containing the auction house, or empty if not found or on error.
+     */
+    public Optional<AuctionHouse> findByName(String name) {
+        try {
+            return auctionHouseRepository.findByName(name);
+        } catch (SQLException e) {
+            logger.error("Failed to find auction house with name: {}", name, e);
+            return Optional.empty();
+        }
+    }
 }

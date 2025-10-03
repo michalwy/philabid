@@ -1,8 +1,12 @@
 package com.philabid.ui;
 
 import com.philabid.i18n.I18nManager;
-import com.philabid.model.*;
+import com.philabid.model.Catalog;
+import com.philabid.model.CatalogValue;
+import com.philabid.model.Category;
+import com.philabid.model.Condition;
 import com.philabid.service.*;
+import com.philabid.ui.control.AuctionItemSelector;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -11,17 +15,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Controller for the catalog value edit dialog.
@@ -30,9 +29,7 @@ public class CatalogValueEditDialogController {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueEditDialogController.class);
     @FXML
-    private TextField auctionItemField;
-    @FXML
-    private ComboBox<Category> categoryComboBox;
+    private AuctionItemSelector auctionItemSelector;
     @FXML
     private ComboBox<Condition> conditionComboBox;
     @FXML
@@ -54,36 +51,26 @@ public class CatalogValueEditDialogController {
     private I18nManager i18nManager;
     private CurrencyService currencyService;
     private EditDialogResult editDialogResult;
-    private Map<Long, Category> categoryCache;
-    private Map<Long, Catalog> catalogCache;
-    private AuctionItem selectedAuctionItem;
 
     @FXML
     private void initialize() {
         logger.debug("CatalogValueEditDialogController initialized.");
 
-        Platform.runLater(() -> auctionItemField.requestFocus());
-
-        // Add a listener to the auction item selection to auto-select catalog and currency
-        auctionItemField.textProperty().addListener((obs, oldVal, newVal) -> handleAuctionItemTextChange(newVal));
-
-        categoryComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                autoSelectCatalogAndCurrency(newVal);
-            }
-        });
+        Platform.runLater(() -> auctionItemSelector.requestFocus());
 
         catalogComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 currencyComboBox.getSelectionModel().select(newVal.getCurrency());
             }
         });
-
         conditionComboBox.showingProperty().addListener((obs, wasShowing, isNowShowing) -> {
             if (wasShowing && !isNowShowing) {
                 Platform.runLater(() -> valueField.requestFocus());
             }
         });
+
+        auctionItemSelector.selectedCategoryProperty()
+                .addListener((obs, oldVal, newVal) -> autoSelectCatalogAndCurrency(newVal));
     }
 
     public void setDialogStage(Stage dialogStage) {
@@ -100,12 +87,8 @@ public class CatalogValueEditDialogController {
         this.categoryService = categoryService;
         this.i18nManager = i18nManager;
 
-        // Populate caches
-        this.categoryCache =
-                this.categoryService.getAllCategories().stream().collect(Collectors.toMap(Category::getId,
-                        Function.identity()));
-        this.catalogCache = this.catalogService.getAllCatalogs().stream().collect(Collectors.toMap(Catalog::getId,
-                Function.identity()));
+        auctionItemSelector.load(i18nManager.getResourceBundle());
+        auctionItemSelector.setServices(auctionItemService, categoryService);
 
         populateComboBoxes();
     }
@@ -119,19 +102,16 @@ public class CatalogValueEditDialogController {
 
         // Pre-select items in ComboBoxes if editing an existing value
         if (catalogValue.getAuctionItemId() != null) {
-            auctionItemService.getAuctionItemById(catalogValue.getAuctionItemId()).ifPresent(item -> {
-                this.selectedAuctionItem = item;
-                auctionItemField.setText(item.getCatalogNumber());
-                autoSelectCatalogAndCurrency(item);
-            });
+            auctionItemService.getAuctionItemById(catalogValue.getAuctionItemId())
+                    .ifPresent(auctionItemSelector::setSelectedAuctionItem);
         }
         if (catalogValue.getConditionId() != null) {
             conditionComboBox.getItems().stream().filter(c -> c.getId().equals(catalogValue.getConditionId()))
                     .findFirst().ifPresent(conditionComboBox.getSelectionModel()::select);
         }
         if (catalogValue.getCatalogId() != null) {
-            catalogCache.values().stream().filter(c -> c.getId().equals(catalogValue.getCatalogId()))
-                    .findFirst().ifPresent(catalogComboBox.getSelectionModel()::select);
+            catalogComboBox.getSelectionModel()
+                    .select(catalogService.getCatalogById(catalogValue.getCatalogId()).orElse(null));
         }
         if (catalogValue.getValue() != null) {
             currencyComboBox.getSelectionModel().select(catalogValue.getValue().getCurrency());
@@ -139,24 +119,14 @@ public class CatalogValueEditDialogController {
     }
 
     private void populateComboBoxes() {
-        setupAuctionItemAutocomplete();
-        categoryComboBox.setItems(FXCollections.observableArrayList(categoryService.getAllCategories()));
         conditionComboBox.setItems(FXCollections.observableArrayList(conditionService.getAllConditions()));
         catalogComboBox.setItems(FXCollections.observableArrayList(catalogService.getAllCatalogs()));
         currencyComboBox.setItems(FXCollections.observableArrayList(currencyService.getCurrencies()));
     }
 
-    private void autoSelectCatalogAndCurrency(AuctionItem item) {
-        if (item.getCategoryId() == null || categoryCache == null || catalogCache == null) return;
-
-        Category category = categoryCache.get(item.getCategoryId());
-        autoSelectCatalogAndCurrency(category);
-    }
-
     private void autoSelectCatalogAndCurrency(Category category) {
         if (category != null && category.getCatalogId() != null) {
-            Catalog defaultCatalog = catalogCache.get(category.getCatalogId());
-            if (defaultCatalog != null) {
+            catalogService.getCatalogById(category.getCatalogId()).ifPresent(defaultCatalog -> {
                 catalogComboBox.getSelectionModel().select(defaultCatalog);
                 // Auto-select currency based on catalog
                 if (defaultCatalog.getCurrency() != null) {
@@ -165,67 +135,14 @@ public class CatalogValueEditDialogController {
                             .findFirst()
                             .ifPresent(currencyComboBox.getSelectionModel()::select);
                 }
-            }
-        }
-    }
-
-    private void setupAuctionItemAutocomplete() {
-        AutoCompletionBinding<AuctionItemSuggestion> binding = TextFields.bindAutoCompletion(auctionItemField,
-                suggestionRequest -> {
-                    String filter = suggestionRequest.getUserText().toLowerCase();
-                    // Search in the original items and wrap them in our suggestion class
-                    return auctionItemService.getAllAuctionItems().stream()
-                            .filter(item -> item.getCatalogNumber().toLowerCase().contains(filter))
-                            .map(AuctionItemSuggestion::new) // Wrap in suggestion
-                            .collect(Collectors.toList());
-                });
-
-        // 3. Set the action to perform when an item is selected
-        binding.setOnAutoCompleted(event -> {
-            // Unwrap the original AuctionItem from our suggestion wrapper
-            this.selectedAuctionItem = event.getCompletion().item();
-            auctionItemField.setText(this.selectedAuctionItem.getCatalogNumber());
-            categoryComboBox.getSelectionModel().select(categoryCache.get(this.selectedAuctionItem.getCategoryId()));
-            autoSelectCatalogAndCurrency(this.selectedAuctionItem);
-            categoryComboBox.setDisable(true);
-            Platform.runLater(() -> {
-                conditionComboBox.requestFocus();
-                conditionComboBox.show();
             });
-        });
-    }
-
-    private void handleAuctionItemTextChange(String newText) {
-        // If text is cleared or doesn't match a selected item, reset the state
-        if (selectedAuctionItem != null &&
-                (newText == null || !newText.equals(selectedAuctionItem.getCatalogNumber()))) {
-            selectedAuctionItem = null;
-            // Enable category selection for a new item
-            categoryComboBox.setDisable(false);
-            categoryComboBox.getSelectionModel().clearSelection();
-            catalogComboBox.getSelectionModel().clearSelection();
         }
-
-        // If text is not empty and no item is selected, it's a new item
-        categoryComboBox.setDisable(selectedAuctionItem != null || newText == null || newText.isBlank());
     }
 
     @FXML
     private void handleSave() {
         if (isInputValid()) {
-            // Scenario 1: Existing item was selected
-            if (selectedAuctionItem != null) {
-                catalogValue.setAuctionItemId(selectedAuctionItem.getId());
-            } else {
-                // Scenario 2: New item needs to be created
-                AuctionItem newAuctionItem = new AuctionItem();
-                newAuctionItem.setCatalogNumber(auctionItemField.getText());
-                newAuctionItem.setOrderNumber(AuctionItem.calculateOrderNumber(auctionItemField.getText()));
-                newAuctionItem.setCategoryId(categoryComboBox.getSelectionModel().getSelectedItem().getId());
-                auctionItemService.saveAuctionItem(newAuctionItem); // This should set the ID
-                catalogValue.setAuctionItemId(newAuctionItem.getId());
-                logger.info("Created new AuctionItem with ID: {}", newAuctionItem.getId());
-            }
+            catalogValue.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
 
             catalogValue.setConditionId(conditionComboBox.getSelectionModel().getSelectedItem().getId());
             catalogValue.setCatalogId(catalogComboBox.getSelectionModel().getSelectedItem().getId());
@@ -252,12 +169,12 @@ public class CatalogValueEditDialogController {
     private boolean isInputValid() {
         StringBuilder errorMessage = new StringBuilder();
 
-        if (auctionItemField.getText() == null || auctionItemField.getText().isBlank()) {
+        if (auctionItemSelector.getText() == null || auctionItemSelector.getText().isBlank()) {
             errorMessage.append("Catalog Number cannot be empty!\n");
         }
 
         // If it's a new item, a category must be selected
-        if (selectedAuctionItem == null && categoryComboBox.getSelectionModel().getSelectedItem() == null) {
+        if (auctionItemSelector.getSelectedAuctionItem() == null && auctionItemSelector.getSelectedCategory() == null) {
             errorMessage.append("Category must be selected for a new catalog number!\n");
         }
         if (conditionComboBox.getSelectionModel().getSelectedItem() == null) {
@@ -294,17 +211,5 @@ public class CatalogValueEditDialogController {
 
     public EditDialogResult getEditDialogResult() {
         return editDialogResult;
-    }
-
-    /**
-     * A private wrapper class to control the text displayed in the autocompletion popup.
-     * The text field will use the StringConverter, but the popup list will use this class's toString() method.
-     */
-    private record AuctionItemSuggestion(AuctionItem item) {
-
-        @Override
-        public String toString() {
-            return item().getCategoryCode() + " " + item().getCatalogNumber();
-        }
     }
 }

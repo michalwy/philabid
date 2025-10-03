@@ -15,12 +15,15 @@ module philabid {
 
     opens com.philabid to javafx.fxml;
     opens com.philabid.ui to javafx.fxml;
-    opens com.philabid.model to javafx.fxml;
+    opens com.philabid.model to javafx.base, javafx.fxml;
 
     exports com.philabid;
     exports com.philabid.ui;
     exports com.philabid.model;
     exports com.philabid.service;
     exports com.philabid.database;
+    exports com.philabid.parsing;
     exports com.philabid.i18n;
+    exports com.philabid.ui.control;
+    opens com.philabid.ui.control to javafx.fxml;
 }

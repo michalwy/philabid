@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.philabid.ui.control.AuctionItemSelector?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -9,12 +10,8 @@
         <Insets bottom="10" left="10" right="10" top="10"/>
     </padding>
 
-    <Label text="%auctionItems.label.catalogNumber" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-    <TextField fx:id="auctionItemField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-    <Label text="%auctionItems.label.category" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-    <ComboBox fx:id="categoryComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"
-              disable="true"/>
+    <AuctionItemSelector fx:id="auctionItemSelector" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2"/>
+    <Label text="%auctions.label.item" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.valignment="TOP"/>
 
     <Label text="%catalogValues.label.condition" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
     <ComboBox fx:id="conditionComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>

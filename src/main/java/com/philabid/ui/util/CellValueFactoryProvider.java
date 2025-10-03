@@ -3,10 +3,17 @@ package com.philabid.ui.util;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.util.Callback;
 
 import javax.money.MonetaryAmount;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -99,5 +106,58 @@ public final class CellValueFactoryProvider {
             ObservableValue<MonetaryColumnValue>> forValueWithCurrency(
             Function<T, MonetaryAmount> valueGetter) {
         return cellData -> new SimpleObjectProperty<>(new MonetaryColumnValue(valueGetter.apply(cellData.getValue())));
+    }
+
+    /**
+     * Creates a reusable CellFactory for columns displaying MonetaryAmount with custom layout.
+     * It formats the value with a right-aligned amount and a currency code.
+     *
+     * @param styler An optional function to apply custom styles to the labels based on the row's data.
+     * @param <T>    The type of the data object in the table row.
+     * @return A Callback for creating the TableCell.
+     */
+    public static <T> Callback<TableColumn<T, MonetaryColumnValue>, TableCell<T, MonetaryColumnValue>> forMonetaryValue(
+            java.util.function.BiConsumer<T, List<Label>> styler) {
+        return column -> new TableCell<>() {
+            private final HBox hbox = new HBox(5);
+            private final Label currencyLabel = new Label();
+            private final Label amountLabel = new Label();
+
+            {
+                // The amount should grow and push the currency to the right.
+                HBox.setHgrow(amountLabel, Priority.ALWAYS);
+                amountLabel.setMaxWidth(Double.MAX_VALUE);
+                amountLabel.setAlignment(Pos.CENTER_RIGHT);
+                hbox.getChildren().addAll(amountLabel, currencyLabel);
+            }
+
+            @Override
+            protected void updateItem(MonetaryColumnValue item, boolean empty) {
+                super.updateItem(item, empty);
+
+                // Reset state
+                currencyLabel.setStyle("");
+                amountLabel.setStyle("");
+                setGraphic(null);
+
+                if (empty || item == null || item.monetaryAmount() == null) {
+                    setText(null);
+                } else {
+                    MonetaryAmount amount = item.monetaryAmount();
+                    currencyLabel.setText(amount.getCurrency().getCurrencyCode());
+
+                    // Format the number to always show two decimal places
+                    BigDecimal number = amount.getNumber().numberValue(BigDecimal.class);
+                    amountLabel.setText(String.format(java.util.Locale.ROOT, "%.2f", number));
+
+                    // Apply custom styling if a styler function is provided
+                    if (styler != null) {
+                        T rowData = getTableRow().getItem();
+                        styler.accept(rowData, List.of(currencyLabel, amountLabel));
+                    }
+                    setGraphic(hbox);
+                }
+            }
+        };
     }
 }

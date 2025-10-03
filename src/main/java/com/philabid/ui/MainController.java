@@ -1,9 +1,11 @@
 package com.philabid.ui;
 
 import com.philabid.i18n.I18nManager;
+import com.philabid.parsing.UrlParsingService;
 import com.philabid.service.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -65,7 +67,9 @@ public class MainController implements Initializable {
     @FXML
     private Tab dashboardTab;
     @FXML
-    private Tab auctionsTab;
+    private Tab activeAuctionsTab;
+    @FXML
+    private Tab archivedAuctionsTab;
     @FXML
     private Tab catalogTab;
     @FXML
@@ -86,6 +90,10 @@ public class MainController implements Initializable {
     private AuctionItemController auctionItemViewController;
     @FXML
     private CatalogValueController catalogValueViewController;
+    @FXML
+    private AuctionController activeAuctionViewController;
+    @FXML
+    private AuctionController archivedAuctionViewController;
 
     // Services
     private I18nManager i18nManager;
@@ -96,6 +104,9 @@ public class MainController implements Initializable {
     private AuctionItemService auctionItemService;
     private CatalogValueService catalogValueService;
     private CurrencyService currencyService;
+    private AuctionService auctionService;
+    private UrlParsingService urlParsingService;
+    private HostServices hostServices;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -129,10 +140,11 @@ public class MainController implements Initializable {
      * Sets the application services. Called after FXML loading.
      */
     public void setServices(I18nManager i18nManager, CurrencyService currencyService,
-                            AuctionHouseService auctionHouseService,
-                            CatalogService catalogService, CategoryService categoryService,
-                            ConditionService conditionService, AuctionItemService auctionItemService,
-                            CatalogValueService catalogValueService) {
+                            AuctionHouseService auctionHouseService, CatalogService catalogService,
+                            CategoryService categoryService, ConditionService conditionService,
+                            AuctionItemService auctionItemService, AuctionService auctionService,
+                            CatalogValueService catalogValueService, UrlParsingService urlParsingService,
+                            HostServices hostServices) {
         this.i18nManager = i18nManager;
         this.currencyService = currencyService;
         this.auctionHouseService = auctionHouseService;
@@ -140,9 +152,28 @@ public class MainController implements Initializable {
         this.categoryService = categoryService;
         this.conditionService = conditionService;
         this.auctionItemService = auctionItemService;
+        this.auctionService = auctionService;
         this.catalogValueService = catalogValueService;
+        this.urlParsingService = urlParsingService;
+        this.hostServices = hostServices;
 
         // Inject services into child controllers
+        if (activeAuctionViewController != null) {
+            activeAuctionViewController.configure(false); // Show active
+            activeAuctionViewController.setServices(this.auctionService, this.auctionHouseService,
+                    this.auctionItemService,
+                    this.conditionService, this.currencyService, this.i18nManager, this.categoryService,
+                    this.urlParsingService, this.hostServices);
+            logger.info("Services injected into ActiveAuctionController.");
+        }
+        if (archivedAuctionViewController != null) {
+            archivedAuctionViewController.configure(true); // Show archived
+            archivedAuctionViewController.setServices(this.auctionService, this.auctionHouseService,
+                    this.auctionItemService,
+                    this.conditionService, this.currencyService, this.i18nManager, this.categoryService,
+                    this.urlParsingService, this.hostServices);
+            logger.info("Services injected into ArchivedAuctionController.");
+        }
         if (auctionItemViewController != null) {
             auctionItemViewController.setServices(this.auctionItemService, this.categoryService, this.catalogService,
                     this.i18nManager);
@@ -157,6 +188,7 @@ public class MainController implements Initializable {
 
         // Update UI with localized strings
         updateLocalizedStrings();
+        setupTabListeners();
 
         logger.info("Services set for MainController");
     }
@@ -176,6 +208,44 @@ public class MainController implements Initializable {
             }));
             timeline.setCycleCount(Timeline.INDEFINITE);
             timeline.play();
+        }
+    }
+
+    /**
+     * Sets up listeners to refresh data when a tab is selected.
+     */
+    private void setupTabListeners() {
+        if (activeAuctionsTab != null && activeAuctionViewController != null) {
+            activeAuctionsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                if (isNowSelected) {
+                    logger.info("Active Auctions tab selected, refreshing data.");
+                    activeAuctionViewController.loadAuctions();
+                }
+            });
+        }
+        if (archivedAuctionsTab != null && archivedAuctionViewController != null) {
+            archivedAuctionsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                if (isNowSelected) {
+                    logger.info("Archived Auctions tab selected, refreshing data.");
+                    archivedAuctionViewController.loadAuctions();
+                }
+            });
+        }
+        if (auctionItemsTab != null && auctionItemViewController != null) {
+            auctionItemsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                if (isNowSelected) {
+                    logger.info("Auction Items tab selected, refreshing data.");
+                    auctionItemViewController.loadAuctionItems();
+                }
+            });
+        }
+        if (catalogValuesTab != null && catalogValueViewController != null) {
+            catalogValuesTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                if (isNowSelected) {
+                    logger.info("Catalog Values tab selected, refreshing data.");
+                    catalogValueViewController.loadCatalogValues();
+                }
+            });
         }
     }
 
@@ -223,8 +293,8 @@ public class MainController implements Initializable {
 
     private void handleShowCatalogs() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CatalogView.fxml"),
-                    i18nManager.getResourceBundle());
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource("/fxml/CatalogView.fxml"), i18nManager.getResourceBundle());
             Parent view = loader.load();
             CatalogController controller = loader.getController();
             controller.setServices(currencyService, catalogService, i18nManager);
@@ -236,8 +306,8 @@ public class MainController implements Initializable {
 
     private void handleShowCategories() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CategoryView.fxml"),
-                    i18nManager.getResourceBundle());
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource("/fxml/CategoryView.fxml"), i18nManager.getResourceBundle());
             Parent view = loader.load();
             CategoryController controller = loader.getController();
             controller.setServices(categoryService, catalogService, i18nManager);
@@ -249,8 +319,8 @@ public class MainController implements Initializable {
 
     private void handleShowConditions() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ConditionView.fxml"),
-                    i18nManager.getResourceBundle());
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource("/fxml/ConditionView.fxml"), i18nManager.getResourceBundle());
             Parent view = loader.load();
             ConditionController controller = loader.getController();
             controller.setServices(conditionService, i18nManager);
@@ -298,7 +368,9 @@ public class MainController implements Initializable {
             if (conditionsMenuItem != null) conditionsMenuItem.setText(i18nManager.getString("menu.tools.conditions"));
 
             if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));
-            if (auctionsTab != null) auctionsTab.setText(i18nManager.getString("tab.auctions"));
+            if (activeAuctionsTab != null) activeAuctionsTab.setText(i18nManager.getString("tab.auctions.active"));
+            if (archivedAuctionsTab != null)
+                archivedAuctionsTab.setText(i18nManager.getString("tab.auctions.archived"));
             if (catalogTab != null) catalogTab.setText(i18nManager.getString("tab.catalog"));
             if (bidsTab != null) bidsTab.setText(i18nManager.getString("tab.bids"));
             if (auctionItemsTab != null) auctionItemsTab.setText(i18nManager.getString("tab.auctionItems"));

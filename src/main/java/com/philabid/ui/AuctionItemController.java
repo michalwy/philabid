@@ -80,11 +80,9 @@ public class AuctionItemController {
         this.categoryService = categoryService;
         this.catalogService = catalogService;
         this.i18nManager = i18nManager;
-
-        loadAuctionItems();
     }
 
-    private void loadAuctionItems() {
+    public void loadAuctionItems() {
         if (auctionItemService != null) {
             auctionItemList.setAll(auctionItemService.getAllAuctionItems());
             auctionItemTable.sort();
@@ -137,7 +135,8 @@ public class AuctionItemController {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirm Deletion");
             alert.setHeaderText("Delete Auction Item");
-            alert.setContentText("Are you sure you want to delete the selected auction item: " + selected.getCatalogNumber() + "?");
+            alert.setContentText(
+                    "Are you sure you want to delete the selected auction item: " + selected.getCatalogNumber() + "?");
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
