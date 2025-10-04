@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -50,20 +49,6 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
 
     @Override
     protected void initializeView() {
-        // Add double-click listener to open the edit dialog
-        table.setRowFactory(tv -> {
-            TableRow<Auction> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (!row.isEmpty() && event.getClickCount() == 2) {
-                    handleEditAuction();
-                }
-            });
-            return row;
-        });
-    }
-
-    @Override
-    protected void setupTableColumns() {
         auctionHouseColumn.setCellValueFactory(new PropertyValueFactory<>("auctionHouseName"));
 
         categoryColumn.setCellValueFactory(CellValueFactoryProvider.forCategoryInfo(Auction::getAuctionItemCategoryCode,
@@ -96,18 +81,17 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
 
         endDateColumn.setCellValueFactory(new PropertyValueFactory<>("endDate"));
         endDateColumn.setCellFactory(column -> new RightAlignedDateCell<>());
-
-        customizeTableColumns();
-    }
-
-    protected void customizeTableColumns() {
-
     }
 
     public abstract List<Auction> loadAuctions();
 
     protected List<Auction> loadTableItems() {
         return loadAuctions();
+    }
+
+    @Override
+    protected void handleDoubleClick() {
+        handleEditAuction();
     }
 
     @FXML

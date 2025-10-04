@@ -83,6 +83,10 @@
     -fx-text-fill: white;
 }
 
+.table-row-cell.expired-auction .text {
+    -fx-strikethrough: true;
+}
+
 /* Text Areas */
 .text-area {
     -fx-background-color: #ffffff;

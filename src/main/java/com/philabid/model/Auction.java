@@ -15,6 +15,7 @@ public class Auction {
     private String lotId;
     private String url;
     private MonetaryAmount currentPrice;
+    private MonetaryAmount maxBid;
     private LocalDateTime endDate;
     private boolean archived;
     private LocalDateTime createdAt;
@@ -185,5 +186,13 @@ public class Auction {
 
     public void setArchived(boolean archived) {
         this.archived = archived;
+    }
+
+    public MonetaryAmount getMaxBid() {
+        return maxBid;
+    }
+
+    public void setMaxBid(MonetaryAmount maxBid) {
+        this.maxBid = maxBid;
     }
 }

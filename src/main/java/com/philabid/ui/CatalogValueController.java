@@ -6,13 +6,10 @@ import com.philabid.ui.cell.MonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -22,17 +19,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.money.MonetaryAmount;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Controller for the Catalog Value management view (CatalogValueView.fxml).
  */
-public class CatalogValueController {
+public class CatalogValueController extends BaseTableViewController<CatalogValue> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueController.class);
-    private final ObservableList<CatalogValue> catalogValueList = FXCollections.observableArrayList();
-    @FXML
-    private TableView<CatalogValue> catalogValueTable;
     @FXML
     private TableColumn<CatalogValue, String> categoryColumn;
     @FXML
@@ -44,8 +39,8 @@ public class CatalogValueController {
     @FXML
     private TableColumn<CatalogValue, MonetaryAmount> valueColumn;
 
-    @FXML
-    private void initialize() {
+    @Override
+    protected void initializeView() {
         // Use the provider for a consistent "Category (CODE)" format
         categoryColumn.setCellValueFactory(CellValueFactoryProvider.forCategoryInfo(
                 CatalogValue::getAuctionItemCategoryCode, CatalogValue::getAuctionItemCategoryName));
@@ -65,14 +60,11 @@ public class CatalogValueController {
 
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         valueColumn.setCellFactory(column -> new MonetaryAmountCell<>());
-
-        catalogValueTable.setItems(catalogValueList);
     }
 
-    public void loadCatalogValues() {
-        catalogValueList.setAll(AppContext.getCatalogValueService().getAllCatalogValues());
-        catalogValueTable.sort();
-        logger.info("Loaded {} catalog values into the table.", catalogValueList.size());
+    @Override
+    protected List<CatalogValue> loadTableItems() {
+        return AppContext.getCatalogValueService().getAllCatalogValues();
     }
 
     @FXML
@@ -87,7 +79,7 @@ public class CatalogValueController {
         if (!Objects.isNull(result)) {
             if (result.saveClicked()) {
                 AppContext.getCatalogValueService().saveCatalogValue(newCatalogValue);
-                loadCatalogValues();
+                refreshTable();
             }
             if (result.addAnother()) {
                 Platform.runLater(this::doHandleAddCatalogValue);
@@ -106,7 +98,7 @@ public class CatalogValueController {
             Stage dialogStage = new Stage();
             dialogStage.setTitle(catalogValue.getId() == null ? "Add Catalog Value" : "Edit Catalog Value");
             dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(catalogValueTable.getScene().getWindow());
+            dialogStage.initOwner(table.getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
@@ -125,7 +117,7 @@ public class CatalogValueController {
 
     @FXML
     private void handleEditCatalogValue() {
-        CatalogValue selected = catalogValueTable.getSelectionModel().getSelectedItem();
+        CatalogValue selected = table.getSelectionModel().getSelectedItem();
         if (selected != null) {
             logger.info("Edit catalog value button clicked for item ID: {}", selected.getAuctionItemId());
             // Logic to be implemented
@@ -134,10 +126,15 @@ public class CatalogValueController {
 
     @FXML
     private void handleDeleteCatalogValue() {
-        CatalogValue selected = catalogValueTable.getSelectionModel().getSelectedItem();
+        CatalogValue selected = table.getSelectionModel().getSelectedItem();
         if (selected != null) {
             logger.info("Delete catalog value button clicked for item ID: {}", selected.getAuctionItemId());
             // Logic to be implemented
         }
+    }
+
+    @Override
+    protected void handleDoubleClick() {
+        handleEditCatalogValue();
     }
 }

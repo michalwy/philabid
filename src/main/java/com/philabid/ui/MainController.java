@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
@@ -92,6 +94,8 @@ public class MainController implements Initializable {
     @FXML
     private ArchivedAuctionController archivedAuctionViewController;
 
+    private final Map<Tab, BaseTableViewController<?>> tabControllerMap = new HashMap<>();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.info("Initializing MainController");
@@ -119,6 +123,7 @@ public class MainController implements Initializable {
             addLogMessage("Application started successfully");
         }
 
+        initializeTabControllerMap();
         updateLocalizedStrings();
         setupTabListeners();
     }
@@ -145,38 +150,22 @@ public class MainController implements Initializable {
      * Sets up listeners to refresh data when a tab is selected.
      */
     private void setupTabListeners() {
-        if (activeAuctionsTab != null && activeAuctionViewController != null) {
-            activeAuctionsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-                if (isNowSelected) {
-                    logger.info("Active Auctions tab selected, refreshing data.");
-                    activeAuctionViewController.refreshTable();
+        mainTabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab != null) {
+                BaseTableViewController<?> controller = tabControllerMap.get(newTab);
+                if (controller != null) {
+                    logger.info("'{}' tab selected, refreshing data.", newTab.getText());
+                    controller.refreshTable();
                 }
-            });
-        }
-        if (archivedAuctionsTab != null && archivedAuctionViewController != null) {
-            archivedAuctionsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-                if (isNowSelected) {
-                    logger.info("Archived Auctions tab selected, refreshing data.");
-                    archivedAuctionViewController.refreshTable();
-                }
-            });
-        }
-        if (auctionItemsTab != null && auctionItemViewController != null) {
-            auctionItemsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-                if (isNowSelected) {
-                    logger.info("Auction Items tab selected, refreshing data.");
-                    auctionItemViewController.loadAuctionItems();
-                }
-            });
-        }
-        if (catalogValuesTab != null && catalogValueViewController != null) {
-            catalogValuesTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-                if (isNowSelected) {
-                    logger.info("Catalog Values tab selected, refreshing data.");
-                    catalogValueViewController.loadCatalogValues();
-                }
-            });
-        }
+            }
+        });
+    }
+
+    private void initializeTabControllerMap() {
+        tabControllerMap.put(activeAuctionsTab, activeAuctionViewController);
+        tabControllerMap.put(archivedAuctionsTab, archivedAuctionViewController);
+        tabControllerMap.put(auctionItemsTab, auctionItemViewController);
+        tabControllerMap.put(catalogValuesTab, catalogValueViewController);
     }
 
     /**

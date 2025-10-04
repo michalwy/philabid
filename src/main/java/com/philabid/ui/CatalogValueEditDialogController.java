@@ -6,20 +6,19 @@ import com.philabid.model.CatalogValue;
 import com.philabid.model.Category;
 import com.philabid.model.Condition;
 import com.philabid.ui.control.AuctionItemSelector;
+import com.philabid.ui.control.MonetaryField;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
-import java.math.BigDecimal;
 
 /**
  * Controller for the catalog value edit dialog.
@@ -34,7 +33,7 @@ public class CatalogValueEditDialogController {
     @FXML
     private ComboBox<Catalog> catalogComboBox;
     @FXML
-    private TextField valueField;
+    private MonetaryField valueField;
     @FXML
     private ComboBox<CurrencyUnit> currencyComboBox;
     @FXML
@@ -77,7 +76,7 @@ public class CatalogValueEditDialogController {
         this.catalogValue = catalogValue;
 
         if (catalogValue.getValue() != null) {
-            valueField.setText(catalogValue.getValue().getNumber().toString());
+            valueField.setAmount(catalogValue.getValue());
         }
 
         // Pre-select items in ComboBoxes if editing an existing value
@@ -128,7 +127,7 @@ public class CatalogValueEditDialogController {
             catalogValue.setConditionId(conditionComboBox.getSelectionModel().getSelectedItem().getId());
             catalogValue.setCatalogId(catalogComboBox.getSelectionModel().getSelectedItem().getId());
             try {
-                catalogValue.setValue(Money.of(new BigDecimal(valueField.getText()),
+                catalogValue.setValue(Money.of(valueField.getAmount(),
                         currencyComboBox.getSelectionModel().getSelectedItem()));
             } catch (NumberFormatException e) {
                 // This should be caught by isInputValid(), but as a safeguard:
@@ -167,14 +166,8 @@ public class CatalogValueEditDialogController {
         if (currencyComboBox.getSelectionModel().getSelectedItem() == null) {
             errorMessage.append("Currency must be selected!\n");
         }
-        if (valueField.getText() == null || valueField.getText().trim().isEmpty()) {
+        if (valueField.isEmpty()) {
             errorMessage.append("Value cannot be empty!\n");
-        } else {
-            try {
-                new BigDecimal(valueField.getText());
-            } catch (NumberFormatException e) {
-                errorMessage.append("Value must be a valid number!\n");
-            }
         }
 
         if (errorMessage.isEmpty()) {

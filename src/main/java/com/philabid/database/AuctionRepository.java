@@ -22,7 +22,7 @@ public class AuctionRepository {
     private static final String FIND_QUERY = """
                       SELECT
                           a.id, a.auction_house_id, a.auction_item_id, a.condition_id, a.lot_id, a.url,
-                          a.current_price, a.currency_code, a.end_date, a.archived, a.created_at, a.updated_at,
+                          a.current_price, a.max_bid, a.currency_code, a.end_date, a.archived, a.created_at, a.updated_at,
                           cv.value AS catalog_value, cv.currency_code AS catalog_currency_code,
                           ah.name AS auction_house_name,
                           ai.catalog_number AS auction_item_catalog_number,
@@ -118,9 +118,10 @@ public class AuctionRepository {
     private Auction insert(Auction auction) throws SQLException {
         String sql =
                 "INSERT INTO auctions(auction_house_id, auction_item_id, condition_id, lot_id, url, " +
-                        "current_price, currency_code, end_date, archived, created_at, updated_at) VALUES(?,?,?,?,?," +
+                        "current_price, currency_code, end_date, archived, created_at, updated_at, max_bid) VALUES(?," +
+                        "?,?,?,?," +
                         "?," +
-                        "?,?,?,?,?)";
+                        "?,?,?,?,?,?)";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -138,6 +139,8 @@ public class AuctionRepository {
             pstmt.setBoolean(9, auction.isArchived());
             pstmt.setTimestamp(10, Timestamp.valueOf(auction.getCreatedAt()));
             pstmt.setTimestamp(11, Timestamp.valueOf(auction.getUpdatedAt()));
+            pstmt.setBigDecimal(12,
+                    auction.getMaxBid() != null ? auction.getMaxBid().getNumber().numberValue(BigDecimal.class) : null);
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {
@@ -162,7 +165,7 @@ public class AuctionRepository {
         String sql =
                 "UPDATE auctions SET auction_house_id = ?, auction_item_id = ?, condition_id = ?, " +
                         "lot_id = ?, url = ?, current_price = ?, currency_code = ?, end_date = ?, " +
-                        "archived = ?, updated_at = ? WHERE id = ?";
+                        "archived = ?, updated_at = ?, max_bid = ? WHERE id = ?";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -178,7 +181,9 @@ public class AuctionRepository {
             pstmt.setTimestamp(8, auction.getEndDate() != null ? Timestamp.valueOf(auction.getEndDate()) : null);
             pstmt.setBoolean(9, auction.isArchived());
             pstmt.setTimestamp(10, Timestamp.valueOf(auction.getUpdatedAt()));
-            pstmt.setLong(11, auction.getId());
+            pstmt.setBigDecimal(11,
+                    auction.getMaxBid() != null ? auction.getMaxBid().getNumber().numberValue(BigDecimal.class) : null);
+            pstmt.setLong(12, auction.getId());
 
             pstmt.executeUpdate();
             return auction;
@@ -197,6 +202,10 @@ public class AuctionRepository {
         auction.setLotId(rs.getString("lot_id"));
         auction.setUrl(rs.getString("url"));
         auction.setCurrentPrice(Money.of(rs.getBigDecimal("current_price"), rs.getString("currency_code")));
+        BigDecimal maxBid = rs.getBigDecimal("max_bid");
+        if (maxBid != null) {
+            auction.setMaxBid(Money.of(rs.getBigDecimal("max_bid"), rs.getString("currency_code")));
+        }
         Timestamp endDate = rs.getTimestamp("end_date");
         if (endDate != null) {
             auction.setEndDate(endDate.toLocalDateTime());

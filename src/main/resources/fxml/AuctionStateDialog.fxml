@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.philabid.ui.control.MonetaryField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/17.0.2-ea"
+          fx:controller="com.philabid.ui.AuctionStateDialogController">
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10"/>
+    </padding>
+
+    <Label text="%auctions.state.label.url" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+    <Hyperlink fx:id="urlLink" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="3"/>
+
+    <Label text="%auctions.state.label.currentPrice" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <MonetaryField fx:id="currentPrice" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+    <Label text="%auctions.state.label.maxBid" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+    <MonetaryField fx:id="maxBid" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+    <Label text="%auctions.state.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3"/>
+
+    <ButtonBar GridPane.columnSpan="4" GridPane.rowIndex="3">
+        <buttons>
+            <Button fx:id="saveAndAddNextButton" onAction="#handleSaveAndNext" text="%common.saveAndNext"
+                    defaultButton="true"/>
+            <Button onAction="#handleSave" text="%common.save"/>
+            <Button cancelButton="true" onAction="#handleCancel" text="%common.cancel"/>
+        </buttons>
+    </ButtonBar>
+</GridPane>

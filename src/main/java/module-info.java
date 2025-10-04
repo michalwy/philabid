@@ -27,5 +27,6 @@ module philabid {
     exports com.philabid.database;
     exports com.philabid.parsing;
     exports com.philabid.i18n;
+    exports com.philabid.util;
     opens com.philabid.ui.control to javafx.fxml;
 }

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS idx_auction_item_unique ON auction_items (category_id, catalog_number);

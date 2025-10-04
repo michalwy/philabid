@@ -19,7 +19,7 @@
                         text="%common.delete"/>
             </items>
         </ToolBar>
-        <TableView fx:id="catalogValueTable" VBox.vgrow="ALWAYS">
+        <TableView fx:id="table" VBox.vgrow="ALWAYS">
             <columns>
                 <TableColumn fx:id="categoryColumn" prefWidth="200.0" text="%catalogValues.column.category"/>
                 <TableColumn fx:id="catalogNumberColumn" prefWidth="200.0" text="%catalogValues.column.catalogNumber"/>

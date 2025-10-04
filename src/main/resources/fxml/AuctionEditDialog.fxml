@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.philabid.ui.control.AuctionItemSelector?>
+<?import com.philabid.ui.control.MonetaryField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -35,7 +36,7 @@
     <TextField fx:id="lotIdField" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
     <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-    <TextField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+    <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
     <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
     <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7"/>

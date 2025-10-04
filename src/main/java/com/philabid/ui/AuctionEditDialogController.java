@@ -6,6 +6,7 @@ import com.philabid.model.AuctionHouse;
 import com.philabid.model.AuctionStatus;
 import com.philabid.model.Condition;
 import com.philabid.ui.control.AuctionItemSelector;
+import com.philabid.ui.control.MonetaryField;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -17,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -47,7 +47,7 @@ public class AuctionEditDialogController {
     @FXML
     private TextField urlField;
     @FXML
-    private TextField priceField;
+    private MonetaryField priceField;
     @FXML
     private Button fetchUrlButton;
     @FXML
@@ -75,18 +75,6 @@ public class AuctionEditDialogController {
                 currencyComboBox.getSelectionModel().select(newVal.getCurrency());
             }
         });
-
-        // Enforce numeric format (with optional decimal part) on the price field
-        UnaryOperator<TextFormatter.Change> priceFilter = change -> {
-            String newText = change.getControlNewText();
-            // This regex allows digits and at most one decimal separator (dot or comma).
-            if (newText.matches("^\\d*([.,]\\d*)?$")) {
-                return change;
-            }
-            return null;
-        };
-
-        priceField.setTextFormatter(new TextFormatter<>(priceFilter));
 
         // Enforce HH:mm format on the time field
         UnaryOperator<TextFormatter.Change> timeFilter = change -> {
@@ -156,7 +144,7 @@ public class AuctionEditDialogController {
         lotIdField.setText(auction.getLotId());
         urlField.setText(auction.getUrl());
         if (auction.getCurrentPrice() != null) {
-            priceField.setText(auction.getCurrentPrice().getNumber().toString());
+            priceField.setAmount(auction.getCurrentPrice());
         }
 
         if (auction.getId() == null) { // It's a new auction
@@ -229,12 +217,8 @@ public class AuctionEditDialogController {
             auction.setConditionId(conditionComboBox.getValue().getId());
             auction.setLotId(lotIdField.getText());
             auction.setUrl(urlField.getText());
-            try {
-                auction.setCurrentPrice(
-                        Money.of(new BigDecimal(priceField.getText().replace(",", ".")), currencyComboBox.getValue()));
-            } catch (NumberFormatException e) {
-                auction.setCurrentPrice(null);
-            }
+            auction.setCurrentPrice(Money.of(priceField.getAmount(), currencyComboBox.getValue()));
+
             LocalDate localDate = endDatePicker.getValue();
             LocalDateTime newEndDate = null;
             if (localDate != null) {
@@ -317,7 +301,7 @@ public class AuctionEditDialogController {
                 }
                 lotIdField.setText(data.lotId());
                 if (data.currentPrice() != null) {
-                    priceField.setText(data.currentPrice().getNumber().toString());
+                    priceField.setAmount(data.currentPrice());
                     currencyComboBox.getSelectionModel().select(data.currentPrice().getCurrency());
                 }
                 if (data.closingDate() != null) {
