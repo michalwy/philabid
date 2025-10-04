@@ -51,7 +51,8 @@ public class AuctionService {
 
     public Optional<Auction> saveAuction(Auction auction) {
         // Basic validation
-        if (auction.getAuctionHouseId() == null || auction.getAuctionItemId() == null || auction.getConditionId() == null) {
+        if (auction.getAuctionHouseId() == null || auction.getAuctionItemId() == null ||
+                auction.getConditionId() == null) {
             logger.warn("Attempted to save an auction with missing required IDs.");
             return Optional.empty();
         }

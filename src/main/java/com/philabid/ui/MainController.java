@@ -91,9 +91,9 @@ public class MainController implements Initializable {
     @FXML
     private CatalogValueController catalogValueViewController;
     @FXML
-    private AuctionController activeAuctionViewController;
+    private ActiveAuctionController activeAuctionViewController;
     @FXML
-    private AuctionController archivedAuctionViewController;
+    private ArchivedAuctionController archivedAuctionViewController;
 
     // Services
     private I18nManager i18nManager;
@@ -159,7 +159,6 @@ public class MainController implements Initializable {
 
         // Inject services into child controllers
         if (activeAuctionViewController != null) {
-            activeAuctionViewController.configure(false); // Show active
             activeAuctionViewController.setServices(this.auctionService, this.auctionHouseService,
                     this.auctionItemService,
                     this.conditionService, this.currencyService, this.i18nManager, this.categoryService,
@@ -167,7 +166,6 @@ public class MainController implements Initializable {
             logger.info("Services injected into ActiveAuctionController.");
         }
         if (archivedAuctionViewController != null) {
-            archivedAuctionViewController.configure(true); // Show archived
             archivedAuctionViewController.setServices(this.auctionService, this.auctionHouseService,
                     this.auctionItemService,
                     this.conditionService, this.currencyService, this.i18nManager, this.categoryService,
@@ -219,7 +217,7 @@ public class MainController implements Initializable {
             activeAuctionsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
                 if (isNowSelected) {
                     logger.info("Active Auctions tab selected, refreshing data.");
-                    activeAuctionViewController.loadAuctions();
+                    activeAuctionViewController.refreshTable();
                 }
             });
         }
@@ -227,7 +225,7 @@ public class MainController implements Initializable {
             archivedAuctionsTab.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
                 if (isNowSelected) {
                     logger.info("Archived Auctions tab selected, refreshing data.");
-                    archivedAuctionViewController.loadAuctions();
+                    archivedAuctionViewController.refreshTable();
                 }
             });
         }

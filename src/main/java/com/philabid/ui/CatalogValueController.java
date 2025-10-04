@@ -3,9 +3,9 @@ package com.philabid.ui;
 import com.philabid.i18n.I18nManager;
 import com.philabid.model.CatalogValue;
 import com.philabid.service.*;
+import com.philabid.ui.cell.MonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
-import com.philabid.ui.util.MonetaryColumnValue;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,12 +14,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.money.MonetaryAmount;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -41,7 +43,7 @@ public class CatalogValueController {
     @FXML
     private TableColumn<CatalogValue, String> catalogColumn;
     @FXML
-    private TableColumn<CatalogValue, MonetaryColumnValue> valueColumn;
+    private TableColumn<CatalogValue, MonetaryAmount> valueColumn;
     private CatalogValueService catalogValueService;
     private AuctionItemService auctionItemService;
     private ConditionService conditionService;
@@ -69,8 +71,8 @@ public class CatalogValueController {
         conditionColumn.setCellValueFactory(CellValueFactoryProvider.forConditionInfo(CatalogValue::getConditionCode,
                 CatalogValue::getConditionName));
 
-        valueColumn.setCellValueFactory(CellValueFactoryProvider.forValueWithCurrency(CatalogValue::getValue));
-        valueColumn.setComparator(MonetaryColumnValue.SORT_COMPARATOR);
+        valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+        valueColumn.setCellFactory(column -> new MonetaryAmountCell<>());
 
         catalogValueTable.setItems(catalogValueList);
     }

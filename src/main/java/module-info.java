@@ -12,6 +12,7 @@ module philabid {
     requires com.fasterxml.jackson.databind;
     requires javafx.graphics;
     requires javafx.base;
+    requires okhttp3;
 
     opens com.philabid to javafx.fxml;
     opens com.philabid.ui to javafx.fxml;
@@ -19,11 +20,12 @@ module philabid {
 
     exports com.philabid;
     exports com.philabid.ui;
+    exports com.philabid.ui.util;
+    exports com.philabid.ui.control;
     exports com.philabid.model;
     exports com.philabid.service;
     exports com.philabid.database;
     exports com.philabid.parsing;
     exports com.philabid.i18n;
-    exports com.philabid.ui.control;
     opens com.philabid.ui.control to javafx.fxml;
 }
