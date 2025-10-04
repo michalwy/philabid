@@ -1,8 +1,8 @@
 package com.philabid.ui;
 
+import com.philabid.AppContext;
 import com.philabid.model.Catalog;
 import com.philabid.model.Category;
-import com.philabid.service.CatalogService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -35,21 +35,16 @@ public class CategoryEditDialogController {
 
     private Stage dialogStage;
     private Category category;
-    private CatalogService catalogService;
     private boolean saveClicked = false;
 
     @FXML
     private void initialize() {
+        populateCatalogComboBox();
         logger.debug("CategoryEditDialogController initialized.");
     }
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
-    }
-
-    public void setServices(CatalogService catalogService) {
-        this.catalogService = catalogService;
-        populateCatalogComboBox();
     }
 
     public void setCategory(Category category) {
@@ -67,13 +62,9 @@ public class CategoryEditDialogController {
     }
 
     private void populateCatalogComboBox() {
-        if (catalogService != null) {
-            List<Catalog> catalogs = catalogService.getAllCatalogs();
-            catalogComboBox.setItems(FXCollections.observableArrayList(catalogs));
-            logger.debug("Populated catalog ComboBox with {} items.", catalogs.size());
-        } else {
-            logger.warn("CatalogService is not available. Cannot populate catalog ComboBox.");
-        }
+        List<Catalog> catalogs = AppContext.getCatalogService().getAllCatalogs();
+        catalogComboBox.setItems(FXCollections.observableArrayList(catalogs));
+        logger.debug("Populated catalog ComboBox with {} items.", catalogs.size());
     }
 
     public boolean isSaveClicked() {
@@ -113,7 +104,7 @@ public class CategoryEditDialogController {
             errorMessage += "No valid code!\n";
         }
 
-        if (errorMessage.length() == 0) {
+        if (errorMessage.isEmpty()) {
             return true;
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);

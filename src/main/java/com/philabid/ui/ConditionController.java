@@ -1,8 +1,7 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.Condition;
-import com.philabid.service.ConditionService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,7 +24,7 @@ import java.util.Optional;
 public class ConditionController {
 
     private static final Logger logger = LoggerFactory.getLogger(ConditionController.class);
-
+    private final ObservableList<Condition> conditionList = FXCollections.observableArrayList();
     @FXML
     private TableView<Condition> conditionTable;
     @FXML
@@ -39,10 +38,6 @@ public class ConditionController {
     @FXML
     private Button deleteButton;
 
-    private ConditionService conditionService;
-    private I18nManager i18nManager;
-    private final ObservableList<Condition> conditionList = FXCollections.observableArrayList();
-
     @FXML
     private void initialize() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -52,23 +47,14 @@ public class ConditionController {
 
         editButton.disableProperty().bind(conditionTable.getSelectionModel().selectedItemProperty().isNull());
         deleteButton.disableProperty().bind(conditionTable.getSelectionModel().selectedItemProperty().isNull());
-        
+
+        loadConditions();
         logger.debug("ConditionController initialized.");
     }
 
-    public void setServices(ConditionService conditionService, I18nManager i18nManager) {
-        this.conditionService = conditionService;
-        this.i18nManager = i18nManager;
-        loadConditions();
-    }
-
     private void loadConditions() {
-        if (conditionService != null) {
-            conditionList.setAll(conditionService.getAllConditions());
-            logger.info("Loaded {} conditions into the table.", conditionList.size());
-        } else {
-            logger.warn("ConditionService is not available. Cannot load data.");
-        }
+        conditionList.setAll(AppContext.getConditionService().getAllConditions());
+        logger.info("Loaded {} conditions into the table.", conditionList.size());
     }
 
     @FXML
@@ -77,7 +63,7 @@ public class ConditionController {
         Condition newCondition = new Condition();
         boolean saveClicked = showConditionEditDialog(newCondition);
         if (saveClicked) {
-            conditionService.saveCondition(newCondition);
+            AppContext.getConditionService().saveCondition(newCondition);
             loadConditions();
         }
     }
@@ -89,7 +75,7 @@ public class ConditionController {
             logger.info("Edit condition button clicked for: {}", selected.getName());
             boolean saveClicked = showConditionEditDialog(selected);
             if (saveClicked) {
-                conditionService.saveCondition(selected);
+                AppContext.getConditionService().saveCondition(selected);
                 loadConditions();
             }
         }
@@ -107,7 +93,7 @@ public class ConditionController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean deleted = conditionService.deleteCondition(selected.getId());
+                boolean deleted = AppContext.getConditionService().deleteCondition(selected.getId());
                 if (deleted) {
                     loadConditions();
                 } else {
@@ -124,7 +110,7 @@ public class ConditionController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/ConditionEditDialog.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
             GridPane page = loader.load();
 

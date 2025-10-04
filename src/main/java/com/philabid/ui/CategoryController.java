@@ -1,9 +1,7 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.Category;
-import com.philabid.service.CatalogService;
-import com.philabid.service.CategoryService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,9 +37,6 @@ public class CategoryController {
     private TableColumn<Category, String> codeColumn;
     @FXML
     private TableColumn<Category, String> catalogColumn;
-    private CategoryService categoryService;
-    private CatalogService catalogService;
-    private I18nManager i18nManager;
 
     @FXML
     private void initialize() {
@@ -56,23 +51,13 @@ public class CategoryController {
         });
 
         categoryTable.setItems(categoryList);
-    }
-
-    public void setServices(CategoryService categoryService, CatalogService catalogService, I18nManager i18nManager) {
-        this.categoryService = categoryService;
-        this.catalogService = catalogService;
-        this.i18nManager = i18nManager;
 
         loadCategories();
     }
 
     private void loadCategories() {
-        if (categoryService != null) {
-            categoryList.setAll(categoryService.getAllCategories());
-            logger.info("Loaded {} categories into the table.", categoryList.size());
-        } else {
-            logger.warn("CategoryService is not available. Cannot load data.");
-        }
+        categoryList.setAll(AppContext.getCategoryService().getAllCategories());
+        logger.info("Loaded {} categories into the table.", categoryList.size());
     }
 
     @FXML
@@ -81,7 +66,7 @@ public class CategoryController {
         Category newCategory = new Category();
         boolean saveClicked = showCategoryEditDialog(newCategory);
         if (saveClicked) {
-            categoryService.saveCategory(newCategory);
+            AppContext.getCategoryService().saveCategory(newCategory);
             loadCategories();
         }
     }
@@ -93,7 +78,7 @@ public class CategoryController {
             logger.info("Edit category button clicked for: {}", selected.getName());
             boolean saveClicked = showCategoryEditDialog(selected);
             if (saveClicked) {
-                categoryService.saveCategory(selected);
+                AppContext.getCategoryService().saveCategory(selected);
                 loadCategories();
             }
         }
@@ -111,7 +96,7 @@ public class CategoryController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean deleted = categoryService.deleteCategory(selected.getId());
+                boolean deleted = AppContext.getCategoryService().deleteCategory(selected.getId());
                 if (deleted) {
                     loadCategories();
                 } else {
@@ -128,7 +113,7 @@ public class CategoryController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/CategoryEditDialog.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
             GridPane page = loader.load();
 
@@ -141,7 +126,6 @@ public class CategoryController {
 
             CategoryEditDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setServices(catalogService);
             controller.setCategory(category);
 
             dialogStage.showAndWait();

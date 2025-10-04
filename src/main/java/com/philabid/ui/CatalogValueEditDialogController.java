@@ -1,11 +1,10 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.Catalog;
 import com.philabid.model.CatalogValue;
 import com.philabid.model.Category;
 import com.philabid.model.Condition;
-import com.philabid.service.*;
 import com.philabid.ui.control.AuctionItemSelector;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -44,12 +43,6 @@ public class CatalogValueEditDialogController {
     private Button cancelButton;
     private Stage dialogStage;
     private CatalogValue catalogValue;
-    private AuctionItemService auctionItemService;
-    private ConditionService conditionService;
-    private CatalogService catalogService;
-    private CategoryService categoryService;
-    private I18nManager i18nManager;
-    private CurrencyService currencyService;
     private EditDialogResult editDialogResult;
 
     @FXML
@@ -71,26 +64,13 @@ public class CatalogValueEditDialogController {
 
         auctionItemSelector.selectedCategoryProperty()
                 .addListener((obs, oldVal, newVal) -> autoSelectCatalogAndCurrency(newVal));
+        auctionItemSelector.load(AppContext.getI18nManager().getResourceBundle());
+
+        populateComboBoxes();
     }
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
-    }
-
-    public void setServices(CurrencyService currencyService, AuctionItemService auctionItemService,
-                            ConditionService conditionService,
-                            CatalogService catalogService, CategoryService categoryService, I18nManager i18nManager) {
-        this.currencyService = currencyService;
-        this.auctionItemService = auctionItemService;
-        this.conditionService = conditionService;
-        this.catalogService = catalogService;
-        this.categoryService = categoryService;
-        this.i18nManager = i18nManager;
-
-        auctionItemSelector.load(i18nManager.getResourceBundle());
-        auctionItemSelector.setServices(auctionItemService, categoryService);
-
-        populateComboBoxes();
     }
 
     public void setCatalogValue(CatalogValue catalogValue) {
@@ -102,7 +82,7 @@ public class CatalogValueEditDialogController {
 
         // Pre-select items in ComboBoxes if editing an existing value
         if (catalogValue.getAuctionItemId() != null) {
-            auctionItemService.getAuctionItemById(catalogValue.getAuctionItemId())
+            AppContext.getAuctionItemService().getAuctionItemById(catalogValue.getAuctionItemId())
                     .ifPresent(auctionItemSelector::setSelectedAuctionItem);
         }
         if (catalogValue.getConditionId() != null) {
@@ -111,7 +91,7 @@ public class CatalogValueEditDialogController {
         }
         if (catalogValue.getCatalogId() != null) {
             catalogComboBox.getSelectionModel()
-                    .select(catalogService.getCatalogById(catalogValue.getCatalogId()).orElse(null));
+                    .select(AppContext.getCatalogService().getCatalogById(catalogValue.getCatalogId()).orElse(null));
         }
         if (catalogValue.getValue() != null) {
             currencyComboBox.getSelectionModel().select(catalogValue.getValue().getCurrency());
@@ -119,14 +99,15 @@ public class CatalogValueEditDialogController {
     }
 
     private void populateComboBoxes() {
-        conditionComboBox.setItems(FXCollections.observableArrayList(conditionService.getAllConditions()));
-        catalogComboBox.setItems(FXCollections.observableArrayList(catalogService.getAllCatalogs()));
-        currencyComboBox.setItems(FXCollections.observableArrayList(currencyService.getCurrencies()));
+        conditionComboBox.setItems(
+                FXCollections.observableArrayList(AppContext.getConditionService().getAllConditions()));
+        catalogComboBox.setItems(FXCollections.observableArrayList(AppContext.getCatalogService().getAllCatalogs()));
+        currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
     }
 
     private void autoSelectCatalogAndCurrency(Category category) {
         if (category != null && category.getCatalogId() != null) {
-            catalogService.getCatalogById(category.getCatalogId()).ifPresent(defaultCatalog -> {
+            AppContext.getCatalogService().getCatalogById(category.getCatalogId()).ifPresent(defaultCatalog -> {
                 catalogComboBox.getSelectionModel().select(defaultCatalog);
                 // Auto-select currency based on catalog
                 if (defaultCatalog.getCurrency() != null) {
@@ -201,8 +182,8 @@ public class CatalogValueEditDialogController {
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.initOwner(dialogStage);
-            alert.setTitle(i18nManager.getString("common.invalidFields"));
-            alert.setHeaderText(i18nManager.getString("common.correctInvalidFields"));
+            alert.setTitle(AppContext.getI18nManager().getString("common.invalidFields"));
+            alert.setHeaderText(AppContext.getI18nManager().getString("common.correctInvalidFields"));
             alert.setContentText(errorMessage.toString());
             alert.showAndWait();
             return false;

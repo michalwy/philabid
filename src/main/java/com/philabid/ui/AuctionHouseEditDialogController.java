@@ -1,7 +1,7 @@
 package com.philabid.ui;
 
+import com.philabid.AppContext;
 import com.philabid.model.AuctionHouse;
-import com.philabid.service.CurrencyService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -46,16 +46,10 @@ public class AuctionHouseEditDialogController {
     private AuctionHouse auctionHouse;
     private boolean saveClicked = false;
 
-    private CurrencyService currencyService;
-
     @FXML
     private void initialize() {
         Platform.runLater(() -> nameField.requestFocus());
         logger.debug("AuctionHouseEditDialogController initialized.");
-    }
-
-    public void setServices(CurrencyService currencyService) {
-        this.currencyService = currencyService;
         populateCurrencyComboBox();
     }
 
@@ -80,7 +74,7 @@ public class AuctionHouseEditDialogController {
     }
 
     private void populateCurrencyComboBox() {
-        currencyComboBox.setItems(FXCollections.observableArrayList(currencyService.getCurrencies()));
+        currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
         logger.debug("Populated currency ComboBox with {} items.", currencyComboBox.getItems().size());
     }
 
@@ -121,7 +115,7 @@ public class AuctionHouseEditDialogController {
             errorMessage += "No currency selected!\n";
         }
 
-        if (errorMessage.length() == 0) {
+        if (errorMessage.isEmpty()) {
             return true;
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);

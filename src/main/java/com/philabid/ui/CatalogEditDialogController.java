@@ -1,7 +1,7 @@
 package com.philabid.ui;
 
+import com.philabid.AppContext;
 import com.philabid.model.Catalog;
-import com.philabid.service.CurrencyService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -35,17 +35,10 @@ public class CatalogEditDialogController {
     private Catalog catalog;
     private boolean saveClicked = false;
 
-    private CurrencyService currencyService;
-
     @FXML
     private void initialize() {
-
-        logger.debug("CatalogEditDialogController initialized.");
-    }
-
-    public void setServices(CurrencyService currencyService) {
-        this.currencyService = currencyService;
         populateCurrencyComboBox();
+        logger.debug("CatalogEditDialogController initialized.");
     }
 
     public void setDialogStage(Stage dialogStage) {
@@ -70,7 +63,7 @@ public class CatalogEditDialogController {
     }
 
     private void populateCurrencyComboBox() {
-        currencyComboBox.setItems(FXCollections.observableArrayList(currencyService.getCurrencies()));
+        currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
     }
 
     public boolean isSaveClicked() {

@@ -1,5 +1,6 @@
 package com.philabid.ui;
 
+import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,11 +25,7 @@ public class ActiveAuctionController extends BaseAuctionController {
 
     @Override
     public List<Auction> loadAuctions() {
-        if (auctionService != null) {
-            return auctionService.getActiveAuctions();
-        } else {
-            return List.of();
-        }
+        return AppContext.getAuctionService().getActiveAuctions();
     }
 
     @Override
@@ -45,8 +42,8 @@ public class ActiveAuctionController extends BaseAuctionController {
 
             {
                 link.setOnAction(event -> {
-                    if (hostServices != null && !link.getText().isEmpty()) {
-                        hostServices.showDocument(link.getText());
+                    if (!link.getText().isEmpty()) {
+                        AppContext.getHostServices().showDocument(link.getText());
                     }
                 });
             }
@@ -84,7 +81,7 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ArchiveAuctionDialog.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
             GridPane page = loader.load();
 
             Stage dialogStage = new Stage();
@@ -100,8 +97,8 @@ public class ActiveAuctionController extends BaseAuctionController {
             dialogStage.showAndWait();
 
             if (controller.isSaveClicked()) {
-                auctionService.saveAuction(selectedAuction);
-                loadAuctions(); // Refresh the list
+                AppContext.getAuctionService().saveAuction(selectedAuction);
+                refreshTable();
             }
         } catch (IOException e) {
             logger.error("Failed to load Archive Auction dialog.", e);

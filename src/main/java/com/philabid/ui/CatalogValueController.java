@@ -1,8 +1,7 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.CatalogValue;
-import com.philabid.service.*;
 import com.philabid.ui.cell.MonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
@@ -44,13 +43,6 @@ public class CatalogValueController {
     private TableColumn<CatalogValue, String> catalogColumn;
     @FXML
     private TableColumn<CatalogValue, MonetaryAmount> valueColumn;
-    private CatalogValueService catalogValueService;
-    private AuctionItemService auctionItemService;
-    private ConditionService conditionService;
-    private CatalogService catalogService;
-    private CategoryService categoryService;
-    private I18nManager i18nManager;
-    private CurrencyService currencyService;
 
     @FXML
     private void initialize() {
@@ -77,27 +69,10 @@ public class CatalogValueController {
         catalogValueTable.setItems(catalogValueList);
     }
 
-    public void setServices(CurrencyService currencyService, CatalogValueService catalogValueService,
-                            AuctionItemService auctionItemService,
-                            ConditionService conditionService, CatalogService catalogService,
-                            CategoryService categoryService, I18nManager i18nManager) {
-        this.currencyService = currencyService;
-        this.catalogValueService = catalogValueService;
-        this.auctionItemService = auctionItemService;
-        this.conditionService = conditionService;
-        this.catalogService = catalogService;
-        this.categoryService = categoryService;
-        this.i18nManager = i18nManager;
-    }
-
     public void loadCatalogValues() {
-        if (catalogValueService != null) {
-            catalogValueList.setAll(catalogValueService.getAllCatalogValues());
-            catalogValueTable.sort();
-            logger.info("Loaded {} catalog values into the table.", catalogValueList.size());
-        } else {
-            logger.warn("CatalogValueService is not available. Cannot load data.");
-        }
+        catalogValueList.setAll(AppContext.getCatalogValueService().getAllCatalogValues());
+        catalogValueTable.sort();
+        logger.info("Loaded {} catalog values into the table.", catalogValueList.size());
     }
 
     @FXML
@@ -111,13 +86,11 @@ public class CatalogValueController {
         EditDialogResult result = showAuctionItemEditDialog(newCatalogValue);
         if (!Objects.isNull(result)) {
             if (result.saveClicked()) {
-                catalogValueService.saveCatalogValue(newCatalogValue);
+                AppContext.getCatalogValueService().saveCatalogValue(newCatalogValue);
                 loadCatalogValues();
             }
             if (result.addAnother()) {
-                Platform.runLater(() -> {
-                    doHandleAddCatalogValue();
-                });
+                Platform.runLater(this::doHandleAddCatalogValue);
             }
         }
     }
@@ -126,7 +99,7 @@ public class CatalogValueController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/CatalogValueEditDialog.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
             GridPane page = loader.load();
 
@@ -139,8 +112,6 @@ public class CatalogValueController {
 
             CatalogValueEditDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setServices(currencyService, auctionItemService, conditionService, catalogService,
-                    categoryService, i18nManager);
             controller.setCatalogValue(catalogValue);
 
             dialogStage.showAndWait();

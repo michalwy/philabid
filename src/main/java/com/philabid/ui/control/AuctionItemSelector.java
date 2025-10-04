@@ -1,9 +1,8 @@
 package com.philabid.ui.control;
 
+import com.philabid.AppContext;
 import com.philabid.model.AuctionItem;
 import com.philabid.model.Category;
-import com.philabid.service.AuctionItemService;
-import com.philabid.service.CategoryService;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -36,8 +35,6 @@ public class AuctionItemSelector extends VBox {
     private TextField auctionItemField;
     @FXML
     private ComboBox<Category> categoryComboBox;
-    private AuctionItemService auctionItemService;
-    private CategoryService categoryService;
 
     public AuctionItemSelector() {
     }
@@ -62,11 +59,7 @@ public class AuctionItemSelector extends VBox {
         categoryComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             selectedCategory.set(newVal);
         });
-    }
 
-    public void setServices(AuctionItemService auctionItemService, CategoryService categoryService) {
-        this.auctionItemService = auctionItemService;
-        this.categoryService = categoryService;
         populateComboBoxes();
         setupAuctionItemAutocomplete();
     }
@@ -108,14 +101,15 @@ public class AuctionItemSelector extends VBox {
     }
 
     private void populateComboBoxes() {
-        categoryComboBox.setItems(FXCollections.observableArrayList(categoryService.getAllCategories()));
+        categoryComboBox.setItems(
+                FXCollections.observableArrayList(AppContext.getCategoryService().getAllCategories()));
     }
 
     private void setupAuctionItemAutocomplete() {
         AutoCompletionBinding<AuctionItemSuggestion> binding = TextFields.bindAutoCompletion(auctionItemField,
                 suggestionRequest -> {
                     String filter = suggestionRequest.getUserText().toLowerCase();
-                    List<AuctionItem> allItems = auctionItemService.getAllAuctionItems();
+                    List<AuctionItem> allItems = AppContext.getAuctionItemService().getAllAuctionItems();
                     return allItems.stream()
                             .filter(item -> item.getCatalogNumber().toLowerCase().contains(filter) ||
                                     (item.getCategoryName() != null &&
@@ -127,7 +121,7 @@ public class AuctionItemSelector extends VBox {
         binding.setOnAutoCompleted(event -> {
             this.selectedAuctionItem.set(event.getCompletion().item());
             auctionItemField.setText(this.selectedAuctionItem.get().getCatalogNumber());
-            categoryService.getCategoryById(this.selectedAuctionItem.get().getCategoryId())
+            AppContext.getCategoryService().getCategoryById(this.selectedAuctionItem.get().getCategoryId())
                     .ifPresentOrElse(category -> {
                                 categoryComboBox.getSelectionModel().select(category);
                                 selectedCategory.set(category);
@@ -160,7 +154,7 @@ public class AuctionItemSelector extends VBox {
             newAuctionItem.setCatalogNumber(auctionItemField.getText());
             newAuctionItem.setOrderNumber(AuctionItem.calculateOrderNumber(auctionItemField.getText()));
             newAuctionItem.setCategoryId(categoryComboBox.getSelectionModel().getSelectedItem().getId());
-            auctionItemService.saveAuctionItem(newAuctionItem);
+            AppContext.getAuctionItemService().saveAuctionItem(newAuctionItem);
             logger.info("Created new AuctionItem with ID: {}", newAuctionItem.getId());
             return newAuctionItem.getId();
         }

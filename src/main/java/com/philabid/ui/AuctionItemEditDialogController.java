@@ -1,11 +1,9 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.AuctionItem;
 import com.philabid.model.Catalog;
 import com.philabid.model.Category;
-import com.philabid.service.CatalogService;
-import com.philabid.service.CategoryService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -39,9 +37,6 @@ public class AuctionItemEditDialogController {
     private Button cancelButton;
     private Stage dialogStage;
     private AuctionItem auctionItem;
-    private CategoryService categoryService;
-    private CatalogService catalogService;
-    private I18nManager i18nManager;
     private boolean saveClicked = false;
     private boolean addAnother = false;
 
@@ -55,18 +50,12 @@ public class AuctionItemEditDialogController {
             updateOrderNumberFromCatalogNumber(newValue);
         });
 
+        populateCategoryComboBox();
         logger.debug("AuctionItemEditDialogController initialized.");
     }
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
-    }
-
-    public void setServices(CategoryService categoryService, CatalogService catalogService, I18nManager i18nManager) {
-        this.categoryService = categoryService;
-        this.catalogService = catalogService;
-        this.i18nManager = i18nManager;
-        populateCategoryComboBox();
     }
 
     public void setAuctionItem(AuctionItem auctionItem) {
@@ -85,13 +74,9 @@ public class AuctionItemEditDialogController {
     }
 
     private void populateCategoryComboBox() {
-        if (categoryService != null) {
-            List<Category> categories = categoryService.getAllCategories();
-            categoryComboBox.setItems(FXCollections.observableArrayList(categories));
-            logger.debug("Populated category ComboBox with {} items.", categories.size());
-        } else {
-            logger.warn("CategoryService is not available. Cannot populate category ComboBox.");
-        }
+        List<Category> categories = AppContext.getCategoryService().getAllCategories();
+        categoryComboBox.setItems(FXCollections.observableArrayList(categories));
+        logger.debug("Populated category ComboBox with {} items.", categories.size());
     }
 
     public boolean isSaveClicked() {
@@ -111,7 +96,7 @@ public class AuctionItemEditDialogController {
             auctionItem.setCategoryId(selectedCategory.getId());
             // Set catalog info from selected category's catalog
             Catalog associatedCatalog =
-                    catalogService.getCatalogById(selectedCategory.getCatalogId()).orElse(null);
+                    AppContext.getCatalogService().getCatalogById(selectedCategory.getCatalogId()).orElse(null);
             if (associatedCatalog != null) {
                 auctionItem.setCatalogName(associatedCatalog.getName());
                 auctionItem.setCatalogIssueYear(associatedCatalog.getIssueYear());
@@ -152,7 +137,7 @@ public class AuctionItemEditDialogController {
 
     private boolean isInputValid() {
         String errorMessage = "";
-        ResourceBundle bundle = i18nManager != null ? i18nManager.getResourceBundle() : null;
+        ResourceBundle bundle = AppContext.getI18nManager().getResourceBundle();
 
         if (categoryComboBox.getSelectionModel().getSelectedItem() == null) {
             errorMessage += (bundle != null ? bundle.getString("auctionItems.validation.noCategorySelected") : "No " +

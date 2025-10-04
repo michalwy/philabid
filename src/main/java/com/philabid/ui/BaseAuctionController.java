@@ -1,14 +1,11 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.Auction;
-import com.philabid.parsing.UrlParsingService;
-import com.philabid.service.*;
 import com.philabid.ui.cell.MonetaryAmountCell;
 import com.philabid.ui.cell.RightAlignedDateCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
-import javafx.application.HostServices;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -51,16 +48,6 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
     @FXML
     protected TableColumn<Auction, LocalDateTime> endDateColumn;
 
-    protected AuctionService auctionService;
-    protected AuctionHouseService auctionHouseService;
-    protected AuctionItemService auctionItemService;
-    protected ConditionService conditionService;
-    protected CurrencyService currencyService;
-    protected CategoryService categoryService;
-    protected I18nManager i18nManager;
-    protected UrlParsingService urlParsingService;
-    protected HostServices hostServices;
-
     @Override
     protected void initializeView() {
         // Add double-click listener to open the edit dialog
@@ -73,21 +60,6 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
             });
             return row;
         });
-    }
-
-    public void setServices(AuctionService auctionService, AuctionHouseService auctionHouseService,
-                            AuctionItemService auctionItemService, ConditionService conditionService,
-                            CurrencyService currencyService, I18nManager i18nManager, CategoryService categoryService,
-                            UrlParsingService urlParsingService, HostServices hostServices) {
-        this.auctionService = auctionService;
-        this.auctionHouseService = auctionHouseService;
-        this.auctionItemService = auctionItemService;
-        this.conditionService = conditionService;
-        this.currencyService = currencyService;
-        this.categoryService = categoryService;
-        this.i18nManager = i18nManager;
-        this.urlParsingService = urlParsingService;
-        this.hostServices = hostServices;
     }
 
     @Override
@@ -144,8 +116,8 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
         Auction newAuction = new Auction();
         boolean saveClicked = showAuctionEditDialog(newAuction);
         if (saveClicked) {
-            auctionService.saveAuction(newAuction);
-            loadAuctions();
+            AppContext.getAuctionService().saveAuction(newAuction);
+            refreshTable();
         }
     }
 
@@ -156,8 +128,8 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
             logger.info("Edit auction button clicked for auction ID: {}", selected.getId());
             boolean saveClicked = showAuctionEditDialog(selected);
             if (saveClicked) {
-                auctionService.saveAuction(selected);
-                loadAuctions();
+                AppContext.getAuctionService().saveAuction(selected);
+                refreshTable();
             }
         }
     }
@@ -174,9 +146,9 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean deleted = auctionService.deleteAuction(selected.getId());
+                boolean deleted = AppContext.getAuctionService().deleteAuction(selected.getId());
                 if (deleted) {
-                    loadAuctions();
+                    refreshTable();
                 } else {
                     logger.error("Failed to delete auction with ID: {}", selected.getId());
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -191,7 +163,7 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/AuctionEditDialog.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
             GridPane page = loader.load();
 
             Stage dialogStage = new Stage();
@@ -203,8 +175,6 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
 
             AuctionEditDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setServices(auctionHouseService, auctionItemService, conditionService, categoryService,
-                    currencyService, i18nManager, urlParsingService);
             controller.setAuction(auction);
 
             dialogStage.showAndWait();

@@ -1,12 +1,10 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import com.philabid.model.AuctionHouse;
 import com.philabid.model.AuctionStatus;
 import com.philabid.model.Condition;
-import com.philabid.parsing.UrlParsingService;
-import com.philabid.service.*;
 import com.philabid.ui.control.AuctionItemSelector;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -64,12 +62,6 @@ public class AuctionEditDialogController {
     private Stage dialogStage;
     private Auction auction;
     private boolean saveClicked = false;
-
-    private AuctionHouseService auctionHouseService;
-    private AuctionItemService auctionItemService;
-    private ConditionService conditionService;
-    private CurrencyService currencyService;
-    private UrlParsingService urlParsingService;
 
     @FXML
     private void initialize() {
@@ -148,25 +140,14 @@ public class AuctionEditDialogController {
                 }
             }
         });
+
+        auctionItemSelector.load(AppContext.getI18nManager().getResourceBundle());
+
+        populateComboBoxes();
     }
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
-    }
-
-    public void setServices(AuctionHouseService ahs, AuctionItemService ais, ConditionService cs,
-                            CategoryService cats, CurrencyService curs, I18nManager i18nManager,
-                            UrlParsingService ups) {
-        this.auctionHouseService = ahs;
-        this.auctionItemService = ais;
-        this.conditionService = cs;
-        this.currencyService = curs;
-        this.urlParsingService = ups;
-
-        auctionItemSelector.load(i18nManager.getResourceBundle());
-        auctionItemSelector.setServices(auctionItemService, cats);
-
-        populateComboBoxes();
     }
 
     public void setAuction(Auction auction) {
@@ -199,10 +180,11 @@ public class AuctionEditDialogController {
         // Select items in ComboBoxes
         if (auction.getAuctionHouseId() != null) {
             auctionHouseComboBox.getSelectionModel()
-                    .select(auctionHouseService.getAuctionHouseById(auction.getAuctionHouseId()).orElse(null));
+                    .select(AppContext.getAuctionHouseService().getAuctionHouseById(auction.getAuctionHouseId())
+                            .orElse(null));
         }
         if (auction.getAuctionItemId() != null) {
-            auctionItemService.getAuctionItemById(auction.getAuctionItemId())
+            AppContext.getAuctionItemService().getAuctionItemById(auction.getAuctionItemId())
                     .ifPresent(auctionItemSelector::setSelectedAuctionItem);
         }
         selectComboBoxValue(conditionComboBox, auction.getConditionId());
@@ -213,9 +195,11 @@ public class AuctionEditDialogController {
     }
 
     private void populateComboBoxes() {
-        auctionHouseComboBox.setItems(FXCollections.observableArrayList(auctionHouseService.getAllAuctionHouses()));
-        conditionComboBox.setItems(FXCollections.observableArrayList(conditionService.getAllConditions()));
-        currencyComboBox.setItems(FXCollections.observableArrayList(currencyService.getCurrencies()));
+        auctionHouseComboBox.setItems(
+                FXCollections.observableArrayList(AppContext.getAuctionHouseService().getAllAuctionHouses()));
+        conditionComboBox.setItems(
+                FXCollections.observableArrayList(AppContext.getConditionService().getAllConditions()));
+        currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
     }
 
     private <T> void selectComboBoxValue(ComboBox<T> comboBox, Object id) {
@@ -326,7 +310,7 @@ public class AuctionEditDialogController {
         }
         logger.info("Fetching data from URL: {}", url);
 
-        urlParsingService.parseUrl(url).ifPresent(data -> {
+        AppContext.getUrlParsingService().parseUrl(url).ifPresent(data -> {
             Platform.runLater(() -> {
                 if (data.auctionHouse() != null) {
                     auctionHouseComboBox.getSelectionModel().select(data.auctionHouse());

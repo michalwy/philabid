@@ -1,10 +1,7 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.AuctionItem;
-import com.philabid.service.AuctionItemService;
-import com.philabid.service.CatalogService;
-import com.philabid.service.CategoryService;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
 import javafx.application.Platform;
@@ -47,10 +44,6 @@ public class AuctionItemController {
     private Button editButton;
     @FXML
     private Button deleteButton;
-    private AuctionItemService auctionItemService;
-    private CategoryService categoryService;
-    private CatalogService catalogService;
-    private I18nManager i18nManager;
 
     @FXML
     private void initialize() {
@@ -74,22 +67,10 @@ public class AuctionItemController {
         logger.debug("AuctionItemController initialized.");
     }
 
-    public void setServices(AuctionItemService auctionItemService, CategoryService categoryService,
-                            CatalogService catalogService, I18nManager i18nManager) {
-        this.auctionItemService = auctionItemService;
-        this.categoryService = categoryService;
-        this.catalogService = catalogService;
-        this.i18nManager = i18nManager;
-    }
-
     public void loadAuctionItems() {
-        if (auctionItemService != null) {
-            auctionItemList.setAll(auctionItemService.getAllAuctionItems());
-            auctionItemTable.sort();
-            logger.info("Loaded {} auction items into the table.", auctionItemList.size());
-        } else {
-            logger.warn("AuctionItemService is not available. Cannot load data.");
-        }
+        auctionItemList.setAll(AppContext.getAuctionItemService().getAllAuctionItems());
+        auctionItemTable.sort();
+        logger.info("Loaded {} auction items into the table.", auctionItemList.size());
     }
 
     @FXML
@@ -103,7 +84,7 @@ public class AuctionItemController {
         newAuctionItem.setCategoryId(categoryId);
         EditDialogResult result = showAuctionItemEditDialog(newAuctionItem);
         if (result.saveClicked()) {
-            auctionItemService.saveAuctionItem(newAuctionItem);
+            AppContext.getAuctionItemService().saveAuctionItem(newAuctionItem);
             loadAuctionItems();
         }
         if (result.addAnother()) {
@@ -121,7 +102,7 @@ public class AuctionItemController {
             logger.info("Edit auction item button clicked for: {}", selected.getCatalogNumber());
             EditDialogResult result = showAuctionItemEditDialog(selected);
             if (result.saveClicked()) {
-                auctionItemService.saveAuctionItem(selected);
+                AppContext.getAuctionItemService().saveAuctionItem(selected);
                 loadAuctionItems();
             }
         }
@@ -140,7 +121,7 @@ public class AuctionItemController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean deleted = auctionItemService.deleteAuctionItem(selected.getId());
+                boolean deleted = AppContext.getAuctionItemService().deleteAuctionItem(selected.getId());
                 if (deleted) {
                     loadAuctionItems();
                 } else {
@@ -160,7 +141,7 @@ public class AuctionItemController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/AuctionItemEditDialog.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
             GridPane page = loader.load();
 
@@ -173,7 +154,6 @@ public class AuctionItemController {
 
             AuctionItemEditDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setServices(categoryService, catalogService, i18nManager);
             controller.setAuctionItem(auctionItem);
 
             dialogStage.showAndWait();

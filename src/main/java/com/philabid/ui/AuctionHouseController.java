@@ -1,9 +1,7 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.AuctionHouse;
-import com.philabid.service.AuctionHouseService;
-import com.philabid.service.CurrencyService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -44,9 +42,6 @@ public class AuctionHouseController {
     private Button editButton;
     @FXML
     private Button deleteButton;
-    private AuctionHouseService auctionHouseService;
-    private CurrencyService currencyService;
-    private I18nManager i18nManager;
 
     @FXML
     private void initialize() {
@@ -60,24 +55,14 @@ public class AuctionHouseController {
         editButton.disableProperty().bind(auctionHouseTable.getSelectionModel().selectedItemProperty().isNull());
         deleteButton.disableProperty().bind(auctionHouseTable.getSelectionModel().selectedItemProperty().isNull());
 
+        loadAuctionHouses();
+
         logger.debug("AuctionHouseController initialized.");
     }
 
-    public void setServices(CurrencyService currencyService, AuctionHouseService auctionHouseService,
-                            I18nManager i18nManager) {
-        this.currencyService = currencyService;
-        this.auctionHouseService = auctionHouseService;
-        this.i18nManager = i18nManager;
-        loadAuctionHouses();
-    }
-
     private void loadAuctionHouses() {
-        if (auctionHouseService != null) {
-            auctionHouseList.setAll(auctionHouseService.getAllAuctionHouses());
-            logger.info("Loaded {} auction houses into the table.", auctionHouseList.size());
-        } else {
-            logger.warn("AuctionHouseService is not available. Cannot load data.");
-        }
+        auctionHouseList.setAll(AppContext.getAuctionHouseService().getAllAuctionHouses());
+        logger.info("Loaded {} auction houses into the table.", auctionHouseList.size());
     }
 
     @FXML
@@ -86,7 +71,7 @@ public class AuctionHouseController {
         AuctionHouse newAuctionHouse = new AuctionHouse();
         boolean saveClicked = showAuctionHouseEditDialog(newAuctionHouse);
         if (saveClicked) {
-            auctionHouseService.saveAuctionHouse(newAuctionHouse);
+            AppContext.getAuctionHouseService().saveAuctionHouse(newAuctionHouse);
             loadAuctionHouses(); // Refresh the table
         }
     }
@@ -98,7 +83,7 @@ public class AuctionHouseController {
             logger.info("Edit button clicked for: {}. Opening edit dialog.", selectedAuctionHouse.getName());
             boolean saveClicked = showAuctionHouseEditDialog(selectedAuctionHouse);
             if (saveClicked) {
-                auctionHouseService.saveAuctionHouse(selectedAuctionHouse);
+                AppContext.getAuctionHouseService().saveAuctionHouse(selectedAuctionHouse);
                 loadAuctionHouses(); // Refresh the table
             }
         } else {
@@ -115,11 +100,12 @@ public class AuctionHouseController {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirm Deletion");
             alert.setHeaderText("Delete Auction House");
-            alert.setContentText("Are you sure you want to delete the selected auction house: " + selected.getName() + "?");
+            alert.setContentText(
+                    "Are you sure you want to delete the selected auction house: " + selected.getName() + "?");
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean deleted = auctionHouseService.deleteAuctionHouse(selected.getId());
+                boolean deleted = AppContext.getAuctionHouseService().deleteAuctionHouse(selected.getId());
                 if (deleted) {
                     logger.info("Successfully deleted auction house with ID: {}", selected.getId());
                     loadAuctionHouses(); // Refresh the table
@@ -142,11 +128,7 @@ public class AuctionHouseController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/AuctionHouseEditDialog.fxml"));
-            if (i18nManager != null) {
-                loader.setResources(i18nManager.getResourceBundle());
-            } else {
-                logger.warn("I18nManager is null. The edit dialog may not have localized strings.");
-            }
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
             GridPane page = loader.load();
 
             Stage dialogStage = new Stage();
@@ -159,7 +141,6 @@ public class AuctionHouseController {
             AuctionHouseEditDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
             controller.setAuctionHouse(auctionHouse);
-            controller.setServices(currencyService);
 
             dialogStage.showAndWait();
 

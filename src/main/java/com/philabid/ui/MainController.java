@@ -1,11 +1,8 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
-import com.philabid.parsing.UrlParsingService;
-import com.philabid.service.*;
+import com.philabid.AppContext;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -95,19 +92,6 @@ public class MainController implements Initializable {
     @FXML
     private ArchivedAuctionController archivedAuctionViewController;
 
-    // Services
-    private I18nManager i18nManager;
-    private AuctionHouseService auctionHouseService;
-    private CatalogService catalogService;
-    private CategoryService categoryService;
-    private ConditionService conditionService;
-    private AuctionItemService auctionItemService;
-    private CatalogValueService catalogValueService;
-    private CurrencyService currencyService;
-    private AuctionService auctionService;
-    private UrlParsingService urlParsingService;
-    private HostServices hostServices;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         logger.info("Initializing MainController");
@@ -134,61 +118,9 @@ public class MainController implements Initializable {
             logTextArea.setEditable(false);
             addLogMessage("Application started successfully");
         }
-    }
 
-    /**
-     * Sets the application services. Called after FXML loading.
-     */
-    public void setServices(I18nManager i18nManager, CurrencyService currencyService,
-                            AuctionHouseService auctionHouseService, CatalogService catalogService,
-                            CategoryService categoryService, ConditionService conditionService,
-                            AuctionItemService auctionItemService, AuctionService auctionService,
-                            CatalogValueService catalogValueService, UrlParsingService urlParsingService,
-                            HostServices hostServices) {
-        this.i18nManager = i18nManager;
-        this.currencyService = currencyService;
-        this.auctionHouseService = auctionHouseService;
-        this.catalogService = catalogService;
-        this.categoryService = categoryService;
-        this.conditionService = conditionService;
-        this.auctionItemService = auctionItemService;
-        this.auctionService = auctionService;
-        this.catalogValueService = catalogValueService;
-        this.urlParsingService = urlParsingService;
-        this.hostServices = hostServices;
-
-        // Inject services into child controllers
-        if (activeAuctionViewController != null) {
-            activeAuctionViewController.setServices(this.auctionService, this.auctionHouseService,
-                    this.auctionItemService,
-                    this.conditionService, this.currencyService, this.i18nManager, this.categoryService,
-                    this.urlParsingService, this.hostServices);
-            logger.info("Services injected into ActiveAuctionController.");
-        }
-        if (archivedAuctionViewController != null) {
-            archivedAuctionViewController.setServices(this.auctionService, this.auctionHouseService,
-                    this.auctionItemService,
-                    this.conditionService, this.currencyService, this.i18nManager, this.categoryService,
-                    this.urlParsingService, this.hostServices);
-            logger.info("Services injected into ArchivedAuctionController.");
-        }
-        if (auctionItemViewController != null) {
-            auctionItemViewController.setServices(this.auctionItemService, this.categoryService, this.catalogService,
-                    this.i18nManager);
-            logger.info("Services injected into AuctionItemController.");
-        }
-        if (catalogValueViewController != null) {
-            catalogValueViewController.setServices(this.currencyService, this.catalogValueService,
-                    this.auctionItemService, this.conditionService, this.catalogService, this.categoryService,
-                    this.i18nManager);
-            logger.info("Services injected into CatalogValueController.");
-        }
-
-        // Update UI with localized strings
         updateLocalizedStrings();
         setupTabListeners();
-
-        logger.info("Services set for MainController");
     }
 
     /**
@@ -279,11 +211,9 @@ public class MainController implements Initializable {
     private void handleShowAuctionHouses() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AuctionHouseView.fxml"),
-                    i18nManager.getResourceBundle());
+                    AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            AuctionHouseController controller = loader.getController();
-            controller.setServices(currencyService, auctionHouseService, i18nManager);
-            showInModalDialog(view, i18nManager.getString("auctionHouses.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("auctionHouses.title"));
         } catch (IOException e) {
             showErrorDialog("Could not open Auction Houses view", e);
         }
@@ -292,11 +222,10 @@ public class MainController implements Initializable {
     private void handleShowCatalogs() {
         try {
             FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource("/fxml/CatalogView.fxml"), i18nManager.getResourceBundle());
+                    new FXMLLoader(getClass().getResource("/fxml/CatalogView.fxml"),
+                            AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            CatalogController controller = loader.getController();
-            controller.setServices(currencyService, catalogService, i18nManager);
-            showInModalDialog(view, i18nManager.getString("catalogs.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("catalogs.title"));
         } catch (IOException e) {
             showErrorDialog("Could not open Catalogs view", e);
         }
@@ -305,11 +234,10 @@ public class MainController implements Initializable {
     private void handleShowCategories() {
         try {
             FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource("/fxml/CategoryView.fxml"), i18nManager.getResourceBundle());
+                    new FXMLLoader(getClass().getResource("/fxml/CategoryView.fxml"),
+                            AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            CategoryController controller = loader.getController();
-            controller.setServices(categoryService, catalogService, i18nManager);
-            showInModalDialog(view, i18nManager.getString("categories.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("categories.title"));
         } catch (IOException e) {
             showErrorDialog("Could not open Categories view", e);
         }
@@ -318,11 +246,10 @@ public class MainController implements Initializable {
     private void handleShowConditions() {
         try {
             FXMLLoader loader =
-                    new FXMLLoader(getClass().getResource("/fxml/ConditionView.fxml"), i18nManager.getResourceBundle());
+                    new FXMLLoader(getClass().getResource("/fxml/ConditionView.fxml"),
+                            AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            ConditionController controller = loader.getController();
-            controller.setServices(conditionService, i18nManager);
-            showInModalDialog(view, i18nManager.getString("conditions.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("conditions.title"));
         } catch (IOException e) {
             showErrorDialog("Could not open Conditions view", e);
         }
@@ -348,35 +275,27 @@ public class MainController implements Initializable {
     }
 
     private void updateLocalizedStrings() {
-        if (i18nManager == null) return;
-
         try {
-            if (fileMenu != null) fileMenu.setText(i18nManager.getString("menu.file"));
-            if (editMenu != null) editMenu.setText(i18nManager.getString("menu.edit"));
-            if (viewMenu != null) viewMenu.setText(i18nManager.getString("menu.view"));
-            if (toolsMenu != null) toolsMenu.setText(i18nManager.getString("menu.tools"));
-            if (helpMenu != null) helpMenu.setText(i18nManager.getString("menu.help"));
+            fileMenu.setText(AppContext.getI18nManager().getString("menu.file"));
+            editMenu.setText(AppContext.getI18nManager().getString("menu.edit"));
+            viewMenu.setText(AppContext.getI18nManager().getString("menu.view"));
+            toolsMenu.setText(AppContext.getI18nManager().getString("menu.tools"));
+            helpMenu.setText(AppContext.getI18nManager().getString("menu.help"));
 
-            if (exitMenuItem != null) exitMenuItem.setText(i18nManager.getString("menu.file.exit"));
-            if (aboutMenuItem != null) aboutMenuItem.setText(i18nManager.getString("menu.help.about"));
-            if (auctionHousesMenuItem != null)
-                auctionHousesMenuItem.setText(i18nManager.getString("menu.tools.auctionHouses"));
-            if (catalogsMenuItem != null) catalogsMenuItem.setText(i18nManager.getString("menu.tools.catalogs"));
-            if (categoriesMenuItem != null) categoriesMenuItem.setText(i18nManager.getString("menu.tools.categories"));
-            if (conditionsMenuItem != null) conditionsMenuItem.setText(i18nManager.getString("menu.tools.conditions"));
+            exitMenuItem.setText(AppContext.getI18nManager().getString("menu.file.exit"));
+            aboutMenuItem.setText(AppContext.getI18nManager().getString("menu.help.about"));
+            auctionHousesMenuItem.setText(AppContext.getI18nManager().getString("menu.tools.auctionHouses"));
+            catalogsMenuItem.setText(AppContext.getI18nManager().getString("menu.tools.catalogs"));
+            categoriesMenuItem.setText(AppContext.getI18nManager().getString("menu.tools.categories"));
+            conditionsMenuItem.setText(AppContext.getI18nManager().getString("menu.tools.conditions"));
 
-            if (dashboardTab != null) dashboardTab.setText(i18nManager.getString("tab.dashboard"));
-            if (activeAuctionsTab != null) activeAuctionsTab.setText(i18nManager.getString("tab.auctions.active"));
-            if (archivedAuctionsTab != null)
-                archivedAuctionsTab.setText(i18nManager.getString("tab.auctions.archived"));
-            if (catalogTab != null) catalogTab.setText(i18nManager.getString("tab.catalog"));
-            if (bidsTab != null) bidsTab.setText(i18nManager.getString("tab.bids"));
-            if (auctionItemsTab != null) auctionItemsTab.setText(i18nManager.getString("tab.auctionItems"));
-            if (catalogValuesTab != null) catalogValuesTab.setText(i18nManager.getString("tab.catalogValues"));
+            dashboardTab.setText(AppContext.getI18nManager().getString("tab.dashboard"));
+            activeAuctionsTab.setText(AppContext.getI18nManager().getString("tab.auctions.active"));
+            archivedAuctionsTab.setText(AppContext.getI18nManager().getString("tab.auctions.archived"));
+            auctionItemsTab.setText(AppContext.getI18nManager().getString("tab.auctionItems"));
+            catalogValuesTab.setText(AppContext.getI18nManager().getString("tab.catalogValues"));
 
-            if (welcomeLabel != null) {
-                welcomeLabel.setText(i18nManager.getString("welcome.message"));
-            }
+            welcomeLabel.setText(AppContext.getI18nManager().getString("welcome.message"));
         } catch (Exception e) {
             logger.warn("Error updating localized strings", e);
         }
@@ -390,7 +309,7 @@ public class MainController implements Initializable {
     @FXML
     private void handleAbout() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(i18nManager != null ? i18nManager.getString("about.title") : "About");
+        alert.setTitle(AppContext.getI18nManager().getString("about.title"));
         alert.setHeaderText("Philabid");
         alert.setContentText("Philabid - Stamp Auction Bidding Assistant\n" +
                 "Version: 1.0-SNAPSHOT\n" +

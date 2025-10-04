@@ -1,9 +1,7 @@
 package com.philabid.ui;
 
-import com.philabid.i18n.I18nManager;
+import com.philabid.AppContext;
 import com.philabid.model.Catalog;
-import com.philabid.service.CatalogService;
-import com.philabid.service.CurrencyService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -44,9 +42,6 @@ public class CatalogController {
     private Button editButton;
     @FXML
     private Button deleteButton;
-    private CurrencyService currencyService;
-    private CatalogService catalogService;
-    private I18nManager i18nManager;
 
     @FXML
     private void initialize() {
@@ -81,23 +76,14 @@ public class CatalogController {
         editButton.disableProperty().bind(catalogTable.getSelectionModel().selectedItemProperty().isNull());
         deleteButton.disableProperty().bind(catalogTable.getSelectionModel().selectedItemProperty().isNull());
 
+        loadCatalogs();
+
         logger.debug("CatalogController initialized.");
     }
 
-    public void setServices(CurrencyService currencyService, CatalogService catalogService, I18nManager i18nManager) {
-        this.currencyService = currencyService;
-        this.catalogService = catalogService;
-        this.i18nManager = i18nManager;
-        loadCatalogs();
-    }
-
     private void loadCatalogs() {
-        if (catalogService != null) {
-            catalogList.setAll(catalogService.getAllCatalogs());
-            logger.info("Loaded {} catalogs into the table.", catalogList.size());
-        } else {
-            logger.warn("CatalogService is not available. Cannot load data.");
-        }
+        catalogList.setAll(AppContext.getCatalogService().getAllCatalogs());
+        logger.info("Loaded {} catalogs into the table.", catalogList.size());
     }
 
     @FXML
@@ -106,7 +92,7 @@ public class CatalogController {
         Catalog newCatalog = new Catalog();
         boolean saveClicked = showCatalogEditDialog(newCatalog);
         if (saveClicked) {
-            catalogService.saveCatalog(newCatalog);
+            AppContext.getCatalogService().saveCatalog(newCatalog);
             loadCatalogs();
         }
     }
@@ -118,7 +104,7 @@ public class CatalogController {
             logger.info("Edit catalog button clicked for: {}", selected.getName());
             boolean saveClicked = showCatalogEditDialog(selected);
             if (saveClicked) {
-                catalogService.saveCatalog(selected);
+                AppContext.getCatalogService().saveCatalog(selected);
                 loadCatalogs();
             }
         }
@@ -136,7 +122,7 @@ public class CatalogController {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean deleted = catalogService.deleteCatalog(selected.getId());
+                boolean deleted = AppContext.getCatalogService().deleteCatalog(selected.getId());
                 if (deleted) {
                     loadCatalogs();
                 } else {
@@ -153,7 +139,7 @@ public class CatalogController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("/fxml/CatalogEditDialog.fxml"));
-            loader.setResources(i18nManager.getResourceBundle());
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
             GridPane page = loader.load();
 
@@ -166,7 +152,6 @@ public class CatalogController {
 
             CatalogEditDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setServices(currencyService);
             controller.setCatalog(catalog);
 
             dialogStage.showAndWait();

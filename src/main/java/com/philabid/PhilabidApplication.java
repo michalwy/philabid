@@ -1,12 +1,5 @@
 package com.philabid;
 
-import com.philabid.database.*;
-import com.philabid.i18n.I18nManager;
-import com.philabid.parsing.UrlParsingService;
-import com.philabid.parsing.impl.AllegroUrlParser;
-import com.philabid.parsing.impl.EbayUrlParser;
-import com.philabid.service.*;
-import com.philabid.ui.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -28,18 +20,6 @@ public class PhilabidApplication extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(PhilabidApplication.class);
 
-    private DatabaseManager databaseManager;
-    private I18nManager i18nManager;
-    private CurrencyService currencyService;
-    private AuctionHouseService auctionHouseService;
-    private CatalogService catalogService;
-    private CategoryService categoryService;
-    private ConditionService conditionService;
-    private AuctionItemService auctionItemService;
-    private AuctionService auctionService;
-    private CatalogValueService catalogValueService;
-    private UrlParsingService urlParsingService;
-
     public static void main(String[] args) {
         logger.info("Launching Philabid application with args: {}", java.util.Arrays.toString(args));
         launch(args);
@@ -50,33 +30,7 @@ public class PhilabidApplication extends Application {
         super.init();
         logger.info("Initializing Philabid application...");
 
-        // Initialize core managers and services
-        i18nManager = new I18nManager();
-        databaseManager = new DatabaseManager();
-
-        // Initialize repositories
-        AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
-        CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
-        CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
-        ConditionRepository conditionRepository = new ConditionRepository(databaseManager);
-        AuctionItemRepository auctionItemRepository = new AuctionItemRepository(databaseManager);
-        AuctionRepository auctionRepository = new AuctionRepository(databaseManager);
-        CatalogValueRepository catalogValueRepository = new CatalogValueRepository(databaseManager);
-
-        // Initialize services
-        currencyService = new CurrencyService();
-        auctionHouseService = new AuctionHouseService(auctionHouseRepository);
-        catalogService = new CatalogService(catalogRepository);
-        categoryService = new CategoryService(categoryRepository);
-        conditionService = new ConditionService(conditionRepository);
-        auctionItemService = new AuctionItemService(auctionItemRepository);
-        auctionService = new AuctionService(auctionRepository);
-        catalogValueService = new CatalogValueService(catalogValueRepository);
-        urlParsingService =
-                new UrlParsingService(List.of(new AllegroUrlParser(), new EbayUrlParser()), auctionHouseService);
-
-        // Initialize database
-        databaseManager.initialize();
+        AppContext.get().init(getHostServices());
 
         logger.info("Application initialization completed successfully");
     }
@@ -87,18 +41,13 @@ public class PhilabidApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
-        fxmlLoader.setResources(i18nManager.getResourceBundle());
+        fxmlLoader.setResources(AppContext.getI18nManager().getResourceBundle());
 
         Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
         scene.getStylesheets().add(Objects.requireNonNull(
                 getClass().getResource("/css/application.css")).toExternalForm());
 
-        MainController controller = fxmlLoader.getController();
-        controller.setServices(i18nManager, currencyService, auctionHouseService, catalogService, categoryService,
-                conditionService, auctionItemService, auctionService, catalogValueService, urlParsingService,
-                getHostServices());
-
-        primaryStage.setTitle(i18nManager.getString("app.title"));
+        primaryStage.setTitle(AppContext.getI18nManager().getString("app.title"));
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(600);
@@ -120,9 +69,7 @@ public class PhilabidApplication extends Application {
     public void stop() throws Exception {
         logger.info("Shutting down Philabid application...");
 
-        if (databaseManager != null) {
-            databaseManager.shutdown();
-        }
+        AppContext.get().shutdown();
 
         super.stop();
         logger.info("Application shutdown completed");
