@@ -2,7 +2,7 @@
 
 .root {
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-background-color: #f4f4f4;
 }
 
@@ -72,6 +72,7 @@
 .table-row-cell {
     -fx-background-color: #ffffff;
     -fx-border-color: transparent;
+    -fx-padding: 5px 0;
 }
 
 .table-row-cell:odd {

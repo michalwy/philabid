@@ -6,13 +6,13 @@ module philabid {
     requires org.xerial.sqlitejdbc;
     requires com.ibm.icu;
     requires org.javamoney.moneta;
-    requires java.money;
     requires org.slf4j;
     requires ch.qos.logback.classic;
     requires com.fasterxml.jackson.databind;
     requires javafx.graphics;
     requires javafx.base;
     requires okhttp3;
+    requires org.javamoney.moneta.convert;
 
     opens com.philabid to javafx.fxml;
     opens com.philabid.ui to javafx.fxml;

@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 /**
@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-
+    private final Map<Tab, BaseTableViewController<?>> tabControllerMap = new HashMap<>();
     // FXML Injected Fields from main.fxml
     @FXML
     private BorderPane rootPane;
@@ -51,6 +51,8 @@ public class MainController implements Initializable {
     private Menu helpMenu;
     @FXML
     private MenuItem exitMenuItem;
+    @FXML
+    private MenuItem preferencesMenuItem;
     @FXML
     private MenuItem aboutMenuItem;
     @FXML
@@ -83,7 +85,6 @@ public class MainController implements Initializable {
     private Label welcomeLabel;
     @FXML
     private TextArea logTextArea;
-
     // Injected controllers from included FXML files
     @FXML
     private AuctionItemController auctionItemViewController;
@@ -93,8 +94,6 @@ public class MainController implements Initializable {
     private ActiveAuctionController activeAuctionViewController;
     @FXML
     private ArchivedAuctionController archivedAuctionViewController;
-
-    private final Map<Tab, BaseTableViewController<?>> tabControllerMap = new HashMap<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -176,6 +175,10 @@ public class MainController implements Initializable {
             exitMenuItem.setOnAction(e -> handleExit());
         }
 
+        if (preferencesMenuItem != null) {
+            preferencesMenuItem.setOnAction(e -> handleShowPreferences());
+        }
+
         if (aboutMenuItem != null) {
             aboutMenuItem.setOnAction(e -> handleAbout());
         }
@@ -197,12 +200,27 @@ public class MainController implements Initializable {
         }
     }
 
+    private void handleShowPreferences() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/PreferencesDialog.fxml"),
+                    AppContext.getI18nManager().getResourceBundle());
+            Parent view = loader.load();
+            PreferencesDialogController controller = loader.getController();
+
+            Stage dialogStage = new Stage();
+            controller.setDialogStage(dialogStage);
+            showInModalDialog(view, AppContext.getI18nManager().getString("preferences.title"), dialogStage);
+        } catch (IOException e) {
+            showErrorDialog("Could not open Preferences view", e);
+        }
+    }
+
     private void handleShowAuctionHouses() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AuctionHouseView.fxml"),
                     AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            showInModalDialog(view, AppContext.getI18nManager().getString("auctionHouses.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("auctionHouses.title"), new Stage());
         } catch (IOException e) {
             showErrorDialog("Could not open Auction Houses view", e);
         }
@@ -214,7 +232,7 @@ public class MainController implements Initializable {
                     new FXMLLoader(getClass().getResource("/fxml/CatalogView.fxml"),
                             AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            showInModalDialog(view, AppContext.getI18nManager().getString("catalogs.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("catalogs.title"), new Stage());
         } catch (IOException e) {
             showErrorDialog("Could not open Catalogs view", e);
         }
@@ -226,7 +244,7 @@ public class MainController implements Initializable {
                     new FXMLLoader(getClass().getResource("/fxml/CategoryView.fxml"),
                             AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            showInModalDialog(view, AppContext.getI18nManager().getString("categories.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("categories.title"), new Stage());
         } catch (IOException e) {
             showErrorDialog("Could not open Categories view", e);
         }
@@ -238,14 +256,13 @@ public class MainController implements Initializable {
                     new FXMLLoader(getClass().getResource("/fxml/ConditionView.fxml"),
                             AppContext.getI18nManager().getResourceBundle());
             Parent view = loader.load();
-            showInModalDialog(view, AppContext.getI18nManager().getString("conditions.title"));
+            showInModalDialog(view, AppContext.getI18nManager().getString("conditions.title"), new Stage());
         } catch (IOException e) {
             showErrorDialog("Could not open Conditions view", e);
         }
     }
 
-    private void showInModalDialog(Parent view, String title) {
-        Stage dialogStage = new Stage();
+    private void showInModalDialog(Parent view, String title, Stage dialogStage) {
         dialogStage.setTitle(title);
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.initOwner(rootPane.getScene().getWindow());

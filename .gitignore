@@ -74,3 +74,5 @@ philabid.db
 philabid-config.json
 *.db
 *.sqlite
+
+.resourceCache/

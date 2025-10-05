@@ -30,11 +30,14 @@ public class AppContext {
     private final CatalogValueService catalogValueService;
     private final UrlParsingService urlParsingService;
     private final DatabaseManager databaseManager;
+    private final ConfigurationService configurationService;
+    private final ExchangeRateService exchangeRateService;
     private HostServices hostServices;
 
     private AppContext() {
         i18nManager = new I18nManager();
         databaseManager = new DatabaseManager();
+        configurationService = new ConfigurationService();
 
         AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
         CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
@@ -43,6 +46,7 @@ public class AppContext {
         AuctionItemRepository auctionItemRepository = new AuctionItemRepository(databaseManager);
         AuctionRepository auctionRepository = new AuctionRepository(databaseManager);
         CatalogValueRepository catalogValueRepository = new CatalogValueRepository(databaseManager);
+        ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository(databaseManager);
 
         currencyService = new CurrencyService();
         auctionHouseService = new AuctionHouseService(auctionHouseRepository);
@@ -54,6 +58,7 @@ public class AppContext {
         catalogValueService = new CatalogValueService(catalogValueRepository);
         urlParsingService =
                 new UrlParsingService(List.of(new AllegroUrlParser(), new EbayUrlParser()), auctionHouseService);
+        exchangeRateService = new ExchangeRateService(exchangeRateRepository);
     }
 
     public static AppContext get() {
@@ -105,6 +110,14 @@ public class AppContext {
 
     public static HostServices getHostServices() {
         return get().hostServices;
+    }
+
+    public static ConfigurationService getConfigurationService() {
+        return get().configurationService;
+    }
+
+    public static ExchangeRateService getExchangeRateService() {
+        return get().exchangeRateService;
     }
 
     public static DatabaseManager getDatabaseManager() {
