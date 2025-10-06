@@ -130,10 +130,28 @@
     -fx-text-fill: -fx-text-light;
 }
 
+/* This is a crucial fix: It ensures that ANY label inside a selected row
+   inherits the light text color, overriding the default .label style. */
+.table-row-cell:selected .label {
+    -fx-text-fill: -fx-text-light;
+}
+
+/* Fix for Hyperlinks inside selected rows */
+.table-row-cell:selected .hyperlink {
+    -fx-text-fill: -fx-text-light;
+}
+
 .secondary-currency-label {
     -fx-font-size: 0.85em; /* Slightly smaller font */
     -fx-text-fill: #666666; /* A muted gray color */
     -fx-padding: 2px 0 0 0; /* A bit of top padding */
+}
+
+/* Ensure text color is light when inside a selected row for custom labels */
+.table-row-cell:selected .secondary-currency-label,
+.table-row-cell:selected .monetary-threshold-warning,
+.table-row-cell:selected .monetary-threshold-critical {
+    -fx-text-fill: -fx-text-light;
 }
 
 .warning-icon {
