@@ -21,8 +21,6 @@ public class DatabaseManager {
     private static final String DATABASE_FILE = "philabid.db";
     private static final String DATABASE_URL = "jdbc:sqlite:" + DATABASE_FILE;
     
-    private Connection connection;
-    
     /**
      * Initializes the database, creating the file if it doesn't exist and running migrations.
      */
@@ -38,10 +36,6 @@ public class DatabaseManager {
             
             // Load SQLite JDBC driver
             Class.forName("org.sqlite.JDBC");
-            
-            // Create connection
-            connection = DriverManager.getConnection(DATABASE_URL);
-            connection.setAutoCommit(true);
             
             // Run Flyway migrations
             runMigrations();
@@ -77,23 +71,7 @@ public class DatabaseManager {
      * @throws SQLException if connection is not available
      */
     public Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection(DATABASE_URL);
-        }
-        return connection;
-    }
-    
-    /**
-     * Shuts down the database connection.
-     */
-    public void shutdown() {
-        if (connection != null) {
-            try {
-                connection.close();
-                logger.info("Database connection closed");
-            } catch (SQLException e) {
-                logger.warn("Error closing database connection", e);
-            }
-        }
+        // Always return a new connection. The calling code (using try-with-resources) is responsible for closing it.
+        return DriverManager.getConnection(DATABASE_URL);
     }
 }

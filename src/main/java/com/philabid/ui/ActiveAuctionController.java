@@ -2,7 +2,7 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
-import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
+import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -62,17 +62,9 @@ public class ActiveAuctionController extends BaseAuctionController {
         });
 
         maxBidColumn.setCellValueFactory(new PropertyValueFactory<>("maxBid"));
-        maxBidColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>((
-                (auction, labels) -> { // This is a BiConsumer<Auction, List<Label>>
-                    if (auction != null && auction.getCatalogValue() != null) {
-                        MultiCurrencyMonetaryAmount currentPrice = auction.getMaxBid();
-                        MultiCurrencyMonetaryAmount catalogValue = auction.getCatalogValue();
-                        if (currentPrice != null && currentPrice.defaultCurrencyAmount()
-                                .isGreaterThan(catalogValue.defaultCurrencyAmount())) {
-                            labels.forEach(label -> label.setStyle("-fx-text-fill: red; -fx-font-weight: bold;"));
-                        }
-                    }
-                })));
+        maxBidColumn.setCellFactory(column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(
+                Auction::getRecommendedPrice,
+                Auction::getCatalogValue));
 
         addRowFormatter((row, auction, empty) -> {
             row.setStyle("");

@@ -13,6 +13,7 @@ module philabid {
     requires javafx.base;
     requires okhttp3;
     requires org.javamoney.moneta.convert;
+    requires org.jetbrains.annotations;
 
     opens com.philabid to javafx.fxml;
     opens com.philabid.ui to javafx.fxml;

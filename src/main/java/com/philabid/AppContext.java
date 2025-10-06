@@ -32,6 +32,7 @@ public class AppContext {
     private final DatabaseManager databaseManager;
     private final ConfigurationService configurationService;
     private final ExchangeRateService exchangeRateService;
+    private final PriceRecommendationService priceRecommendationService;
     private HostServices hostServices;
 
     private AppContext() {
@@ -59,6 +60,7 @@ public class AppContext {
         urlParsingService =
                 new UrlParsingService(List.of(new AllegroUrlParser(), new EbayUrlParser()), auctionHouseService);
         exchangeRateService = new ExchangeRateService(exchangeRateRepository);
+        priceRecommendationService = new PriceRecommendationService();
     }
 
     public static AppContext get() {
@@ -120,6 +122,10 @@ public class AppContext {
         return get().exchangeRateService;
     }
 
+    public static PriceRecommendationService getPriceRecommendationService() {
+        return get().priceRecommendationService;
+    }
+
     public static DatabaseManager getDatabaseManager() {
         return get().databaseManager;
     }
@@ -128,9 +134,5 @@ public class AppContext {
         databaseManager.initialize();
 
         this.hostServices = hostServices;
-    }
-
-    public void shutdown() {
-        databaseManager.shutdown();
     }
 }

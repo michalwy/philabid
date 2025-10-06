@@ -1,5 +1,6 @@
 package com.philabid.database;
 
+import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
@@ -232,6 +233,10 @@ public class AuctionRepository {
         auction.setAuctionItemCategoryCode(rs.getString("auction_item_category_code"));
         auction.setConditionName(rs.getString("condition_name"));
         auction.setConditionCode(rs.getString("condition_code"));
+
+        auction.setAuctionItemCategoryAverageCatalogValuePercentage(BigDecimal.valueOf(0.5));
+        auction.setRecommendedPrice(AppContext.getPriceRecommendationService().calculateRecommendation(auction));
+
         return auction;
     }
 }

@@ -13,8 +13,8 @@ repositories {
 
 dependencies {
     // JavaFX
-    implementation("org.openjfx:javafx-controls:26-ea+7")
-    implementation("org.openjfx:javafx-fxml:26-ea+7")
+    implementation("org.openjfx:javafx-controls:25")
+    implementation("org.openjfx:javafx-fxml:25")
 
     // ControlsFX for enhanced UI controls
     implementation("org.controlsfx:controlsfx:11.2.2")
@@ -37,6 +37,8 @@ dependencies {
 
     // JSON processing for configuration
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
+
+    compileOnly("org.jetbrains:annotations:26.0.2")
 
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:6.0.0-RC3")

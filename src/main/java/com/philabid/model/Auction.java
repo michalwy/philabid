@@ -3,6 +3,7 @@ package com.philabid.model;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 
 import javax.money.MonetaryAmount;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -28,10 +29,12 @@ public class Auction {
     private Long auctionItemOrderNumber;
     private String auctionItemCategoryName;
     private String auctionItemCategoryCode;
+    private BigDecimal auctionItemCategoryAverageCatalogValuePercentage = new BigDecimal(1);
     private String conditionName;
     private String conditionCode;
 
     private MultiCurrencyMonetaryAmount catalogValue;
+    private MultiCurrencyMonetaryAmount recommendedPrice;
 
     public Auction() {
         this.archived = false;
@@ -208,6 +211,23 @@ public class Auction {
 
     public void setMaxBid(MonetaryAmount maxBid) {
         this.maxBid = MultiCurrencyMonetaryAmount.of(maxBid);
+    }
+
+    public BigDecimal getAuctionItemCategoryAverageCatalogValuePercentage() {
+        return auctionItemCategoryAverageCatalogValuePercentage;
+    }
+
+    public void setAuctionItemCategoryAverageCatalogValuePercentage(
+            BigDecimal auctionItemCategoryAverageCatalogValuePercentage) {
+        this.auctionItemCategoryAverageCatalogValuePercentage = auctionItemCategoryAverageCatalogValuePercentage;
+    }
+
+    public MultiCurrencyMonetaryAmount getRecommendedPrice() {
+        return recommendedPrice;
+    }
+
+    public void setRecommendedPrice(MultiCurrencyMonetaryAmount recommendedPrice) {
+        this.recommendedPrice = recommendedPrice;
     }
 
     public boolean isFinished() {

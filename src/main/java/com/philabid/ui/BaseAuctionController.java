@@ -4,6 +4,7 @@ import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.cell.RightAlignedDateCell;
+import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
@@ -43,6 +44,8 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
     @FXML
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> currentPriceColumn;
     @FXML
+    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> recommendedPriceColumn;
+    @FXML
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> catalogValueColumn;
     @FXML
     protected TableColumn<Auction, LocalDateTime> endDateColumn;
@@ -64,17 +67,15 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
 
         // Use a reusable cell factory and add specific styling for the current price
         currentPriceColumn.setCellValueFactory(new PropertyValueFactory<>("currentPrice"));
-        currentPriceColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>((
-                (auction, labels) -> { // This is a BiConsumer<Auction, List<Label>>
-                    if (auction != null && auction.getCatalogValue() != null) {
-                        MultiCurrencyMonetaryAmount currentPrice = auction.getCurrentPrice();
-                        MultiCurrencyMonetaryAmount catalogValue = auction.getCatalogValue();
-                        if (currentPrice != null && currentPrice.defaultCurrencyAmount()
-                                .isGreaterThan(catalogValue.defaultCurrencyAmount())) {
-                            labels.forEach(label -> label.setStyle("-fx-text-fill: red; -fx-font-weight: bold;"));
-                        }
-                    }
-                })));
+        currentPriceColumn.setCellFactory(
+                column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(Auction::getRecommendedPrice,
+                        Auction::getCatalogValue));
+
+        // For now, recommended price is the same as catalog value
+        recommendedPriceColumn.setCellValueFactory(new PropertyValueFactory<>("recommendedPrice"));
+        recommendedPriceColumn.setCellFactory(
+                column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(Auction::getCatalogValue,
+                        Auction::getCatalogValue));
 
         catalogValueColumn.setCellValueFactory(new PropertyValueFactory<>("catalogValue"));
         catalogValueColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>());

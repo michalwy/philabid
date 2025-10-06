@@ -1,6 +1,7 @@
 package com.philabid.ui.cell;
 
 import com.philabid.util.MultiCurrencyMonetaryAmount;
+import com.philabid.util.TriConsumer;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -9,20 +10,19 @@ import javafx.scene.layout.Priority;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurrencyMonetaryAmount> {
     private final HBox hbox = new HBox(5);
     private final Label currencyLabel = new Label();
     private final Label amountLabel = new Label();
     private final Label foreignCurrencyAmountLabel = new Label();
-    private final BiConsumer<T, List<Label>> styler;
+    private final TriConsumer<MultiCurrencyMonetaryAmount, T, List<Label>> styler;
 
     public MultiCurrencyMonetaryAmountCell() {
         this(null);
     }
 
-    public MultiCurrencyMonetaryAmountCell(BiConsumer<T, List<Label>> styler) {
+    public MultiCurrencyMonetaryAmountCell(TriConsumer<MultiCurrencyMonetaryAmount, T, List<Label>> styler) {
         this.styler = styler;
 
         // The amount should grow and push the currency to the right.
@@ -62,8 +62,7 @@ public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurren
             // Apply custom styling if a styler function is provided
             if (styler != null) {
                 T rowData = getTableRow().getItem();
-                styler.accept(rowData,
-                        List.of(foreignCurrencyAmountLabel, currencyLabel, amountLabel));
+                styler.accept(item, rowData, List.of(foreignCurrencyAmountLabel, currencyLabel, amountLabel));
             }
             setGraphic(hbox);
         }

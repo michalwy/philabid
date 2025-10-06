@@ -22,6 +22,7 @@
                 <TableColumn fx:id="catalogNumberColumn" prefWidth="50.0" text="%auctions.column.catalogNumber"/>
                 <TableColumn fx:id="conditionColumn" prefWidth="70.0" text="%auctions.column.condition"/>
                 <TableColumn fx:id="currentPriceColumn" prefWidth="50.0" text="%auctions.column.finalPrice"/>
+                <TableColumn fx:id="recommendedPriceColumn" prefWidth="50.0" text="%auctions.column.recommendedPrice"/>
                 <TableColumn fx:id="catalogValueColumn" prefWidth="50.0" text="%auctions.column.catalogValue"/>
                 <TableColumn fx:id="endDateColumn" prefWidth="150.0" text="%auctions.column.endDate"/>
             </columns>

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Objects;
 
 /**
@@ -28,16 +29,13 @@ public class PhilabidApplication extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        logger.info("Initializing Philabid application...");
-
-        AppContext.get().init(getHostServices());
-
-        logger.info("Application initialization completed successfully");
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) throws IOException, SQLException {
         logger.info("Starting Philabid application UI...");
+
+        AppContext.get().init(getHostServices());
 
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
@@ -68,8 +66,6 @@ public class PhilabidApplication extends Application {
     @Override
     public void stop() throws Exception {
         logger.info("Shutting down Philabid application...");
-
-        AppContext.get().shutdown();
 
         super.stop();
         logger.info("Application shutdown completed");
