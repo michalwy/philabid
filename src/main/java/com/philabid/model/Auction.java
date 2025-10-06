@@ -101,6 +101,10 @@ public class Auction {
         this.currentPrice = MultiCurrencyMonetaryAmount.of(currentPrice);
     }
 
+    public void setRawCurrentPrice(MonetaryAmount currentPrice) {
+        this.currentPrice = new MultiCurrencyMonetaryAmount(currentPrice, null);
+    }
+
     public LocalDateTime getEndDate() {
         return endDate;
     }
@@ -193,6 +197,10 @@ public class Auction {
         this.catalogValue = MultiCurrencyMonetaryAmount.of(catalogValue);
     }
 
+    public void setRawCatalogValue(MonetaryAmount catalogValue) {
+        this.catalogValue = new MultiCurrencyMonetaryAmount(catalogValue, null);
+    }
+
     public boolean isArchived() {
         return archived;
     }
@@ -211,6 +219,10 @@ public class Auction {
 
     public void setMaxBid(MonetaryAmount maxBid) {
         this.maxBid = MultiCurrencyMonetaryAmount.of(maxBid);
+    }
+
+    public void setRawMaxBid(MonetaryAmount maxBid) {
+        this.maxBid = new MultiCurrencyMonetaryAmount(maxBid, null);
     }
 
     public BigDecimal getAuctionItemCategoryAverageCatalogValuePercentage() {

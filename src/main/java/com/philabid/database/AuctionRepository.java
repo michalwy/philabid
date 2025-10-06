@@ -206,10 +206,10 @@ public class AuctionRepository {
         auction.setConditionId(rs.getLong("condition_id"));
         auction.setLotId(rs.getString("lot_id"));
         auction.setUrl(rs.getString("url"));
-        auction.setCurrentPrice(Money.of(rs.getBigDecimal("current_price"), rs.getString("currency_code")));
+        auction.setRawCurrentPrice(Money.of(rs.getBigDecimal("current_price"), rs.getString("currency_code")));
         BigDecimal maxBid = rs.getBigDecimal("max_bid");
         if (maxBid != null) {
-            auction.setMaxBid(Money.of(rs.getBigDecimal("max_bid"), rs.getString("currency_code")));
+            auction.setRawMaxBid(Money.of(rs.getBigDecimal("max_bid"), rs.getString("currency_code")));
         }
         Timestamp endDate = rs.getTimestamp("end_date");
         if (endDate != null) {
@@ -222,7 +222,7 @@ public class AuctionRepository {
         BigDecimal catalogValueAmount = rs.getBigDecimal("catalog_value");
         String catalogValueCurrency = rs.getString("catalog_currency_code");
         if (catalogValueAmount != null && catalogValueCurrency != null) {
-            auction.setCatalogValue(Money.of(catalogValueAmount, Monetary.getCurrency(catalogValueCurrency)));
+            auction.setRawCatalogValue(Money.of(catalogValueAmount, Monetary.getCurrency(catalogValueCurrency)));
         }
 
         // Joined fields
@@ -233,9 +233,6 @@ public class AuctionRepository {
         auction.setAuctionItemCategoryCode(rs.getString("auction_item_category_code"));
         auction.setConditionName(rs.getString("condition_name"));
         auction.setConditionCode(rs.getString("condition_code"));
-
-        auction.setAuctionItemCategoryAverageCatalogValuePercentage(BigDecimal.valueOf(0.5));
-        auction.setRecommendedPrice(AppContext.getPriceRecommendationService().calculateRecommendation(auction));
 
         return auction;
     }

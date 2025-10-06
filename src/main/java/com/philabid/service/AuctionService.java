@@ -4,6 +4,7 @@ import com.philabid.database.AuctionRepository;
 import com.philabid.model.Auction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.philabid.AppContext;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -33,7 +34,9 @@ public class AuctionService {
 
     public List<Auction> getActiveAuctions() {
         try {
-            return auctionRepository.findAllActive();
+            List<Auction> auctions = auctionRepository.findAllActive();
+            auctions.forEach(this::enrichAuction);
+            return auctions;
         } catch (SQLException e) {
             logger.error("Failed to retrieve active auctions", e);
             return Collections.emptyList();
@@ -42,7 +45,9 @@ public class AuctionService {
 
     public List<Auction> getArchivedAuctions() {
         try {
-            return auctionRepository.findAllArchived();
+            List<Auction> auctions = auctionRepository.findAllArchived();
+            auctions.forEach(this::enrichAuction);
+            return auctions;
         } catch (SQLException e) {
             logger.error("Failed to retrieve archived auctions", e);
             return Collections.emptyList();
@@ -72,5 +77,20 @@ public class AuctionService {
             logger.error("Failed to delete auction with ID: {}", id, e);
             return false;
         }
+    }
+
+    private void enrichAuction(Auction auction) {
+        // This is where we calculate derived properties after the main DB query is closed.
+        // This prevents database locks by separating read and potential write (cache) operations.
+        if (auction.getCurrentPrice() != null) {
+            auction.setCurrentPrice(auction.getCurrentPrice().originalAmount());
+        }
+        if (auction.getMaxBid() != null) {
+            auction.setMaxBid(auction.getMaxBid().originalAmount());
+        }
+        if (auction.getCatalogValue() != null) {
+            auction.setCatalogValue(auction.getCatalogValue().originalAmount());
+        }
+        auction.setRecommendedPrice(AppContext.getPriceRecommendationService().calculateRecommendation(auction));
     }
 }

@@ -69,6 +69,14 @@ public class AuctionEditDialogController {
 
         Platform.runLater(() -> urlField.requestFocus());
 
+        // Add a listener to auto-trigger parsing when a URL is pasted
+        urlField.textProperty().addListener((obs, oldVal, newVal) -> {
+            // A simple heuristic to detect a paste of a URL
+            if (newVal != null && !newVal.equals(oldVal) && newVal.trim().startsWith("http")) {
+                handleFetchUrlData();
+            }
+        });
+
         // Auto-select currency when an auction house is chosen
         auctionHouseComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && newVal.getCurrency() != null) {
@@ -309,6 +317,8 @@ public class AuctionEditDialogController {
                     endDatePicker.setValue(data.closingDate().toLocalDate());
                     endTimeField.setText(data.closingDate().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
                 }
+                // After successfully populating, move focus to the next logical field
+                auctionItemSelector.requestFocus();
                 logger.info("Fields populated from URL data.");
             });
         });

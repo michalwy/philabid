@@ -45,7 +45,9 @@ public class ExchangeRateService {
 
         for (int i = 0; i < 10; i++) {
             LocalDate rateDate = date.minusDays(i);
-            Optional<ExchangeRate> rate = getRemoteExchangeRate(rateDate, from, to);
+            Optional<ExchangeRate> rate =
+                    getLocalExchangeRate(rateDate, from, to).or(() -> getRemoteExchangeRate(rateDate, from, to));
+
             if (rate.isPresent()) {
                 ExchangeRate exchangeRate = rate.get();
                 if (i != 0) {

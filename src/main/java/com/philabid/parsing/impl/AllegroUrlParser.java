@@ -15,9 +15,11 @@ public class AllegroUrlParser implements UrlAuctionParser {
 
     private static final Logger logger = LoggerFactory.getLogger(AllegroUrlParser.class);
 
-    // This pattern finds the last group of digits in the URL path,
-    // ignoring any query parameters (?) or fragments (#).
-    private static final Pattern LOT_ID_PATTERN = Pattern.compile("-(\\d+)(?:[?#]|$)");
+    // New pattern for URLs with "offerId=" query parameter
+    private static final Pattern NEW_LOT_ID_PATTERN = Pattern.compile("offerId=(\\d+)");
+
+    // Old pattern for URLs where the ID is at the end of the path
+    private static final Pattern OLD_LOT_ID_PATTERN = Pattern.compile("-(\\d+)(?:[?#]|$)");
 
     @Override
     public boolean supports(String url) {
@@ -32,15 +34,22 @@ public class AllegroUrlParser implements UrlAuctionParser {
         AuctionHouse allegroHouse = auctionHouseService.findByName("Allegro")
                 .orElse(null);
 
-        Matcher matcher = LOT_ID_PATTERN.matcher(url);
         String lotId = null;
-        if (matcher.find()) {
-            lotId = matcher.group(1);
-            logger.debug("Extracted Lot ID from Allegro URL: {}", lotId);
+
+        // 1. Try the new pattern first (more specific)
+        Matcher newMatcher = NEW_LOT_ID_PATTERN.matcher(url);
+        if (newMatcher.find()) {
+            lotId = newMatcher.group(1);
+            logger.debug("Extracted Lot ID from Allegro URL (new format): {}", lotId);
         } else {
-            logger.warn("Could not extract Lot ID from Allegro URL: {}", url);
-            // Optionally, you could throw an exception here
-            // throw new IOException("Could not parse Lot ID from Allegro URL: " + url);
+            // 2. If the new pattern fails, try the old one
+            Matcher oldMatcher = OLD_LOT_ID_PATTERN.matcher(url);
+            if (oldMatcher.find()) {
+                lotId = oldMatcher.group(1);
+                logger.debug("Extracted Lot ID from Allegro URL (old format): {}", lotId);
+            } else {
+                logger.warn("Could not extract Lot ID from Allegro URL: {}", url);
+            }
         }
 
         return new AuctionPageData(
