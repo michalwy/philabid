@@ -32,7 +32,8 @@ public class CatalogValueService {
     }
 
     public Optional<CatalogValue> saveCatalogValue(CatalogValue catalogValue) {
-        if (catalogValue.getAuctionItemId() == null || catalogValue.getConditionId() == null || catalogValue.getCatalogId() == null || catalogValue.getValue() == null) {
+        if (catalogValue.getAuctionItemId() == null || catalogValue.getConditionId() == null ||
+                catalogValue.getCatalogId() == null || catalogValue.getValue() == null) {
             logger.warn("Attempted to save a catalog value with missing required fields.");
             return Optional.empty();
         }
@@ -40,7 +41,14 @@ public class CatalogValueService {
         try {
             return Optional.of(catalogValueRepository.save(catalogValue));
         } catch (SQLException e) {
-            logger.error("Failed to save catalog value for item ID: {}", catalogValue.getAuctionItemId(), e);
+            // Check if the error is due to a unique constraint violation
+            if (e.getMessage() != null && e.getMessage().contains("SQLITE_CONSTRAINT_UNIQUE")) {
+                logger.warn(
+                        "Attempted to save a duplicate catalog value for item ID: {}, condition ID: {}, catalog ID: {}",
+                        catalogValue.getAuctionItemId(), catalogValue.getConditionId(), catalogValue.getCatalogId());
+            } else {
+                logger.error("Failed to save catalog value for item ID: {}", catalogValue.getAuctionItemId(), e);
+            }
             return Optional.empty();
         }
     }

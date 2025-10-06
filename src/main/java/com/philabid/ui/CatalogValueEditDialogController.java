@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
+import java.util.Optional;
 
 /**
  * Controller for the catalog value edit dialog.
@@ -123,21 +124,31 @@ public class CatalogValueEditDialogController {
     private void handleSave() {
         if (isInputValid()) {
             catalogValue.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
-
             catalogValue.setConditionId(conditionComboBox.getSelectionModel().getSelectedItem().getId());
             catalogValue.setCatalogId(catalogComboBox.getSelectionModel().getSelectedItem().getId());
             try {
                 catalogValue.setValue(Money.of(valueField.getAmount(),
                         currencyComboBox.getSelectionModel().getSelectedItem()));
             } catch (NumberFormatException e) {
-                // This should be caught by isInputValid(), but as a safeguard:
                 logger.error("Invalid number format for value field: {}", valueField.getText());
                 return;
             }
 
-            editDialogResult = new EditDialogResult(true, false);
+            Optional<CatalogValue> savedValue = AppContext.getCatalogValueService().saveCatalogValue(catalogValue);
 
-            dialogStage.close();
+            if (savedValue.isPresent()) {
+                editDialogResult = new EditDialogResult(true, false);
+                dialogStage.close();
+            } else {
+                // Save failed, likely due to a duplicate entry
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.initOwner(dialogStage);
+                alert.setTitle(AppContext.getI18nManager().getString("common.error.title"));
+                alert.setHeaderText("Duplicate Entry");
+                alert.setContentText("A catalog value for this item and condition already exists. Please " +
+                        "edit the existing entry instead of creating a new one.");
+                alert.showAndWait();
+            }
         }
     }
 

@@ -1,0 +1,2 @@
+-- Add a unique constraint to prevent duplicate entries for the same item, condition, and catalog.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_catalog_value_unique ON catalog_values (auction_item_id, condition_id);
