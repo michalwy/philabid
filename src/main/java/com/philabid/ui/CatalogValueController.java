@@ -10,6 +10,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Controller for the Catalog Value management view (CatalogValueView.fxml).
@@ -128,8 +131,30 @@ public class CatalogValueController extends BaseTableViewController<CatalogValue
     private void handleDeleteCatalogValue() {
         CatalogValue selected = table.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            logger.info("Delete catalog value button clicked for item ID: {}", selected.getAuctionItemId());
-            // Logic to be implemented
+            logger.info("Delete catalog value button clicked for: {}, {}", selected.getAuctionItemCatalogNumber(),
+                    selected.getConditionCode());
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirm Deletion");
+            alert.setHeaderText("Delete Catalog Value");
+            alert.setContentText(
+                    "Are you sure you want to delete the selected catalog value: " +
+                            selected.getAuctionItemCatalogNumber() + "?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                boolean deleted = AppContext.getCatalogValueService().deleteCatalogValue(selected.getId());
+                if (deleted) {
+                    refreshTable();
+                } else {
+                    logger.error("Failed to delete catalog value with ID: {}", selected.getId());
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Deletion Failed");
+                    errorAlert.setHeaderText("Could not delete the catalog value.");
+                    errorAlert.setContentText("An error occurred while trying to delete the catalog value. Please " +
+                            "check the logs.");
+                    errorAlert.showAndWait();
+                }
+            }
         }
     }
 
