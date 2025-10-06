@@ -1,6 +1,7 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
+import com.philabid.ui.cell.EndingDateCell;
 import com.philabid.model.Auction;
 import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
@@ -68,19 +69,19 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         addRowFormatter((row, auction, empty) -> {
             row.setStyle("");
-            row.getStyleClass().remove("expired-auction");
+            row.getStyleClass().remove("winning-auction");
 
             if (empty || auction == null) {
                 return;
             }
-            LocalDateTime now = LocalDateTime.now();
-            if (auction.getEndDate().isBefore(now)) {
-                row.setStyle("-fx-opacity: 0.5;");
-                row.getStyleClass().add("expired-auction");
-            } else if (auction.getEndDate().isBefore(now.plusHours(24))) {
-                row.setStyle("-fx-font-weight: bold;");
+
+            if (auction.getMaxBid() != null && auction.getCurrentPrice() != null && auction.getMaxBid().originalAmount()
+                    .isGreaterThanOrEqualTo(auction.getCurrentPrice().originalAmount())) {
+                row.getStyleClass().add("winning-auction");
             }
         });
+
+        endDateColumn.setCellFactory(column -> new EndingDateCell<>());
 
         Platform.runLater(() -> {
             endDateColumn.setSortType(TableColumn.SortType.ASCENDING);

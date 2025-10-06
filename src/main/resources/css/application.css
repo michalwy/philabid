@@ -1,15 +1,38 @@
 /* Philabid Application Styles */
 
 .root {
+    /* Color Palette Variables */
+    -fx-background-main: #f4f4f4;
+    -fx-background-content: #ffffff;
+    -fx-background-odd-row: #f8f8ff;
+
+    -fx-gradient-start: #ffffff;
+    -fx-gradient-end-light: #f0f0f0;
+    -fx-gradient-end-medium: #e0e0e0;
+
+    -fx-border-main: #c0c0c0;
+
+    -fx-accent-primary: #0078d4;
+    -fx-accent-hover: #e8f4ff;
+    -fx-accent-pressed-start: #c8e8ff;
+    -fx-accent-pressed-end: #a8d8ff;
+
+    -fx-text-main: #333333;
+    -fx-text-light: white;
+
+    -fx-success-color: #e6ffed;
+    -fx-warning-color: orange;
+    -fx-critical-color: red;
+
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
     -fx-font-size: 14px;
-    -fx-background-color: #f4f4f4;
+    -fx-background-color: -fx-background-main;
 }
 
 /* Menu Bar */
 .menu-bar {
-    -fx-background-color: linear-gradient(to bottom, #ffffff, #e0e0e0);
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: linear-gradient(to bottom, -fx-gradient-start, -fx-gradient-end-medium);
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -18,7 +41,7 @@
 }
 
 .menu:hover {
-    -fx-background-color: #e8f4ff;
+    -fx-background-color: -fx-accent-hover;
 }
 
 .menu-item {
@@ -26,24 +49,24 @@
 }
 
 .menu-item:hover {
-    -fx-background-color: #e8f4ff;
+    -fx-background-color: -fx-accent-hover;
 }
 
 /* Tab Pane */
 .tab-pane {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-background-content;
 }
 
 .tab {
-    -fx-background-color: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: linear-gradient(to bottom, -fx-gradient-end-light, #d0d0d0);
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 1 1 0 1;
     -fx-padding: 5 15 5 15;
 }
 
 .tab:selected {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: -fx-background-content;
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 1 1 0 1;
 }
 
@@ -57,14 +80,14 @@
 
 /* Tables */
 .table-view {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: -fx-background-content;
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 1;
 }
 
 .table-view .column-header {
     -fx-background-color: linear-gradient(to bottom, #f8f8f8, #e8e8e8);
-    -fx-border-color: #c0c0c0;
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 0 1 1 0;
     -fx-font-weight: bold;
 }
@@ -76,49 +99,83 @@
 }
 
 .table-row-cell:odd {
-    -fx-background-color: #f8f8ff;
+    -fx-background-color: -fx-background-odd-row;
 }
 
 .table-row-cell:selected {
-    -fx-background-color: #0078d4;
-    -fx-text-fill: white;
+    -fx-background-color: -fx-accent-primary;
+    -fx-text-fill: -fx-text-light;
 }
 
 .table-row-cell.expired-auction .text {
     -fx-strikethrough: true;
+    -fx-opacity: 0.5;
+}
+
+.table-row-cell.closing-soon-auction {
+    -fx-background-color: #FFFFE0; /* Light Yellow */
+}
+
+.table-row-cell.closing-soon-auction:selected {
+    -fx-background-color: -fx-accent-primary;
+    -fx-text-fill: -fx-text-light;
+}
+
+.table-row-cell.winning-auction {
+    -fx-background-color: -fx-success-color;
+}
+
+.table-row-cell.winning-auction:selected {
+    -fx-background-color: -fx-accent-primary;
+    -fx-text-fill: -fx-text-light;
+}
+
+.warning-icon {
+    -fx-fill: -fx-warning-color;
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+.table-row-cell .monetary-threshold-warning {
+    -fx-text-fill: -fx-warning-color;
+}
+
+.table-row-cell .monetary-threshold-critical {
+    -fx-text-fill: -fx-critical-color;
+    -fx-font-weight: bold;
 }
 
 /* Text Areas */
 .text-area {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: -fx-background-content;
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 1;
     -fx-font-family: "Consolas", "Monaco", monospace;
     -fx-font-size: 11px;
 }
 
 .text-area .content {
-    -fx-background-color: #ffffff;
+    -fx-background-color: -fx-background-content;
 }
 
 /* Text Fields */
 .text-field {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: -fx-background-content;
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 1;
     -fx-border-radius: 2;
     -fx-background-radius: 2;
 }
 
 .text-field:focused {
-    -fx-border-color: #0078d4;
+    -fx-border-color: -fx-accent-primary;
     -fx-border-width: 2;
 }
 
 /* Buttons */
 .button {
-    -fx-background-color: linear-gradient(to bottom, #ffffff, #e0e0e0);
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: linear-gradient(to bottom, -fx-gradient-start, -fx-gradient-end-medium);
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 1;
     -fx-border-radius: 3;
     -fx-background-radius: 3;
@@ -126,30 +183,30 @@
 }
 
 .button:hover {
-    -fx-background-color: linear-gradient(to bottom, #e8f4ff, #c8e8ff);
-    -fx-border-color: #0078d4;
+    -fx-background-color: linear-gradient(to bottom, -fx-accent-hover, -fx-accent-pressed-start);
+    -fx-border-color: -fx-accent-primary;
 }
 
 .button:pressed {
-    -fx-background-color: linear-gradient(to bottom, #c8e8ff, #a8d8ff);
+    -fx-background-color: linear-gradient(to bottom, -fx-accent-pressed-start, -fx-accent-pressed-end);
 }
 
 /* Status Bar */
 .status-bar {
-    -fx-background-color: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
-    -fx-border-color: #c0c0c0;
+    -fx-background-color: linear-gradient(to bottom, -fx-gradient-end-light, -fx-gradient-end-medium);
+    -fx-border-color: -fx-border-main;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 5 10 5 10;
 }
 
 /* Labels */
 .label {
-    -fx-text-fill: #333333;
+    -fx-text-fill: -fx-text-main;
 }
 
 /* Separators */
 .separator {
-    -fx-background-color: #c0c0c0;
+    -fx-background-color: -fx-border-main;
 }
 
 /* Welcome message styling */
@@ -168,5 +225,5 @@
 .stat-value {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0078d4;
+    -fx-text-fill: -fx-accent-primary;
 }

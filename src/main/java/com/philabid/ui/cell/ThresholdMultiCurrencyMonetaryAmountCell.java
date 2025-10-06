@@ -7,9 +7,17 @@ import java.util.List;
 import java.util.function.Function;
 
 public class ThresholdMultiCurrencyMonetaryAmountCell<T> extends MultiCurrencyMonetaryAmountCell<T> {
+
+    public static final String CRITICAL_THRESHOLD_STYLE_CLASS = "monetary-threshold-critical";
+    public static final String WARNING_THRESHOLD_STYLE_CLASS = "monetary-threshold-warning";
+
     public ThresholdMultiCurrencyMonetaryAmountCell(Function<T, MultiCurrencyMonetaryAmount> warningThresholdGetter,
                                                     Function<T, MultiCurrencyMonetaryAmount> criticalThresholdGetter) {
         super((value, row, labels) -> {
+
+            removeStyleClassFromLabels(CRITICAL_THRESHOLD_STYLE_CLASS, labels);
+            removeStyleClassFromLabels(WARNING_THRESHOLD_STYLE_CLASS, labels);
+
             if (row == null || value == null) return;
 
             MultiCurrencyMonetaryAmount warningThreshold = warningThresholdGetter.apply(row);
@@ -17,15 +25,19 @@ public class ThresholdMultiCurrencyMonetaryAmountCell<T> extends MultiCurrencyMo
 
             if (criticalThreshold != null &&
                     value.defaultCurrencyAmount().isGreaterThan(criticalThreshold.defaultCurrencyAmount())) {
-                applyStyleToLabels("-fx-text-fill: red; -fx-font-weight: bold;", labels);
+                applyStyleClassToLabels(CRITICAL_THRESHOLD_STYLE_CLASS, labels);
             } else if (warningThreshold != null &&
                     value.defaultCurrencyAmount().isGreaterThan(warningThreshold.defaultCurrencyAmount())) {
-                applyStyleToLabels("-fx-text-fill: orange;", labels);
+                applyStyleClassToLabels(WARNING_THRESHOLD_STYLE_CLASS, labels);
             }
         });
     }
 
-    private static void applyStyleToLabels(String cssStyle, List<Label> labels) {
-        labels.forEach(label -> label.setStyle(cssStyle));
+    private static void applyStyleClassToLabels(String styleClass, List<Label> labels) {
+        labels.forEach(label -> label.getStyleClass().add(styleClass));
+    }
+
+    private static void removeStyleClassFromLabels(String styleClass, List<Label> labels) {
+        labels.forEach(label -> label.getStyleClass().remove(styleClass));
     }
 }
