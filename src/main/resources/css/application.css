@@ -130,6 +130,12 @@
     -fx-text-fill: -fx-text-light;
 }
 
+.secondary-currency-label {
+    -fx-font-size: 0.85em; /* Slightly smaller font */
+    -fx-text-fill: #666666; /* A muted gray color */
+    -fx-padding: 2px 0 0 0; /* A bit of top padding */
+}
+
 .warning-icon {
     -fx-fill: -fx-warning-color;
     -fx-scale-x: 0.8;
