@@ -2,9 +2,10 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.CatalogValue;
-import com.philabid.ui.cell.MonetaryAmountCell;
+import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
+import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,7 +18,6 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.money.MonetaryAmount;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class CatalogValueController extends BaseTableViewController<CatalogValue
     @FXML
     private TableColumn<CatalogValue, String> catalogColumn;
     @FXML
-    private TableColumn<CatalogValue, MonetaryAmount> valueColumn;
+    private TableColumn<CatalogValue, MultiCurrencyMonetaryAmount> valueColumn;
 
     @Override
     protected void initializeView() {
@@ -59,7 +59,7 @@ public class CatalogValueController extends BaseTableViewController<CatalogValue
                 CatalogValue::getConditionName));
 
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
-        valueColumn.setCellFactory(column -> new MonetaryAmountCell<>());
+        valueColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>());
     }
 
     @Override
@@ -77,11 +77,11 @@ public class CatalogValueController extends BaseTableViewController<CatalogValue
         CatalogValue newCatalogValue = new CatalogValue();
         EditDialogResult result = showAuctionItemEditDialog(newCatalogValue);
         if (!Objects.isNull(result)) {
-            if (result.saveClicked()) {
+            if (result.saved()) {
                 AppContext.getCatalogValueService().saveCatalogValue(newCatalogValue);
                 refreshTable();
             }
-            if (result.addAnother()) {
+            if (result.editNext()) {
                 Platform.runLater(this::doHandleAddCatalogValue);
             }
         }

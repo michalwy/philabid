@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.javamoney.moneta.Money;
 
@@ -19,6 +20,10 @@ public class AuctionStateDialogController {
     private MonetaryField currentPrice;
     @FXML
     private MonetaryField maxBid;
+    @FXML
+    private Label maxBidCurrencyLabel;
+    @FXML
+    private Label currencyLabel;
     @FXML
     private CheckBox archivedCheckBox;
 
@@ -44,14 +49,16 @@ public class AuctionStateDialogController {
         }
 
         if (auction.getCurrentPrice() != null) {
-            currentPrice.setAmount(auction.getCurrentPrice());
+            currentPrice.setAmount(auction.getCurrentPrice().originalAmount());
+            currencyLabel.setText(auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
         }
 
         if (auction.getMaxBid() != null) {
-            maxBid.setAmount(auction.getMaxBid());
+            maxBid.setAmount(auction.getMaxBid().originalAmount());
+            maxBidCurrencyLabel.setText(auction.getMaxBid().getOriginalCurrency().getCurrencyCode());
         }
 
-        archivedCheckBox.setSelected(auction.isArchived());
+        archivedCheckBox.setSelected(auction.isArchived() || auction.isFinished());
 
         Platform.runLater(() -> {
             currentPrice.requestFocus();
@@ -83,11 +90,12 @@ public class AuctionStateDialogController {
             return false;
         }
 
-        auction.setCurrentPrice(Money.of(currentPrice.getAmount(), auction.getCurrentPrice().getCurrency()));
+        auction.setCurrentPrice(
+                Money.of(currentPrice.getAmount(), auction.getCurrentPrice().getOriginalCurrency()));
         auction.setArchived(archivedCheckBox.isSelected());
 
         if (!maxBid.isEmpty()) {
-            auction.setMaxBid(Money.of(maxBid.getAmount(), auction.getCurrentPrice().getCurrency()));
+            auction.setMaxBid(Money.of(maxBid.getAmount(), auction.getCurrentPrice().getOriginalCurrency()));
         }
 
         return true;

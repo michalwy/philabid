@@ -2,7 +2,8 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
-import com.philabid.ui.cell.MonetaryAmountCell;
+import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
+import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,7 +19,6 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.money.MonetaryAmount;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ActiveAuctionController extends BaseAuctionController {
     protected TableColumn<Auction, String> urlColumn;
 
     @FXML
-    protected TableColumn<Auction, MonetaryAmount> maxBidColumn;
+    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> maxBidColumn;
 
     @Override
     public List<Auction> loadAuctions() {
@@ -62,13 +62,13 @@ public class ActiveAuctionController extends BaseAuctionController {
         });
 
         maxBidColumn.setCellValueFactory(new PropertyValueFactory<>("maxBid"));
-        maxBidColumn.setCellFactory(column -> new MonetaryAmountCell<>((
+        maxBidColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>((
                 (auction, labels) -> { // This is a BiConsumer<Auction, List<Label>>
                     if (auction != null && auction.getCatalogValue() != null) {
-                        MonetaryAmount currentPrice = auction.getMaxBid();
-                        MonetaryAmount catalogValue = auction.getCatalogValue();
-                        if (currentPrice != null && currentPrice.getCurrency().equals(catalogValue.getCurrency()) &&
-                                currentPrice.isGreaterThan(catalogValue)) {
+                        MultiCurrencyMonetaryAmount currentPrice = auction.getMaxBid();
+                        MultiCurrencyMonetaryAmount catalogValue = auction.getCatalogValue();
+                        if (currentPrice != null && currentPrice.defaultCurrencyAmount()
+                                .isGreaterThan(catalogValue.defaultCurrencyAmount())) {
                             labels.forEach(label -> label.setStyle("-fx-text-fill: red; -fx-font-weight: bold;"));
                         }
                     }
@@ -128,19 +128,24 @@ public class ActiveAuctionController extends BaseAuctionController {
             dialogStage.showAndWait();
 
             EditDialogResult editDialogResult = controller.getEditDialogResult();
-            if (editDialogResult != null && editDialogResult.saveClicked()) {
+            if (editDialogResult != null && editDialogResult.saved()) {
                 AppContext.getAuctionService().saveAuction(selectedAuction);
 
                 final int selectedIndex = table.getSelectionModel().getSelectedIndex();
+                final boolean archived = selectedAuction.isArchived();
 
                 refreshTable();
 
-                if (editDialogResult.addAnother()) {
+                if (editDialogResult.editNext()) {
                     Platform.runLater(() -> {
-                        table.getSelectionModel().select(selectedIndex + 1);
-                        table.scrollTo(selectedIndex + 1);
+                        int nextIndex = selectedIndex;
+                        if (!archived) {
+                            nextIndex++;
+                        }
+                        table.getSelectionModel().select(nextIndex);
+                        table.scrollTo(nextIndex);
                         table.requestFocus();
-                        table.getFocusModel().focus(selectedIndex + 1);
+                        table.getFocusModel().focus(nextIndex);
                         handleEditState();
                     });
                 }

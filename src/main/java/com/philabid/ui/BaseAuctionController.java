@@ -2,10 +2,11 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
-import com.philabid.ui.cell.MonetaryAmountCell;
+import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.cell.RightAlignedDateCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
+import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,7 +20,6 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.money.MonetaryAmount;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,9 +41,9 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
     @FXML
     protected TableColumn<Auction, String> conditionColumn;
     @FXML
-    protected TableColumn<Auction, MonetaryAmount> currentPriceColumn;
+    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> currentPriceColumn;
     @FXML
-    protected TableColumn<Auction, MonetaryAmount> catalogValueColumn;
+    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> catalogValueColumn;
     @FXML
     protected TableColumn<Auction, LocalDateTime> endDateColumn;
 
@@ -64,20 +64,20 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
 
         // Use a reusable cell factory and add specific styling for the current price
         currentPriceColumn.setCellValueFactory(new PropertyValueFactory<>("currentPrice"));
-        currentPriceColumn.setCellFactory(column -> new MonetaryAmountCell<>((
+        currentPriceColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>((
                 (auction, labels) -> { // This is a BiConsumer<Auction, List<Label>>
                     if (auction != null && auction.getCatalogValue() != null) {
-                        MonetaryAmount currentPrice = auction.getCurrentPrice();
-                        MonetaryAmount catalogValue = auction.getCatalogValue();
-                        if (currentPrice != null && currentPrice.getCurrency().equals(catalogValue.getCurrency()) &&
-                                currentPrice.isGreaterThan(catalogValue)) {
+                        MultiCurrencyMonetaryAmount currentPrice = auction.getCurrentPrice();
+                        MultiCurrencyMonetaryAmount catalogValue = auction.getCatalogValue();
+                        if (currentPrice != null && currentPrice.defaultCurrencyAmount()
+                                .isGreaterThan(catalogValue.defaultCurrencyAmount())) {
                             labels.forEach(label -> label.setStyle("-fx-text-fill: red; -fx-font-weight: bold;"));
                         }
                     }
                 })));
 
         catalogValueColumn.setCellValueFactory(new PropertyValueFactory<>("catalogValue"));
-        catalogValueColumn.setCellFactory(column -> new MonetaryAmountCell<>());
+        catalogValueColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>());
 
         endDateColumn.setCellValueFactory(new PropertyValueFactory<>("endDate"));
         endDateColumn.setCellFactory(column -> new RightAlignedDateCell<>());

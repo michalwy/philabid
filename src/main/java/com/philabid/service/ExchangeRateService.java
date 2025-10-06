@@ -1,16 +1,17 @@
 package com.philabid.service;
 
 import com.philabid.database.ExchangeRateRepository;
+import org.javamoney.moneta.Money;
 import org.javamoney.moneta.convert.ExchangeRateBuilder;
 import org.javamoney.moneta.spi.DefaultNumberValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
+import javax.money.MonetaryAmount;
 import javax.money.convert.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
@@ -19,17 +20,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ExchangeRateService {
     private static final Logger logger = LoggerFactory.getLogger(ExchangeRateService.class);
 
-    private final Map<ExchangeRateCacheKey, ExchangeRate> inMemoryCache = new ConcurrentHashMap<>();
+    private final Map<ExchangeRateCacheKey, ExchangeRate> exchangeRateCache = new ConcurrentHashMap<>();
     private final ExchangeRateRepository repository;
 
     public ExchangeRateService(ExchangeRateRepository repository) {
         this.repository = repository;
     }
 
-    private static LocalDate adjustWeekendToPreviousBusinessDay(LocalDate d) {
-        if (d.getDayOfWeek() == DayOfWeek.SATURDAY) return d.minusDays(1);
-        if (d.getDayOfWeek() == DayOfWeek.SUNDAY) return d.minusDays(2);
-        return d;
+    public Optional<ExchangeRate> getCurrentExchangeRate(CurrencyUnit from, CurrencyUnit to) {
+        LocalDate date = LocalDate.now();
+        return getExchangeRate(date, from, to);
     }
 
     public Optional<ExchangeRate> getExchangeRate(LocalDate date, CurrencyUnit from, CurrencyUnit to) {
@@ -119,15 +119,15 @@ public class ExchangeRateService {
 
     private Optional<ExchangeRate> getCachedExchangeRate(LocalDate date, CurrencyUnit from, CurrencyUnit to) {
         ExchangeRateCacheKey key = new ExchangeRateCacheKey(date, from, to);
-        if (inMemoryCache.containsKey(key)) {
-            return Optional.of(inMemoryCache.get(key));
+        if (exchangeRateCache.containsKey(key)) {
+            return Optional.of(exchangeRateCache.get(key));
         }
         return Optional.empty();
     }
 
     private void cacheExchangeRate(LocalDate date, CurrencyUnit from, CurrencyUnit to, ExchangeRate rate) {
         ExchangeRateCacheKey key = new ExchangeRateCacheKey(date, from, to);
-        inMemoryCache.put(key, rate);
+        exchangeRateCache.put(key, rate);
     }
 
     private ExchangeRate buildExchangeRate(CurrencyUnit from, CurrencyUnit to, BigDecimal factor) {
@@ -136,5 +136,14 @@ public class ExchangeRateService {
                 .setTerm(to)
                 .setFactor(DefaultNumberValue.of(factor))
                 .build();
+    }
+
+    public Optional<MonetaryAmount> exchange(MonetaryAmount amount, CurrencyUnit to) {
+        return exchange(amount, to, LocalDate.now());
+    }
+
+    public Optional<MonetaryAmount> exchange(MonetaryAmount amount, CurrencyUnit to, LocalDate date) {
+        return getExchangeRate(date, amount.getCurrency(), to).map(
+                exchangeRate -> Money.of(amount.multiply(exchangeRate.getFactor()).getNumber(), to));
     }
 }

@@ -144,7 +144,7 @@ public class AuctionEditDialogController {
         lotIdField.setText(auction.getLotId());
         urlField.setText(auction.getUrl());
         if (auction.getCurrentPrice() != null) {
-            priceField.setAmount(auction.getCurrentPrice());
+            priceField.setAmount(auction.getCurrentPrice().originalAmount());
         }
 
         if (auction.getId() == null) { // It's a new auction
@@ -177,7 +177,8 @@ public class AuctionEditDialogController {
         }
         selectComboBoxValue(conditionComboBox, auction.getConditionId());
         if (auction.getCurrentPrice() != null) {
-            selectComboBoxValue(currencyComboBox, auction.getCurrentPrice().getCurrency().getCurrencyCode());
+            selectComboBoxValue(currencyComboBox,
+                    auction.getCurrentPrice().originalAmount().getCurrency().getCurrencyCode());
         }
         archivedCheckBox.setSelected(auction.isArchived());
     }

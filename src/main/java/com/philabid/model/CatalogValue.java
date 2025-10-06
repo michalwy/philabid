@@ -1,7 +1,9 @@
 package com.philabid.model;
 
-import java.time.LocalDateTime;
+import com.philabid.util.MultiCurrencyMonetaryAmount;
+
 import javax.money.MonetaryAmount;
+import java.time.LocalDateTime;
 
 /**
  * Represents a catalog value for a specific auction item in a given condition.
@@ -12,7 +14,7 @@ public class CatalogValue {
     private Long auctionItemId;
     private Long conditionId;
     private Long catalogId;
-    private MonetaryAmount value;
+    private MultiCurrencyMonetaryAmount value;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -63,12 +65,16 @@ public class CatalogValue {
         this.catalogId = catalogId;
     }
 
-    public MonetaryAmount getValue() {
+    public MultiCurrencyMonetaryAmount getValue() {
         return value;
     }
 
-    public void setValue(MonetaryAmount value) {
+    public void setValue(MultiCurrencyMonetaryAmount value) {
         this.value = value;
+    }
+
+    public void setValue(MonetaryAmount value) {
+        this.value = MultiCurrencyMonetaryAmount.of(value);
     }
 
     public LocalDateTime getCreatedAt() {

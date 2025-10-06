@@ -133,14 +133,16 @@ public class AuctionRepository {
             pstmt.setLong(3, auction.getConditionId());
             pstmt.setString(4, auction.getLotId());
             pstmt.setString(5, auction.getUrl());
-            pstmt.setBigDecimal(6, auction.getCurrentPrice().getNumber().numberValue(BigDecimal.class));
-            pstmt.setString(7, auction.getCurrentPrice().getCurrency().getCurrencyCode());
+            pstmt.setBigDecimal(6,
+                    auction.getCurrentPrice().originalAmount().getNumber().numberValue(BigDecimal.class));
+            pstmt.setString(7, auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
             pstmt.setTimestamp(8, auction.getEndDate() != null ? Timestamp.valueOf(auction.getEndDate()) : null);
             pstmt.setBoolean(9, auction.isArchived());
             pstmt.setTimestamp(10, Timestamp.valueOf(auction.getCreatedAt()));
             pstmt.setTimestamp(11, Timestamp.valueOf(auction.getUpdatedAt()));
             pstmt.setBigDecimal(12,
-                    auction.getMaxBid() != null ? auction.getMaxBid().getNumber().numberValue(BigDecimal.class) : null);
+                    auction.getMaxBid() != null ?
+                            auction.getMaxBid().originalAmount().getNumber().numberValue(BigDecimal.class) : null);
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {
@@ -176,13 +178,15 @@ public class AuctionRepository {
             pstmt.setLong(3, auction.getConditionId());
             pstmt.setString(4, auction.getLotId());
             pstmt.setString(5, auction.getUrl());
-            pstmt.setBigDecimal(6, auction.getCurrentPrice().getNumber().numberValue(BigDecimal.class));
-            pstmt.setString(7, auction.getCurrentPrice().getCurrency().getCurrencyCode());
+            pstmt.setBigDecimal(6,
+                    auction.getCurrentPrice().originalAmount().getNumber().numberValue(BigDecimal.class));
+            pstmt.setString(7, auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
             pstmt.setTimestamp(8, auction.getEndDate() != null ? Timestamp.valueOf(auction.getEndDate()) : null);
             pstmt.setBoolean(9, auction.isArchived());
             pstmt.setTimestamp(10, Timestamp.valueOf(auction.getUpdatedAt()));
             pstmt.setBigDecimal(11,
-                    auction.getMaxBid() != null ? auction.getMaxBid().getNumber().numberValue(BigDecimal.class) : null);
+                    auction.getMaxBid() != null ?
+                            auction.getMaxBid().originalAmount().getNumber().numberValue(BigDecimal.class) : null);
             pstmt.setLong(12, auction.getId());
 
             pstmt.executeUpdate();

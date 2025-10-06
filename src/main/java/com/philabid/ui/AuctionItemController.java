@@ -78,11 +78,11 @@ public class AuctionItemController extends BaseTableViewController<AuctionItem> 
         AuctionItem newAuctionItem = new AuctionItem();
         newAuctionItem.setCategoryId(categoryId);
         EditDialogResult result = showAuctionItemEditDialog(newAuctionItem);
-        if (result.saveClicked()) {
+        if (result.saved()) {
             AppContext.getAuctionItemService().saveAuctionItem(newAuctionItem);
             refreshTable();
         }
-        if (result.addAnother()) {
+        if (result.editNext()) {
             final Long lastCategoryId = newAuctionItem.getCategoryId();
             Platform.runLater(() -> {
                 doHandleAddAuctionItem(lastCategoryId);
@@ -96,7 +96,7 @@ public class AuctionItemController extends BaseTableViewController<AuctionItem> 
         if (selected != null) {
             logger.info("Edit auction item button clicked for: {}", selected.getCatalogNumber());
             EditDialogResult result = showAuctionItemEditDialog(selected);
-            if (result.saveClicked()) {
+            if (result.saved()) {
                 AppContext.getAuctionItemService().saveAuctionItem(selected);
                 refreshTable();
             }

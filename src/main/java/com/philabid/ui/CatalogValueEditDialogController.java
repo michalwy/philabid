@@ -76,7 +76,7 @@ public class CatalogValueEditDialogController {
         this.catalogValue = catalogValue;
 
         if (catalogValue.getValue() != null) {
-            valueField.setAmount(catalogValue.getValue());
+            valueField.setAmount(catalogValue.getValue().originalAmount());
         }
 
         // Pre-select items in ComboBoxes if editing an existing value
@@ -93,7 +93,7 @@ public class CatalogValueEditDialogController {
                     .select(AppContext.getCatalogService().getCatalogById(catalogValue.getCatalogId()).orElse(null));
         }
         if (catalogValue.getValue() != null) {
-            currencyComboBox.getSelectionModel().select(catalogValue.getValue().getCurrency());
+            currencyComboBox.getSelectionModel().select(catalogValue.getValue().getOriginalCurrency());
         }
     }
 

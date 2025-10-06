@@ -108,8 +108,8 @@ public class CatalogValueRepository {
             pstmt.setLong(1, catalogValue.getAuctionItemId());
             pstmt.setLong(2, catalogValue.getConditionId());
             pstmt.setLong(3, catalogValue.getCatalogId());
-            pstmt.setBigDecimal(4, catalogValue.getValue().getNumber().numberValue(BigDecimal.class));
-            pstmt.setString(5, catalogValue.getValue().getCurrency().getCurrencyCode());
+            pstmt.setBigDecimal(4, catalogValue.getValue().originalAmount().getNumber().numberValue(BigDecimal.class));
+            pstmt.setString(5, catalogValue.getValue().getOriginalCurrency().getCurrencyCode());
             pstmt.setTimestamp(6, Timestamp.valueOf(catalogValue.getCreatedAt()));
             pstmt.setTimestamp(7, Timestamp.valueOf(catalogValue.getUpdatedAt()));
 
@@ -142,8 +142,8 @@ public class CatalogValueRepository {
             pstmt.setLong(1, catalogValue.getAuctionItemId());
             pstmt.setLong(2, catalogValue.getConditionId());
             pstmt.setLong(3, catalogValue.getCatalogId());
-            pstmt.setBigDecimal(4, catalogValue.getValue().getNumber().numberValue(BigDecimal.class));
-            pstmt.setString(5, catalogValue.getValue().getCurrency().getCurrencyCode());
+            pstmt.setBigDecimal(4, catalogValue.getValue().originalAmount().getNumber().numberValue(BigDecimal.class));
+            pstmt.setString(5, catalogValue.getValue().getOriginalCurrency().getCurrencyCode());
             pstmt.setTimestamp(6, Timestamp.valueOf(catalogValue.getUpdatedAt()));
             pstmt.setLong(7, catalogValue.getId());
 

@@ -15,14 +15,20 @@
 
     <Label text="%auctions.state.label.currentPrice" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
     <MonetaryField fx:id="currentPrice" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <Label fx:id="currencyLabel" text="CUR" GridPane.columnIndex="2" GridPane.rowIndex="1">
+        <GridPane.margin><Insets left="-5.0"/></GridPane.margin>
+    </Label>
 
-    <Label text="%auctions.state.label.maxBid" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-    <MonetaryField fx:id="maxBid" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+    <Label text="%auctions.state.label.maxBid" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <MonetaryField fx:id="maxBid" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+    <Label fx:id="maxBidCurrencyLabel" text="CUR" GridPane.columnIndex="2" GridPane.rowIndex="2">
+        <GridPane.margin><Insets left="-5.0"/></GridPane.margin>
+    </Label>
 
-    <Label text="%auctions.state.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-    <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3"/>
+    <Label text="%auctions.state.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+    <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3"/>
 
-    <ButtonBar GridPane.columnSpan="4" GridPane.rowIndex="3">
+    <ButtonBar GridPane.columnSpan="4" GridPane.rowIndex="4">
         <buttons>
             <Button fx:id="saveAndAddNextButton" onAction="#handleSaveAndNext" text="%common.saveAndNext"
                     defaultButton="true"/>

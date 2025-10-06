@@ -1,5 +1,7 @@
 package com.philabid.model;
 
+import com.philabid.util.MultiCurrencyMonetaryAmount;
+
 import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
 
@@ -14,8 +16,8 @@ public class Auction {
     private Long conditionId;
     private String lotId;
     private String url;
-    private MonetaryAmount currentPrice;
-    private MonetaryAmount maxBid;
+    private MultiCurrencyMonetaryAmount currentPrice;
+    private MultiCurrencyMonetaryAmount maxBid;
     private LocalDateTime endDate;
     private boolean archived;
     private LocalDateTime createdAt;
@@ -29,7 +31,7 @@ public class Auction {
     private String conditionName;
     private String conditionCode;
 
-    private MonetaryAmount catalogValue;
+    private MultiCurrencyMonetaryAmount catalogValue;
 
     public Auction() {
         this.archived = false;
@@ -84,12 +86,16 @@ public class Auction {
         this.url = url;
     }
 
-    public MonetaryAmount getCurrentPrice() {
+    public MultiCurrencyMonetaryAmount getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(MonetaryAmount currentPrice) {
+    public void setCurrentPrice(MultiCurrencyMonetaryAmount currentPrice) {
         this.currentPrice = currentPrice;
+    }
+
+    public void setCurrentPrice(MonetaryAmount currentPrice) {
+        this.currentPrice = MultiCurrencyMonetaryAmount.of(currentPrice);
     }
 
     public LocalDateTime getEndDate() {
@@ -172,12 +178,16 @@ public class Auction {
         this.auctionHouseName = auctionHouseName;
     }
 
-    public MonetaryAmount getCatalogValue() {
+    public MultiCurrencyMonetaryAmount getCatalogValue() {
         return catalogValue;
     }
 
-    public void setCatalogValue(MonetaryAmount catalogValue) {
+    public void setCatalogValue(MultiCurrencyMonetaryAmount catalogValue) {
         this.catalogValue = catalogValue;
+    }
+
+    public void setCatalogValue(MonetaryAmount catalogValue) {
+        this.catalogValue = MultiCurrencyMonetaryAmount.of(catalogValue);
     }
 
     public boolean isArchived() {
@@ -188,11 +198,19 @@ public class Auction {
         this.archived = archived;
     }
 
-    public MonetaryAmount getMaxBid() {
+    public MultiCurrencyMonetaryAmount getMaxBid() {
         return maxBid;
     }
 
-    public void setMaxBid(MonetaryAmount maxBid) {
+    public void setMaxBid(MultiCurrencyMonetaryAmount maxBid) {
         this.maxBid = maxBid;
+    }
+
+    public void setMaxBid(MonetaryAmount maxBid) {
+        this.maxBid = MultiCurrencyMonetaryAmount.of(maxBid);
+    }
+
+    public boolean isFinished() {
+        return endDate.isBefore(LocalDateTime.now());
     }
 }
