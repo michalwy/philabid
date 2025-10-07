@@ -61,4 +61,13 @@ public class CatalogValueService {
             return false;
         }
     }
+
+    public Optional<CatalogValue> findByAuctionItemAndCondition(long auctionItemId, long conditionId) {
+        try {
+            return catalogValueRepository.findByAuctionItemAndCondition(auctionItemId, conditionId);
+        } catch (SQLException e) {
+            logger.error("Failed to find catalog value for item ID {} and condition ID {}", auctionItemId, conditionId, e);
+            return Optional.empty();
+        }
+    }
 }

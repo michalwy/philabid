@@ -1,18 +1,16 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
-import com.philabid.ui.cell.EndingDateCell;
 import com.philabid.model.Auction;
+import com.philabid.model.CatalogValue;
+import com.philabid.ui.cell.EndingDateCell;
 import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -21,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class ActiveAuctionController extends BaseAuctionController {
@@ -69,10 +66,16 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         addRowFormatter((row, auction, empty) -> {
             row.setStyle("");
+            // Always remove classes first to handle row reuse
             row.getStyleClass().remove("winning-auction");
+            row.getStyleClass().remove("expired-auction");
 
             if (empty || auction == null) {
                 return;
+            }
+
+            if (auction.isFinished()) {
+                row.getStyleClass().add("expired-auction");
             }
 
             if (auction.getMaxBid() != null && auction.getCurrentPrice() != null && auction.getMaxBid().originalAmount()
@@ -92,13 +95,78 @@ public class ActiveAuctionController extends BaseAuctionController {
     @Override
     protected List<MenuItem> getContextMenuItems() {
         MenuItem archiveItem = new MenuItem("Edit state...");
-        archiveItem.setOnAction(event -> handleEditState());
+        archiveItem.setOnAction(event -> handleEditState(table.getSelectionModel().getSelectedItem()));
 
-        return List.of(archiveItem);
+        MenuItem addCatalogValueItem = new MenuItem("Add Catalog Value...");
+        addCatalogValueItem.setOnAction(event -> handleAddCatalogValue(table.getSelectionModel().getSelectedItem()));
+
+        MenuItem updateCatalogValueItem = new MenuItem("Update Catalog Value...");
+        updateCatalogValueItem.setOnAction(
+                event -> handleUpdateCatalogValue(table.getSelectionModel().getSelectedItem()));
+
+        return List.of(archiveItem, addCatalogValueItem, updateCatalogValueItem);
     }
 
-    private void handleEditState() {
+    @Override
+    protected void onContextMenuShowing(ContextMenu contextMenu) {
         Auction selectedAuction = table.getSelectionModel().getSelectedItem();
+        if (selectedAuction == null) return;
+
+        // Show/hide context menu items based on the auction's state
+        contextMenu.getItems().stream()
+                .filter(item -> "Add Catalog Value...".equals(item.getText()))
+                .findFirst()
+                .ifPresent(menuItem -> {
+                    // Show this option only if catalog value is missing
+                    menuItem.setVisible(selectedAuction.getCatalogValue() == null);
+                });
+
+        contextMenu.getItems().stream()
+                .filter(item -> "Update Catalog Value...".equals(item.getText()))
+                .findFirst()
+                .ifPresent(menuItem -> {
+                    // Show this option only if catalog value exists and is from an inactive catalog
+                    menuItem.setVisible(
+                            selectedAuction.getCatalogValue() != null && !selectedAuction.isCatalogActive());
+                });
+    }
+
+    private void handleAddCatalogValue(Auction auction) {
+        if (auction == null) return;
+
+        CatalogValue newCatalogValue = new CatalogValue();
+        // Pre-populate with data from the auction
+        newCatalogValue.setAuctionItemId(auction.getAuctionItemId());
+        newCatalogValue.setConditionId(auction.getConditionId());
+
+//                    if (auction.getAuctionItemCategoryCatalog != null) {
+//                        newCatalogValue.setCatalogId(AppContext.getCategoryService().getCategoryById(item
+//                        .getCategoryId()).get().getCatalogId());
+//                    }
+
+        EditDialogResult result = showCatalogValueEditDialog(newCatalogValue);
+        if (result != null && result.saved()) {
+            refreshTable(); // Refresh to show the new value
+        }
+    }
+
+    private void handleUpdateCatalogValue(Auction auction) {
+        if (auction == null) return;
+
+        // Find the existing CatalogValue to edit it
+        AppContext.getCatalogValueService()
+                .findByAuctionItemAndCondition(auction.getAuctionItemId(), auction.getConditionId())
+                .ifPresent(catalogValueToUpdate -> {
+                    // We want the user to select a new, active catalog, so we don't pre-set the old one.
+                    catalogValueToUpdate.setCatalogId(null);
+                    EditDialogResult result = showCatalogValueEditDialog(catalogValueToUpdate);
+                    if (result != null && result.saved()) {
+                        refreshTable();
+                    }
+                });
+    }
+
+    private void handleEditState(Auction selectedAuction) {
         if (selectedAuction == null) {
             return;
         }
@@ -139,7 +207,7 @@ public class ActiveAuctionController extends BaseAuctionController {
                         table.scrollTo(nextIndex);
                         table.requestFocus();
                         table.getFocusModel().focus(nextIndex);
-                        handleEditState();
+                        handleEditState(table.getSelectionModel().getSelectedItem());
                     });
                 }
             }
@@ -148,8 +216,36 @@ public class ActiveAuctionController extends BaseAuctionController {
         }
     }
 
+    private EditDialogResult showCatalogValueEditDialog(CatalogValue catalogValue) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/fxml/CatalogValueEditDialog.fxml"));
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
+
+            GridPane page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Add Catalog Value");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(table.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            CatalogValueEditDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setCatalogValue(catalogValue);
+
+            dialogStage.showAndWait();
+
+            return controller.getEditDialogResult();
+        } catch (IOException e) {
+            logger.error("Failed to load the catalog value edit dialog.", e);
+            return null;
+        }
+    }
+
     @Override
     protected void handleDoubleClick() {
-        handleEditState();
+        handleEditState(table.getSelectionModel().getSelectedItem());
     }
 }

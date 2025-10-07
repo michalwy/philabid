@@ -68,6 +68,23 @@ public class CatalogValueRepository {
         return Optional.empty();
     }
 
+    public Optional<CatalogValue> findByAuctionItemAndCondition(long auctionItemId, long conditionId) throws SQLException {
+        // This might return one of many if multiple catalogs have a value.
+        // It's assumed for now that the combination is unique enough for this context.
+        String sql = FIND_QUERY + " WHERE cv.auction_item_id = ? AND cv.condition_id = ? LIMIT 1";
+        try (Connection conn = databaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, auctionItemId);
+            pstmt.setLong(2, conditionId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapRowToCatalogValue(rs));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     public List<CatalogValue> findAll() throws SQLException {
         String sql = FIND_QUERY + " ORDER BY ai.catalog_number, cond.name";
         List<CatalogValue> catalogValues = new ArrayList<>();

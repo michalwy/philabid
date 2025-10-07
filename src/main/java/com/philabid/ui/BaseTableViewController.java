@@ -77,11 +77,21 @@ public abstract class BaseTableViewController<T> {
             if (table.getSelectionModel().isEmpty()) {
                 e.consume(); // Don't show the menu
             }
+            onContextMenuShowing(contextMenu);
         });
     }
 
     protected List<MenuItem> getContextMenuItems() {
         return List.of();
+    }
+
+    /**
+     * A hook for subclasses to customize the context menu just before it is shown.
+     * For example, to hide or disable certain items based on the selected row.
+     * @param contextMenu The context menu that is about to be shown.
+     */
+    protected void onContextMenuShowing(ContextMenu contextMenu) {
+        // Default implementation does nothing.
     }
 
     protected abstract List<T> loadTableItems();

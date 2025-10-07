@@ -25,6 +25,7 @@ public class AuctionRepository {
                           a.id, a.auction_house_id, a.auction_item_id, a.condition_id, a.lot_id, a.url,
                           a.current_price, a.max_bid, a.currency_code, a.end_date, a.archived, a.created_at, a.updated_at,
                           cv.value AS catalog_value, cv.currency_code AS catalog_currency_code,
+                          cat.is_active as catalog_is_active,
                           ah.name AS auction_house_name,
                           ai.catalog_number AS auction_item_catalog_number,
                           ai.order_number AS auction_item_order_number,
@@ -38,6 +39,7 @@ public class AuctionRepository {
                       LEFT JOIN conditions cond ON a.condition_id = cond.id
                       LEFT JOIN categories catg ON ai.category_id = catg.id
                       LEFT JOIN catalog_values cv ON cv.auction_item_id = a.auction_item_id AND cv.condition_id = a.condition_id
+                      LEFT JOIN catalogs cat ON cv.catalog_id = cat.id
             """;
     private final DatabaseManager databaseManager;
 
@@ -223,6 +225,7 @@ public class AuctionRepository {
         String catalogValueCurrency = rs.getString("catalog_currency_code");
         if (catalogValueAmount != null && catalogValueCurrency != null) {
             auction.setRawCatalogValue(Money.of(catalogValueAmount, Monetary.getCurrency(catalogValueCurrency)));
+            auction.setCatalogActive(rs.getBoolean("catalog_is_active"));
         }
 
         // Joined fields

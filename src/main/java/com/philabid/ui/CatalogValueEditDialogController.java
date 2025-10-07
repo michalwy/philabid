@@ -49,8 +49,6 @@ public class CatalogValueEditDialogController {
     private void initialize() {
         logger.debug("CatalogValueEditDialogController initialized.");
 
-        Platform.runLater(() -> auctionItemSelector.requestFocus());
-
         catalogComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 currencyComboBox.getSelectionModel().select(newVal.getCurrency());
@@ -95,6 +93,19 @@ public class CatalogValueEditDialogController {
         }
         if (catalogValue.getValue() != null) {
             currencyComboBox.getSelectionModel().select(catalogValue.getValue().getOriginalCurrency());
+        }
+
+        if (catalogComboBox.getSelectionModel().getSelectedItem() != null) {
+            if (conditionComboBox.getSelectionModel().getSelectedItem() != null) {
+                Platform.runLater(() -> valueField.requestFocus());
+            } else {
+                Platform.runLater(() -> {
+                    conditionComboBox.requestFocus();
+                    conditionComboBox.show();
+                });
+            }
+        } else {
+            Platform.runLater(() -> auctionItemSelector.requestFocus());
         }
     }
 

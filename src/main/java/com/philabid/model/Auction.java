@@ -34,6 +34,7 @@ public class Auction {
     private String conditionCode;
 
     private MultiCurrencyMonetaryAmount catalogValue;
+    private boolean catalogActive = false; // Default to true
     private MultiCurrencyMonetaryAmount recommendedPrice;
 
     public Auction() {
@@ -199,6 +200,14 @@ public class Auction {
 
     public void setRawCatalogValue(MonetaryAmount catalogValue) {
         this.catalogValue = new MultiCurrencyMonetaryAmount(catalogValue, null);
+    }
+
+    public boolean isCatalogActive() {
+        return catalogActive;
+    }
+
+    public void setCatalogActive(boolean catalogActive) {
+        this.catalogActive = catalogActive;
     }
 
     public boolean isArchived() {

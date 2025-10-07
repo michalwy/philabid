@@ -1,6 +1,7 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
+import com.philabid.ui.cell.CatalogValueCell;
 import com.philabid.model.Auction;
 import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.cell.RightAlignedDateCell;
@@ -78,7 +79,7 @@ public abstract class BaseAuctionController extends BaseTableViewController<Auct
                         Auction::getCatalogValue));
 
         catalogValueColumn.setCellValueFactory(new PropertyValueFactory<>("catalogValue"));
-        catalogValueColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>());
+        catalogValueColumn.setCellFactory(column -> new CatalogValueCell());
 
         endDateColumn.setCellValueFactory(new PropertyValueFactory<>("endDate"));
         endDateColumn.setCellFactory(column -> new RightAlignedDateCell<>());

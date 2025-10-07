@@ -80,6 +80,7 @@ public class AuctionItemSelector extends VBox {
         this.selectedAuctionItem.set(auctionItem);
         if (auctionItem != null) {
             auctionItemField.setText(auctionItem.getCatalogNumber());
+            autoSelectCategory(auctionItem);
             categoryComboBox.setDisable(true);
         }
     }
@@ -121,14 +122,20 @@ public class AuctionItemSelector extends VBox {
         binding.setOnAutoCompleted(event -> {
             this.selectedAuctionItem.set(event.getCompletion().item());
             auctionItemField.setText(this.selectedAuctionItem.get().getCatalogNumber());
-            AppContext.getCategoryService().getCategoryById(this.selectedAuctionItem.get().getCategoryId())
+            autoSelectCategory(this.selectedAuctionItem.get());
+            categoryComboBox.setDisable(true);
+        });
+    }
+
+    private void autoSelectCategory(AuctionItem auctionItem) {
+        if (auctionItem != null && auctionItem.getCategoryId() != null) {
+            AppContext.getCategoryService().getCategoryById(auctionItem.getCategoryId())
                     .ifPresentOrElse(category -> {
                                 categoryComboBox.getSelectionModel().select(category);
                                 selectedCategory.set(category);
                             },
                             () -> categoryComboBox.getSelectionModel().select(null));
-            categoryComboBox.setDisable(true);
-        });
+        }
     }
 
     private void handleAuctionItemTextChange(String newText) {

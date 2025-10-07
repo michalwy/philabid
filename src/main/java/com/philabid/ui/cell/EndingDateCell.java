@@ -23,9 +23,9 @@ public class EndingDateCell<T> extends TableCell<T, LocalDateTime> {
     private final SVGPath warningIcon = new SVGPath();
 
     public EndingDateCell() {
-        // A simple flame/warning icon
-        warningIcon.setContent("M10,2c-4.42,0-8,3.58-8,8s3.58,8,8,8s8-3.58,8-8S14.42,2,10,2z M11,16H9v-2h2V16z M11,12H9V6h2V12z");
-        warningIcon.getStyleClass().add("warning-icon");
+        // A simple clock icon (Material Design)
+        warningIcon.setContent("M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z");
+        warningIcon.getStyleClass().add("ending-soon-icon");
 
         graphicBox.setAlignment(Pos.CENTER_RIGHT);
         graphicBox.getChildren().addAll(warningIcon, textLabel);

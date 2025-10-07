@@ -3,21 +3,21 @@ package com.philabid.ui.cell;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import com.philabid.util.TriConsumer;
 import javafx.geometry.Pos;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurrencyMonetaryAmount> {
-    private final VBox vbox = new VBox(0); // Use VBox for vertical layout
-    private final Label currencyLabel = new Label();
-    private final Label amountLabel = new Label();
+    private final Label primaryAmountLabel = new Label();
     private final Label foreignCurrencyAmountLabel = new Label();
     private final TriConsumer<MultiCurrencyMonetaryAmount, T, List<Label>> styler;
+    private final SVGPath icon = new SVGPath();
 
     public MultiCurrencyMonetaryAmountCell() {
         this(null);
@@ -26,34 +26,43 @@ public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurren
     public MultiCurrencyMonetaryAmountCell(TriConsumer<MultiCurrencyMonetaryAmount, T, List<Label>> styler) {
         this.styler = styler;
 
-        // The amount should grow and push the currency to the right.
-        HBox primaryAmountBox = new HBox(5);
-        HBox.setHgrow(primaryAmountBox, Priority.ALWAYS);
-        primaryAmountBox.setAlignment(Pos.CENTER_RIGHT);
-        primaryAmountBox.getChildren().addAll(amountLabel, currencyLabel);
+        icon.setVisible(false);
 
         foreignCurrencyAmountLabel.getStyleClass().add("secondary-currency-label");
-        vbox.getChildren().addAll(primaryAmountBox, foreignCurrencyAmountLabel);
+
+        HBox hbox = new HBox(5);
+        hbox.setAlignment(Pos.CENTER_RIGHT);
+        hbox.getChildren().addAll(icon, primaryAmountLabel);
+
+        VBox vbox = new VBox(0);
         vbox.setAlignment(Pos.CENTER_RIGHT);
+        vbox.getChildren().addAll(hbox, foreignCurrencyAmountLabel);
+
+        setGraphic(vbox);
+        setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+        setAlignment(Pos.CENTER_RIGHT);
     }
 
     @Override
     protected void updateItem(MultiCurrencyMonetaryAmount item, boolean empty) {
         super.updateItem(item, empty);
 
-        // Reset state
-        currencyLabel.setStyle("");
-        amountLabel.setStyle("");
-        foreignCurrencyAmountLabel.setText(""); // Clear secondary label
-        setGraphic(null);
-
         if (empty || item == null) {
-            setText(null);
+            // Hide the graphic content for empty rows
+            if (getGraphic() != null) {
+                getGraphic().setVisible(false);
+            }
         } else {
+            // Make sure the graphic is visible for non-empty rows
+            if (getGraphic() != null) {
+                getGraphic().setVisible(true);
+            }
+
             // Always display the default currency amount as the primary value
             BigDecimal defaultNumber = item.defaultCurrencyAmount().getNumber().numberValue(BigDecimal.class);
-            amountLabel.setText(String.format(java.util.Locale.ROOT, "%.2f", defaultNumber));
-            currencyLabel.setText(item.defaultCurrencyAmount().getCurrency().getCurrencyCode());
+            primaryAmountLabel.setText(String.format(java.util.Locale.ROOT, "%.2f %s", defaultNumber,
+                    item.defaultCurrencyAmount().getCurrency().getCurrencyCode()));
 
             // If the currency is not the default, show the converted value as secondary info
             if (!item.isDefaultCurrency()) {
@@ -61,15 +70,22 @@ public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurren
                 foreignCurrencyAmountLabel.setText(
                         String.format(java.util.Locale.ROOT, "(%.2f %s)", originalNumber,
                                 item.originalAmount().getCurrency().getCurrencyCode()));
+                foreignCurrencyAmountLabel.setVisible(true);
+            } else {
+                foreignCurrencyAmountLabel.setVisible(false);
+                foreignCurrencyAmountLabel.setText(""); // Clear text to prevent old values from showing
             }
 
             // Apply custom styling if a styler function is provided
             if (styler != null) {
                 T rowData = getTableRow().getItem();
                 // Styler now affects all labels in the cell
-                styler.accept(item, rowData, List.of(amountLabel, currencyLabel, foreignCurrencyAmountLabel));
+                styler.accept(item, rowData, List.of(primaryAmountLabel, foreignCurrencyAmountLabel));
             }
-            setGraphic(vbox);
         }
+    }
+
+    public SVGPath getIcon() {
+        return icon;
     }
 }

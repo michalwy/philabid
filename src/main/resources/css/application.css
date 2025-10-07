@@ -98,6 +98,12 @@
     -fx-padding: 5px 0;
 }
 
+/* Vertically center the content of all table cells.
+   This ensures alignment when some rows are taller than others. */
+.table-cell {
+    -fx-alignment: CENTER_LEFT;
+}
+
 .table-row-cell:odd {
     -fx-background-color: -fx-background-odd-row;
 }
@@ -156,6 +162,13 @@
 
 .warning-icon {
     -fx-fill: -fx-warning-color;
+    -fx-scale-x: 0.8;
+    -fx-scale-y: 0.8;
+}
+
+/* Style for the clock icon in the ending date cell */
+.ending-soon-icon {
+    -fx-fill: -fx-accent-primary; /* Use the primary blue color */
     -fx-scale-x: 0.8;
     -fx-scale-y: 0.8;
 }
