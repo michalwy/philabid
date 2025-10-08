@@ -5,6 +5,7 @@ import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javax.money.MonetaryAmount;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Represents an auction for a specific philatelic item.
@@ -34,8 +35,11 @@ public class Auction {
     private String conditionCode;
 
     private MultiCurrencyMonetaryAmount catalogValue;
+    private MultiCurrencyMonetaryAmount archivedCatalogValue;
     private boolean catalogActive = false; // Default to true
     private MultiCurrencyMonetaryAmount recommendedPrice;
+
+    private List<Auction> archivedAuctions;
 
     public Auction() {
         this.archived = false;
@@ -202,6 +206,18 @@ public class Auction {
         this.catalogValue = new MultiCurrencyMonetaryAmount(catalogValue, null);
     }
 
+    public MultiCurrencyMonetaryAmount getArchivedCatalogValue() {
+        return archivedCatalogValue;
+    }
+
+    public void setArchivedCatalogValue(MultiCurrencyMonetaryAmount archivedCatalogValue) {
+        this.archivedCatalogValue = archivedCatalogValue;
+    }
+
+    public void setRawArchivedCatalogValue(MonetaryAmount archivedCatalogValue) {
+        this.archivedCatalogValue = new MultiCurrencyMonetaryAmount(archivedCatalogValue, null);
+    }
+
     public boolean isCatalogActive() {
         return catalogActive;
     }
@@ -253,5 +269,13 @@ public class Auction {
 
     public boolean isFinished() {
         return endDate.isBefore(LocalDateTime.now());
+    }
+
+    public List<Auction> getArchivedAuctions() {
+        return archivedAuctions;
+    }
+
+    public void setArchivedAuctions(List<Auction> archivedAuctions) {
+        this.archivedAuctions = archivedAuctions;
     }
 }

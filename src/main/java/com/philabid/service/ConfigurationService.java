@@ -72,6 +72,7 @@ public class ConfigurationService {
         // Auction settings
         ObjectNode auctionSettings = configuration.putObject("auction");
         auctionSettings.put("defaultCurrency", "USD");
+        auctionSettings.put("recommendationAnalysisDays", 90);
         auctionSettings.put("bidIncrement", 1.0);
         auctionSettings.put("autoRefreshInterval", 30); // seconds
 
@@ -206,5 +207,9 @@ public class ConfigurationService {
     public CurrencyUnit getDefaultCurrency() {
         String defaultCurrencyCode = getString("application.defaultCurrency", "PLN");
         return Monetary.getCurrency(defaultCurrencyCode);
+    }
+
+    public int getRecommendationAnalysisDays() {
+        return getInt("auction.recommendationAnalysisDays", 90);
     }
 }

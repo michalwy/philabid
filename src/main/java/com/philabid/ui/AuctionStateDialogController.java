@@ -30,6 +30,7 @@ public class AuctionStateDialogController {
     private Stage dialogStage;
     private Auction auction;
     private EditDialogResult editDialogResult;
+    private boolean initiallyArchived;
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
@@ -59,6 +60,8 @@ public class AuctionStateDialogController {
         }
 
         archivedCheckBox.setSelected(auction.isArchived() || auction.isFinished());
+
+        initiallyArchived = auction.isArchived();
 
         Platform.runLater(() -> {
             currentPrice.requestFocus();
@@ -92,11 +95,17 @@ public class AuctionStateDialogController {
 
         auction.setCurrentPrice(
                 Money.of(currentPrice.getAmount(), auction.getCurrentPrice().getOriginalCurrency()));
-        auction.setArchived(archivedCheckBox.isSelected());
 
         if (!maxBid.isEmpty()) {
             auction.setMaxBid(Money.of(maxBid.getAmount(), auction.getCurrentPrice().getOriginalCurrency()));
         }
+
+        // If the auction is being archived, take a snapshot of the current catalog value
+        if (!initiallyArchived && archivedCheckBox.isSelected() && auction.getCatalogValue() != null) {
+            auction.setArchivedCatalogValue(auction.getCatalogValue());
+        }
+
+        auction.setArchived(archivedCheckBox.isSelected());
 
         return true;
     }

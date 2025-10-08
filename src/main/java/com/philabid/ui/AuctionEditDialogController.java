@@ -62,6 +62,7 @@ public class AuctionEditDialogController {
     private Stage dialogStage;
     private Auction auction;
     private boolean saveClicked = false;
+    private boolean initiallyArchived;
 
     @FXML
     private void initialize() {
@@ -189,6 +190,7 @@ public class AuctionEditDialogController {
                     auction.getCurrentPrice().originalAmount().getCurrency().getCurrencyCode());
         }
         archivedCheckBox.setSelected(auction.isArchived());
+        initiallyArchived = auction.isArchived();
     }
 
     private void populateComboBoxes() {
@@ -243,6 +245,9 @@ public class AuctionEditDialogController {
                 }
                 newEndDate = LocalDateTime.of(localDate, localTime);
                 auction.setEndDate(newEndDate);
+            }
+            if (!initiallyArchived && archivedCheckBox.isSelected() && auction.getCatalogValue() != null) {
+                auction.setArchivedCatalogValue(auction.getCatalogValue());
             }
             auction.setArchived(archivedCheckBox.isSelected());
 

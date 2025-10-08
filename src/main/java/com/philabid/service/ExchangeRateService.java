@@ -145,6 +145,9 @@ public class ExchangeRateService {
     }
 
     public Optional<MonetaryAmount> exchange(MonetaryAmount amount, CurrencyUnit to, LocalDate date) {
+        if (amount.getCurrency().equals(to)) {
+            return Optional.of(amount);
+        }
         return getExchangeRate(date, amount.getCurrency(), to).map(
                 exchangeRate -> Money.of(amount.multiply(exchangeRate.getFactor()).getNumber(), to));
     }

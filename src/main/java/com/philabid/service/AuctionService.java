@@ -1,14 +1,15 @@
 package com.philabid.service;
 
+import com.philabid.AppContext;
 import com.philabid.database.AuctionRepository;
 import com.philabid.model.Auction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.philabid.AppContext;
 
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -35,7 +36,9 @@ public class AuctionService {
     public List<Auction> getActiveAuctions() {
         try {
             List<Auction> auctions = auctionRepository.findAllActive();
-            auctions.forEach(this::enrichAuction);
+            Map<Long, List<Auction>> archiveMap = auctionRepository.findArchivedForActive();
+            archiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);
+            auctions.forEach(auction -> enrichAuction(auction, archiveMap));
             return auctions;
         } catch (SQLException e) {
             logger.error("Failed to retrieve active auctions", e);
@@ -80,6 +83,10 @@ public class AuctionService {
     }
 
     private void enrichAuction(Auction auction) {
+        enrichAuction(auction, Map.of());
+    }
+
+    private void enrichAuction(Auction auction, Map<Long, List<Auction>> archiveMap) {
         // This is where we calculate derived properties after the main DB query is closed.
         // This prevents database locks by separating read and potential write (cache) operations.
         if (auction.getCurrentPrice() != null) {
@@ -91,6 +98,8 @@ public class AuctionService {
         if (auction.getCatalogValue() != null) {
             auction.setCatalogValue(auction.getCatalogValue().originalAmount());
         }
-        auction.setRecommendedPrice(AppContext.getPriceRecommendationService().calculateRecommendation(auction));
+        auction.setArchivedAuctions(archiveMap.getOrDefault(auction.getId(), List.of()));
+        auction.setRecommendedPrice(
+                AppContext.getPriceRecommendationService().calculateRecommendation(auction).orElse(null));
     }
 }

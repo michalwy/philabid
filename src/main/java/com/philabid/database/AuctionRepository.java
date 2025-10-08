@@ -1,6 +1,5 @@
 package com.philabid.database;
 
-import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
@@ -10,9 +9,8 @@ import javax.money.Monetary;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 /**
  * Repository for managing Auction entities in the database.
@@ -21,9 +19,10 @@ public class AuctionRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionRepository.class);
     private static final String FIND_QUERY = """
-                      SELECT
+                      SELECT {additional_fields}
                           a.id, a.auction_house_id, a.auction_item_id, a.condition_id, a.lot_id, a.url,
                           a.current_price, a.max_bid, a.currency_code, a.end_date, a.archived, a.created_at, a.updated_at,
+                          a.archived_catalog_value, a.archived_catalog_currency_code,
                           cv.value AS catalog_value, cv.currency_code AS catalog_currency_code,
                           cat.is_active as catalog_is_active,
                           ah.name AS auction_house_name,
@@ -40,11 +39,27 @@ public class AuctionRepository {
                       LEFT JOIN categories catg ON ai.category_id = catg.id
                       LEFT JOIN catalog_values cv ON cv.auction_item_id = a.auction_item_id AND cv.condition_id = a.condition_id
                       LEFT JOIN catalogs cat ON cv.catalog_id = cat.id
+                      {join_clause}
+                      WHERE {where_clause}
+                      ORDER BY {order_clause}
             """;
     private final DatabaseManager databaseManager;
 
     public AuctionRepository(DatabaseManager databaseManager) {
         this.databaseManager = databaseManager;
+    }
+
+    private static String getFindQuery(List<String> additionalFields, String whereClause, String joinClause,
+                                       String orderClause) {
+        String additionalFieldsString = String.join(",", additionalFields);
+        if (!additionalFieldsString.isEmpty()) {
+            additionalFieldsString = additionalFieldsString + ",";
+        }
+        return FIND_QUERY
+                .replace("{additional_fields}", additionalFieldsString)
+                .replace("{where_clause}", whereClause)
+                .replace("{join_clause}", joinClause)
+                .replace("{order_clause}", orderClause);
     }
 
     public Auction save(Auction auction) throws SQLException {
@@ -56,20 +71,11 @@ public class AuctionRepository {
     }
 
     public Optional<Auction> findById(long id) throws SQLException {
-        String sql = FIND_QUERY + " WHERE a.id = ?";
-        try (Connection conn = databaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setLong(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRowToAuction(rs));
-                }
-            }
-        } catch (SQLException e) {
-            logger.error("Error finding auction with ID: {}", id, e);
-            throw e;
-        }
-        return Optional.empty();
+        final Auction[] result = new Auction[1];
+        new FindQueryBuilder()
+                .withWhereClause("a.id = ?", id)
+                .execute((rs, auction) -> result[0] = auction);
+        return result[0] != null ? Optional.of(result[0]) : Optional.empty();
     }
 
     /**
@@ -89,20 +95,34 @@ public class AuctionRepository {
     }
 
     private List<Auction> findByArchivedStatus(boolean isArchived) throws SQLException {
-        String sql = FIND_QUERY + " WHERE a.archived = ? ORDER BY a.end_date DESC";
         List<Auction> auctions = new ArrayList<>();
-        try (Connection conn = databaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setBoolean(1, isArchived);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                auctions.add(mapRowToAuction(rs));
-            }
-        } catch (SQLException e) {
-            logger.error("Error retrieving all auctions", e);
-            throw e;
-        }
+        new FindQueryBuilder()
+                .withWhereClause("a.archived = ?", isArchived)
+                .withOrderClause("a.end_date DESC")
+                .execute((rs, auction) -> auctions.add(auction));
         return auctions;
+    }
+
+    public Map<Long, List<Auction>> findArchivedForActive() throws SQLException {
+        Map<Long, List<Auction>> archiveMap = new HashMap<>();
+        new FindQueryBuilder()
+                .withAdditionalField("act_a.id AS active_id")
+                .withWhereClause("act_a.archived = 0")
+                .withJoinClause(
+                        "INNER JOIN auctions act_a ON " +
+                                "act_a.auction_item_id = a.auction_item_id AND " +
+                                "act_a.condition_id = a.condition_id AND " +
+                                "a.archived = 1 ")
+                .execute((rs, auction) -> {
+                    long activeId = 0;
+                    try {
+                        activeId = rs.getLong("active_id");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    archiveMap.computeIfAbsent(activeId, k -> new ArrayList<>()).add(auction);
+                });
+        return archiveMap;
     }
 
     public boolean deleteById(long id) throws SQLException {
@@ -120,11 +140,10 @@ public class AuctionRepository {
 
     private Auction insert(Auction auction) throws SQLException {
         String sql =
-                "INSERT INTO auctions(auction_house_id, auction_item_id, condition_id, lot_id, url, " +
-                        "current_price, currency_code, end_date, archived, created_at, updated_at, max_bid) VALUES(?," +
-                        "?,?,?,?," +
-                        "?," +
-                        "?,?,?,?,?,?)";
+                "INSERT INTO auctions(auction_house_id, auction_item_id, condition_id, lot_id, url, current_price, " +
+                        "currency_code, end_date, archived, created_at, updated_at, max_bid, " +
+                        "archived_catalog_value, archived_catalog_currency_code) " +
+                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -146,6 +165,14 @@ public class AuctionRepository {
             pstmt.setBigDecimal(12,
                     auction.getMaxBid() != null ?
                             auction.getMaxBid().originalAmount().getNumber().numberValue(BigDecimal.class) : null);
+            if (auction.getArchivedCatalogValue() != null) {
+                pstmt.setBigDecimal(13,
+                        auction.getArchivedCatalogValue().originalAmount().getNumber().numberValue(BigDecimal.class));
+                pstmt.setString(14, auction.getArchivedCatalogValue().getOriginalCurrency().getCurrencyCode());
+            } else {
+                pstmt.setNull(13, Types.DECIMAL);
+                pstmt.setNull(14, Types.VARCHAR);
+            }
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {
@@ -169,8 +196,9 @@ public class AuctionRepository {
     private Auction update(Auction auction) throws SQLException {
         String sql =
                 "UPDATE auctions SET auction_house_id = ?, auction_item_id = ?, condition_id = ?, " +
-                        "lot_id = ?, url = ?, current_price = ?, currency_code = ?, end_date = ?, " +
-                        "archived = ?, updated_at = ?, max_bid = ? WHERE id = ?";
+                        "lot_id = ?, url = ?, current_price = ?, currency_code = ?, end_date = ?, archived = ?, " +
+                        "updated_at = ?, max_bid = ?, archived_catalog_value = ?, archived_catalog_currency_code = ? " +
+                        "WHERE id = ?";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -190,7 +218,15 @@ public class AuctionRepository {
             pstmt.setBigDecimal(11,
                     auction.getMaxBid() != null ?
                             auction.getMaxBid().originalAmount().getNumber().numberValue(BigDecimal.class) : null);
-            pstmt.setLong(12, auction.getId());
+            if (auction.getArchivedCatalogValue() != null) {
+                pstmt.setBigDecimal(12,
+                        auction.getArchivedCatalogValue().originalAmount().getNumber().numberValue(BigDecimal.class));
+                pstmt.setString(13, auction.getArchivedCatalogValue().getOriginalCurrency().getCurrencyCode());
+            } else {
+                pstmt.setNull(12, Types.DECIMAL);
+                pstmt.setNull(13, Types.VARCHAR);
+            }
+            pstmt.setLong(14, auction.getId());
 
             pstmt.executeUpdate();
             return auction;
@@ -227,6 +263,12 @@ public class AuctionRepository {
             auction.setRawCatalogValue(Money.of(catalogValueAmount, Monetary.getCurrency(catalogValueCurrency)));
             auction.setCatalogActive(rs.getBoolean("catalog_is_active"));
         }
+        BigDecimal archivedCatalogValueAmount = rs.getBigDecimal("archived_catalog_value");
+        String archivedCatalogValueCurrency = rs.getString("archived_catalog_currency_code");
+        if (archivedCatalogValueAmount != null && archivedCatalogValueCurrency != null) {
+            auction.setRawArchivedCatalogValue(
+                    Money.of(archivedCatalogValueAmount, Monetary.getCurrency(archivedCatalogValueCurrency)));
+        }
 
         // Joined fields
         auction.setAuctionHouseName(rs.getString("auction_house_name"));
@@ -238,5 +280,63 @@ public class AuctionRepository {
         auction.setConditionCode(rs.getString("condition_code"));
 
         return auction;
+    }
+
+    class FindQueryBuilder {
+        private final List<String> additionalFields = new ArrayList<>();
+        private final List<String> whereClauses = new ArrayList<>();
+        private final List<String> joinClauses = new ArrayList<>();
+        private final List<String> orderClauses = new ArrayList<>();
+        private final List<Object> params = new ArrayList<>();
+
+        public FindQueryBuilder withAdditionalField(String field) {
+            additionalFields.add(field);
+            return this;
+        }
+
+        public FindQueryBuilder withWhereClause(String clause, Object... clauseParams) {
+            whereClauses.add(clause);
+            params.addAll(Arrays.asList(clauseParams));
+            return this;
+        }
+
+        public FindQueryBuilder withOrderClause(String clause) {
+            orderClauses.add(clause);
+            return this;
+        }
+
+        public FindQueryBuilder withJoinClause(String clause) {
+            joinClauses.add(clause);
+            return this;
+        }
+
+        public void execute(BiConsumer<ResultSet, Auction> consumer) throws SQLException {
+            String whereClause = String.join(" AND ", whereClauses);
+            if (whereClause.isEmpty()) {
+                whereClause = "1=1"; // Always true if no specific conditions
+            }
+            String joinClause = String.join(" ", joinClauses);
+            if (joinClause.isEmpty()) {
+                joinClause = "";
+            }
+            String orderClause = String.join(", ", orderClauses);
+            if (orderClause.isEmpty()) {
+                orderClause = "a.end_date DESC";
+            }
+            String sql = getFindQuery(additionalFields, whereClause, joinClause, orderClause);
+            try (Connection conn = databaseManager.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                for (int i = 0; i < params.size(); i++) {
+                    pstmt.setObject(i + 1, params.get(i));
+                }
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    consumer.accept(rs, mapRowToAuction(rs));
+                }
+            } catch (SQLException e) {
+                logger.error("Error executing find query", e);
+                throw e;
+            }
+        }
     }
 }

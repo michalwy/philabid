@@ -12,7 +12,11 @@
     <Label text="%preferences.label.defaultCurrency" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
     <ComboBox fx:id="defaultCurrencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-    <ButtonBar GridPane.columnSpan="2" GridPane.rowIndex="1">
+    <Label text="%preferences.label.analysisDays" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <Spinner fx:id="analysisDaysSpinner" editable="true" maxWidth="Infinity" GridPane.columnIndex="1"
+             GridPane.rowIndex="1"/>
+
+    <ButtonBar GridPane.columnSpan="2" GridPane.rowIndex="2">
         <buttons>
             <Button onAction="#handleSave" text="%common.save" defaultButton="true"/>
             <Button onAction="#handleCancel" text="%common.cancel" cancelButton="true"/>
