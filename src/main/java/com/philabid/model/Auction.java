@@ -2,8 +2,9 @@ package com.philabid.model;
 
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 
+import javax.money.CurrencyUnit;
+import javax.money.Monetary;
 import javax.money.MonetaryAmount;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,20 +27,23 @@ public class Auction {
     private LocalDateTime updatedAt;
 
     private String auctionHouseName;
+    private CurrencyUnit auctionHouseCurrency;
     private String auctionItemCatalogNumber;
     private Long auctionItemOrderNumber;
     private String auctionItemCategoryName;
     private String auctionItemCategoryCode;
-    private BigDecimal auctionItemCategoryAverageCatalogValuePercentage = new BigDecimal(1);
+    private Long auctionItemCategoryId;
     private String conditionName;
     private String conditionCode;
 
     private MultiCurrencyMonetaryAmount catalogValue;
     private MultiCurrencyMonetaryAmount archivedCatalogValue;
+    private Double archivedCatalogValuePercentage;
     private boolean catalogActive = false; // Default to true
     private MultiCurrencyMonetaryAmount recommendedPrice;
 
     private List<Auction> archivedAuctions;
+    private List<Auction> categoryArchivedAuction;
 
     public Auction() {
         this.archived = false;
@@ -98,16 +102,12 @@ public class Auction {
         return currentPrice;
     }
 
-    public void setCurrentPrice(MultiCurrencyMonetaryAmount currentPrice) {
-        this.currentPrice = currentPrice;
-    }
-
     public void setCurrentPrice(MonetaryAmount currentPrice) {
-        this.currentPrice = MultiCurrencyMonetaryAmount.of(currentPrice);
+        this.currentPrice = currentPrice != null ? MultiCurrencyMonetaryAmount.of(currentPrice) : null;
     }
 
     public void setRawCurrentPrice(MonetaryAmount currentPrice) {
-        this.currentPrice = new MultiCurrencyMonetaryAmount(currentPrice, null);
+        this.currentPrice = currentPrice != null ? new MultiCurrencyMonetaryAmount(currentPrice, null) : null;
     }
 
     public LocalDateTime getEndDate() {
@@ -166,6 +166,14 @@ public class Auction {
         this.auctionItemCategoryCode = auctionItemCategoryCode;
     }
 
+    public Long getAuctionItemCategoryId() {
+        return auctionItemCategoryId;
+    }
+
+    public void setAuctionItemCategoryId(Long auctionItemCategoryId) {
+        this.auctionItemCategoryId = auctionItemCategoryId;
+    }
+
     public String getConditionName() {
         return conditionName;
     }
@@ -218,6 +226,14 @@ public class Auction {
         this.archivedCatalogValue = new MultiCurrencyMonetaryAmount(archivedCatalogValue, null);
     }
 
+    public Double getArchivedCatalogValuePercentage() {
+        return archivedCatalogValuePercentage;
+    }
+
+    public void setArchivedCatalogValuePercentage(Double archivedCatalogValuePercentage) {
+        this.archivedCatalogValuePercentage = archivedCatalogValuePercentage;
+    }
+
     public boolean isCatalogActive() {
         return catalogActive;
     }
@@ -238,25 +254,12 @@ public class Auction {
         return maxBid;
     }
 
-    public void setMaxBid(MultiCurrencyMonetaryAmount maxBid) {
-        this.maxBid = maxBid;
-    }
-
     public void setMaxBid(MonetaryAmount maxBid) {
-        this.maxBid = MultiCurrencyMonetaryAmount.of(maxBid);
+        this.maxBid = maxBid != null ? MultiCurrencyMonetaryAmount.of(maxBid) : null;
     }
 
     public void setRawMaxBid(MonetaryAmount maxBid) {
-        this.maxBid = new MultiCurrencyMonetaryAmount(maxBid, null);
-    }
-
-    public BigDecimal getAuctionItemCategoryAverageCatalogValuePercentage() {
-        return auctionItemCategoryAverageCatalogValuePercentage;
-    }
-
-    public void setAuctionItemCategoryAverageCatalogValuePercentage(
-            BigDecimal auctionItemCategoryAverageCatalogValuePercentage) {
-        this.auctionItemCategoryAverageCatalogValuePercentage = auctionItemCategoryAverageCatalogValuePercentage;
+        this.maxBid = maxBid != null ? new MultiCurrencyMonetaryAmount(maxBid, null) : null;
     }
 
     public MultiCurrencyMonetaryAmount getRecommendedPrice() {
@@ -277,5 +280,25 @@ public class Auction {
 
     public void setArchivedAuctions(List<Auction> archivedAuctions) {
         this.archivedAuctions = archivedAuctions;
+    }
+
+    public List<Auction> getCategoryArchivedAuction() {
+        return categoryArchivedAuction;
+    }
+
+    public void setCategoryArchivedAuction(List<Auction> categoryArchivedAuction) {
+        this.categoryArchivedAuction = categoryArchivedAuction;
+    }
+
+    public CurrencyUnit getAuctionHouseCurrency() {
+        return auctionHouseCurrency;
+    }
+
+    public void setAuctionHouseCurrency(CurrencyUnit auctionHouseCurrency) {
+        this.auctionHouseCurrency = auctionHouseCurrency;
+    }
+
+    public void setCurrency(String currencyCode) {
+        this.auctionHouseCurrency = Monetary.getCurrency(currencyCode);
     }
 }

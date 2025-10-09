@@ -2,6 +2,7 @@ package com.philabid.database;
 
 import com.philabid.model.Auction;
 import org.javamoney.moneta.Money;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,16 +23,19 @@ public class AuctionRepository {
                       SELECT {additional_fields}
                           a.id, a.auction_house_id, a.auction_item_id, a.condition_id, a.lot_id, a.url,
                           a.current_price, a.max_bid, a.currency_code, a.end_date, a.archived, a.created_at, a.updated_at,
-                          a.archived_catalog_value, a.archived_catalog_currency_code,
+                          a.archived_catalog_value, a.archived_catalog_currency_code, a.archived_catalog_value_percentage,
                           cv.value AS catalog_value, cv.currency_code AS catalog_currency_code,
                           cat.is_active as catalog_is_active,
                           ah.name AS auction_house_name,
+                          ah.currency AS auction_house_currency_code,
                           ai.catalog_number AS auction_item_catalog_number,
                           ai.order_number AS auction_item_order_number,
                           catg.name AS auction_item_category_name,
                           catg.code AS auction_item_category_code,
+                          catg.id AS auction_item_category_id,
                           cond.name AS condition_name,
-                          cond.code AS condition_code
+                          cond.code AS condition_code,
+                          cond.id AS condition_id
                       FROM auctions a
                       LEFT JOIN auction_houses ah ON a.auction_house_id = ah.id
                       LEFT JOIN auction_items ai ON a.auction_item_id = ai.id
@@ -103,7 +107,7 @@ public class AuctionRepository {
         return auctions;
     }
 
-    public Map<Long, List<Auction>> findArchivedForActive() throws SQLException {
+    public Map<Long, List<Auction>> findArchivedForActiveAuctions() throws SQLException {
         Map<Long, List<Auction>> archiveMap = new HashMap<>();
         new FindQueryBuilder()
                 .withAdditionalField("act_a.id AS active_id")
@@ -125,6 +129,30 @@ public class AuctionRepository {
         return archiveMap;
     }
 
+    public Map<Pair<Long, Long>, List<Auction>> findArchivedForActiveCategories() throws SQLException {
+        Map<Pair<Long, Long>, List<Auction>> archiveMap = new HashMap<>();
+        new FindQueryBuilder()
+                .withJoinClause(
+                        "INNER JOIN auction_items act_ai ON act_ai.category_id = ai.category_id " +
+                                "INNER JOIN auctions act_a " +
+                                "ON act_a.auction_item_id = act_ai.id AND " +
+                                "act_a.condition_id = a.condition_id AND " +
+                                "act_a.archived = 0")
+                .withWhereClause("a.archived = 1")
+                .execute((rs, auction) -> {
+                    long categoryId = 0;
+                    long conditionId = 0;
+                    try {
+                        categoryId = rs.getLong("auction_item_category_id");
+                        conditionId = rs.getLong("condition_id");
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    archiveMap.computeIfAbsent(Pair.with(categoryId, conditionId), k -> new ArrayList<>()).add(auction);
+                });
+        return archiveMap;
+    }
+
     public boolean deleteById(long id) throws SQLException {
         String sql = "DELETE FROM auctions WHERE id = ?";
         try (Connection conn = databaseManager.getConnection();
@@ -142,8 +170,8 @@ public class AuctionRepository {
         String sql =
                 "INSERT INTO auctions(auction_house_id, auction_item_id, condition_id, lot_id, url, current_price, " +
                         "currency_code, end_date, archived, created_at, updated_at, max_bid, " +
-                        "archived_catalog_value, archived_catalog_currency_code) " +
-                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        "archived_catalog_value, archived_catalog_currency_code, archived_catalog_value_percentage) " +
+                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?)";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -155,9 +183,14 @@ public class AuctionRepository {
             pstmt.setLong(3, auction.getConditionId());
             pstmt.setString(4, auction.getLotId());
             pstmt.setString(5, auction.getUrl());
-            pstmt.setBigDecimal(6,
-                    auction.getCurrentPrice().originalAmount().getNumber().numberValue(BigDecimal.class));
-            pstmt.setString(7, auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
+            if (auction.getCurrentPrice() != null) {
+                pstmt.setBigDecimal(6,
+                        auction.getCurrentPrice().originalAmount().getNumber().numberValue(BigDecimal.class));
+                pstmt.setString(7, auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
+            } else {
+                pstmt.setNull(6, Types.DECIMAL);
+                pstmt.setNull(7, Types.VARCHAR);
+            }
             pstmt.setTimestamp(8, auction.getEndDate() != null ? Timestamp.valueOf(auction.getEndDate()) : null);
             pstmt.setBoolean(9, auction.isArchived());
             pstmt.setTimestamp(10, Timestamp.valueOf(auction.getCreatedAt()));
@@ -172,6 +205,11 @@ public class AuctionRepository {
             } else {
                 pstmt.setNull(13, Types.DECIMAL);
                 pstmt.setNull(14, Types.VARCHAR);
+            }
+            if (auction.getArchivedCatalogValuePercentage() != null) {
+                pstmt.setDouble(15, auction.getArchivedCatalogValuePercentage());
+            } else {
+                pstmt.setNull(15, Types.DOUBLE);
             }
 
             int affectedRows = pstmt.executeUpdate();
@@ -197,7 +235,9 @@ public class AuctionRepository {
         String sql =
                 "UPDATE auctions SET auction_house_id = ?, auction_item_id = ?, condition_id = ?, " +
                         "lot_id = ?, url = ?, current_price = ?, currency_code = ?, end_date = ?, archived = ?, " +
-                        "updated_at = ?, max_bid = ?, archived_catalog_value = ?, archived_catalog_currency_code = ? " +
+                        "updated_at = ?, max_bid = ?, archived_catalog_value = ?, archived_catalog_currency_code = ?," +
+                        " " +
+                        "archived_catalog_value_percentage = ? " +
                         "WHERE id = ?";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -209,15 +249,24 @@ public class AuctionRepository {
             pstmt.setLong(3, auction.getConditionId());
             pstmt.setString(4, auction.getLotId());
             pstmt.setString(5, auction.getUrl());
-            pstmt.setBigDecimal(6,
-                    auction.getCurrentPrice().originalAmount().getNumber().numberValue(BigDecimal.class));
-            pstmt.setString(7, auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
+            if (auction.getCurrentPrice() != null) {
+                pstmt.setBigDecimal(6,
+                        auction.getCurrentPrice().originalAmount().getNumber().numberValue(BigDecimal.class));
+                pstmt.setString(7, auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
+            } else {
+                pstmt.setNull(6, Types.DECIMAL);
+                pstmt.setString(7, auction.getAuctionHouseCurrency().getCurrencyCode());
+            }
             pstmt.setTimestamp(8, auction.getEndDate() != null ? Timestamp.valueOf(auction.getEndDate()) : null);
             pstmt.setBoolean(9, auction.isArchived());
             pstmt.setTimestamp(10, Timestamp.valueOf(auction.getUpdatedAt()));
-            pstmt.setBigDecimal(11,
-                    auction.getMaxBid() != null ?
-                            auction.getMaxBid().originalAmount().getNumber().numberValue(BigDecimal.class) : null);
+            if (auction.getMaxBid() != null) {
+                pstmt.setBigDecimal(11,
+                        auction.getMaxBid() != null ?
+                                auction.getMaxBid().originalAmount().getNumber().numberValue(BigDecimal.class) : null);
+            } else {
+                pstmt.setNull(11, Types.DECIMAL);
+            }
             if (auction.getArchivedCatalogValue() != null) {
                 pstmt.setBigDecimal(12,
                         auction.getArchivedCatalogValue().originalAmount().getNumber().numberValue(BigDecimal.class));
@@ -226,7 +275,12 @@ public class AuctionRepository {
                 pstmt.setNull(12, Types.DECIMAL);
                 pstmt.setNull(13, Types.VARCHAR);
             }
-            pstmt.setLong(14, auction.getId());
+            if (auction.getArchivedCatalogValuePercentage() != null) {
+                pstmt.setDouble(14, auction.getArchivedCatalogValuePercentage());
+            } else {
+                pstmt.setNull(14, Types.DOUBLE);
+            }
+            pstmt.setLong(15, auction.getId());
 
             pstmt.executeUpdate();
             return auction;
@@ -244,7 +298,10 @@ public class AuctionRepository {
         auction.setConditionId(rs.getLong("condition_id"));
         auction.setLotId(rs.getString("lot_id"));
         auction.setUrl(rs.getString("url"));
-        auction.setRawCurrentPrice(Money.of(rs.getBigDecimal("current_price"), rs.getString("currency_code")));
+        BigDecimal currentPrice = rs.getBigDecimal("current_price");
+        if (currentPrice != null) {
+            auction.setRawCurrentPrice(Money.of(currentPrice, rs.getString("currency_code")));
+        }
         BigDecimal maxBid = rs.getBigDecimal("max_bid");
         if (maxBid != null) {
             auction.setRawMaxBid(Money.of(rs.getBigDecimal("max_bid"), rs.getString("currency_code")));
@@ -269,13 +326,16 @@ public class AuctionRepository {
             auction.setRawArchivedCatalogValue(
                     Money.of(archivedCatalogValueAmount, Monetary.getCurrency(archivedCatalogValueCurrency)));
         }
+        auction.setArchivedCatalogValuePercentage(rs.getDouble("archived_catalog_value_percentage"));
 
         // Joined fields
         auction.setAuctionHouseName(rs.getString("auction_house_name"));
+        auction.setAuctionHouseCurrency(Monetary.getCurrency(rs.getString("auction_house_currency_code")));
         auction.setAuctionItemCatalogNumber(rs.getString("auction_item_catalog_number"));
         auction.setAuctionItemOrder(rs.getObject("auction_item_order_number", Long.class));
         auction.setAuctionItemCategoryName(rs.getString("auction_item_category_name"));
         auction.setAuctionItemCategoryCode(rs.getString("auction_item_category_code"));
+        auction.setAuctionItemCategoryId(rs.getLong("auction_item_category_id"));
         auction.setConditionName(rs.getString("condition_name"));
         auction.setConditionCode(rs.getString("condition_code"));
 

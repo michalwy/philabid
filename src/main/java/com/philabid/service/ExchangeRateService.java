@@ -32,7 +32,8 @@ public class ExchangeRateService {
         return getExchangeRate(date, from, to);
     }
 
-    public Optional<ExchangeRate> getExchangeRate(LocalDate date, CurrencyUnit from, CurrencyUnit to) {
+    public Optional<ExchangeRate> getExchangeRate(LocalDate desiredDate, CurrencyUnit from, CurrencyUnit to) {
+        LocalDate date = desiredDate.minusDays(1);
         Optional<ExchangeRate> localRate = getCachedExchangeRate(date, from, to);
         if (localRate.isPresent()) {
             return localRate;
@@ -104,15 +105,17 @@ public class ExchangeRateService {
     }
 
     private ExchangeRate storeLocalExchangeRate(LocalDate date, CurrencyUnit from, CurrencyUnit to, BigDecimal factor) {
-        try {
-            com.philabid.model.ExchangeRate newExchangeRate = new com.philabid.model.ExchangeRate();
-            newExchangeRate.setDate(date);
-            newExchangeRate.setSourceCurrency(from);
-            newExchangeRate.setTargetCurrency(to);
-            newExchangeRate.setRate(factor);
-            repository.saveRate(newExchangeRate);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+        if (date.isBefore(LocalDate.now())) {
+            try {
+                com.philabid.model.ExchangeRate newExchangeRate = new com.philabid.model.ExchangeRate();
+                newExchangeRate.setDate(date);
+                newExchangeRate.setSourceCurrency(from);
+                newExchangeRate.setTargetCurrency(to);
+                newExchangeRate.setRate(factor);
+                repository.saveRate(newExchangeRate);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
         ExchangeRate exchangeRate = buildExchangeRate(from, to, factor);
         cacheExchangeRate(date, from, to, exchangeRate);

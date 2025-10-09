@@ -35,6 +35,8 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
     implementation("ch.qos.logback:logback-classic:1.5.18")
 
+    implementation("org.javatuples:javatuples:1.2")
+
     // JSON processing for configuration
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
 

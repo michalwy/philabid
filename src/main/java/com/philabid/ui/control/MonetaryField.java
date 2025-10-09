@@ -35,6 +35,9 @@ public class MonetaryField extends TextField {
 
     public BigDecimal getAmount() {
         String text = getText().replace(',', '.');
+        if (text.isBlank()) {
+            return null;
+        }
         return new BigDecimal(text);
     }
 

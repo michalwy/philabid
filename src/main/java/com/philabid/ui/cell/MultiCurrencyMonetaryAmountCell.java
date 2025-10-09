@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurrencyMonetaryAmount> {
+    private final Label defaultCurrencyAmountLabel = new Label();
     private final Label primaryAmountLabel = new Label();
     private final Label foreignCurrencyAmountLabel = new Label();
     private final TriConsumer<MultiCurrencyMonetaryAmount, T, List<Label>> styler;
@@ -30,15 +31,18 @@ public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurren
 
         foreignCurrencyAmountLabel.getStyleClass().add("secondary-currency-label");
 
-        HBox hbox = new HBox(5);
-        hbox.setAlignment(Pos.CENTER_RIGHT);
-        hbox.getChildren().addAll(icon, primaryAmountLabel);
-
         VBox vbox = new VBox(0);
         vbox.setAlignment(Pos.CENTER_RIGHT);
-        vbox.getChildren().addAll(hbox, foreignCurrencyAmountLabel);
+        vbox.getChildren().addAll(primaryAmountLabel, foreignCurrencyAmountLabel);
 
-        setGraphic(vbox);
+        Label spacingLabel = new Label();
+        spacingLabel.setPrefWidth(5);
+
+        HBox hbox = new HBox(0);
+        hbox.setAlignment(Pos.CENTER_RIGHT);
+        hbox.getChildren().addAll(icon, spacingLabel, defaultCurrencyAmountLabel, vbox);
+
+        setGraphic(hbox);
         setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
         setAlignment(Pos.CENTER_RIGHT);
@@ -60,20 +64,30 @@ public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurren
             }
 
             // Always display the default currency amount as the primary value
-            BigDecimal defaultNumber = item.defaultCurrencyAmount().getNumber().numberValue(BigDecimal.class);
-            primaryAmountLabel.setText(String.format(java.util.Locale.ROOT, "%.2f %s", defaultNumber,
-                    item.defaultCurrencyAmount().getCurrency().getCurrencyCode()));
 
-            // If the currency is not the default, show the converted value as secondary info
-            if (!item.isDefaultCurrency()) {
+            if (item.isDefaultCurrency()) {
+                foreignCurrencyAmountLabel.setVisible(false);
+                foreignCurrencyAmountLabel.setText("");
+                primaryAmountLabel.setVisible(false);
+                primaryAmountLabel.setText("");
+
                 BigDecimal originalNumber = item.originalAmount().getNumber().numberValue(BigDecimal.class);
+                defaultCurrencyAmountLabel.setText(String.format(java.util.Locale.ROOT, "%.2f %s", originalNumber,
+                        item.defaultCurrencyAmount().getCurrency().getCurrencyCode()));
+                defaultCurrencyAmountLabel.setVisible(true);
+            } else {
+                defaultCurrencyAmountLabel.setVisible(false);
+                defaultCurrencyAmountLabel.setText("");
+
+                BigDecimal originalNumber = item.originalAmount().getNumber().numberValue(BigDecimal.class);
+                BigDecimal defaultNumber = item.defaultCurrencyAmount().getNumber().numberValue(BigDecimal.class);
+                primaryAmountLabel.setText(String.format(java.util.Locale.ROOT, "%.2f %s", defaultNumber,
+                        item.defaultCurrencyAmount().getCurrency().getCurrencyCode()));
                 foreignCurrencyAmountLabel.setText(
                         String.format(java.util.Locale.ROOT, "(%.2f %s)", originalNumber,
                                 item.originalAmount().getCurrency().getCurrencyCode()));
                 foreignCurrencyAmountLabel.setVisible(true);
-            } else {
-                foreignCurrencyAmountLabel.setVisible(false);
-                foreignCurrencyAmountLabel.setText(""); // Clear text to prevent old values from showing
+                primaryAmountLabel.setVisible(true);
             }
 
             // Apply custom styling if a styler function is provided

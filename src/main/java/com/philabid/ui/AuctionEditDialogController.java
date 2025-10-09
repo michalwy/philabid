@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -166,8 +167,6 @@ public class AuctionEditDialogController {
             if (lastUsedAuctionHouse != null) {
                 auctionHouseComboBox.getSelectionModel().select(lastUsedAuctionHouse);
             }
-
-            priceField.setText("1.00");
         } else { // It's an existing auction
             // Set date and time from the existing auction object
             endDatePicker.setValue(auction.getEndDate().toLocalDate());
@@ -228,7 +227,8 @@ public class AuctionEditDialogController {
             auction.setConditionId(conditionComboBox.getValue().getId());
             auction.setLotId(lotIdField.getText());
             auction.setUrl(urlField.getText());
-            auction.setCurrentPrice(Money.of(priceField.getAmount(), currencyComboBox.getValue()));
+            BigDecimal currentPrice = priceField.getAmount();
+            auction.setCurrentPrice(currentPrice != null ? Money.of(currentPrice, currencyComboBox.getValue()) : null);
 
             LocalDate localDate = endDatePicker.getValue();
             LocalDateTime newEndDate = null;

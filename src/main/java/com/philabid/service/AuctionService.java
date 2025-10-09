@@ -3,6 +3,7 @@ package com.philabid.service;
 import com.philabid.AppContext;
 import com.philabid.database.AuctionRepository;
 import com.philabid.model.Auction;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +37,11 @@ public class AuctionService {
     public List<Auction> getActiveAuctions() {
         try {
             List<Auction> auctions = auctionRepository.findAllActive();
-            Map<Long, List<Auction>> archiveMap = auctionRepository.findArchivedForActive();
-            archiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);
-            auctions.forEach(auction -> enrichAuction(auction, archiveMap));
+            Map<Long, List<Auction>> auctionsArchiveMap = auctionRepository.findArchivedForActiveAuctions();
+            Map<Pair<Long, Long>, List<Auction>> categoriesArchiveMap =
+                    auctionRepository.findArchivedForActiveCategories();
+            auctionsArchiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);
+            auctions.forEach(auction -> enrichAuction(auction, auctionsArchiveMap, categoriesArchiveMap));
             return auctions;
         } catch (SQLException e) {
             logger.error("Failed to retrieve active auctions", e);
@@ -83,10 +86,11 @@ public class AuctionService {
     }
 
     private void enrichAuction(Auction auction) {
-        enrichAuction(auction, Map.of());
+        enrichAuction(auction, Map.of(), Map.of());
     }
 
-    private void enrichAuction(Auction auction, Map<Long, List<Auction>> archiveMap) {
+    private void enrichAuction(Auction auction, Map<Long, List<Auction>> auctionArchiveMap,
+                               Map<Pair<Long, Long>, List<Auction>> categoryArchiveMap) {
         // This is where we calculate derived properties after the main DB query is closed.
         // This prevents database locks by separating read and potential write (cache) operations.
         if (auction.getCurrentPrice() != null) {
@@ -98,7 +102,10 @@ public class AuctionService {
         if (auction.getCatalogValue() != null) {
             auction.setCatalogValue(auction.getCatalogValue().originalAmount());
         }
-        auction.setArchivedAuctions(archiveMap.getOrDefault(auction.getId(), List.of()));
+        auction.setArchivedAuctions(auctionArchiveMap.getOrDefault(auction.getId(), List.of()));
+        auction.setCategoryArchivedAuction(
+                categoryArchiveMap.getOrDefault(Pair.with(auction.getAuctionItemCategoryId(), auction.getConditionId()),
+                        List.of()));
         auction.setRecommendedPrice(
                 AppContext.getPriceRecommendationService().calculateRecommendation(auction).orElse(null));
     }

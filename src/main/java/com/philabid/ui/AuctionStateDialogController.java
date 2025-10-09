@@ -3,9 +3,9 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import com.philabid.ui.control.MonetaryField;
+import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -52,11 +52,15 @@ public class AuctionStateDialogController {
         if (auction.getCurrentPrice() != null) {
             currentPrice.setAmount(auction.getCurrentPrice().originalAmount());
             currencyLabel.setText(auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
+        } else {
+            currencyLabel.setText(auction.getAuctionHouseCurrency().getCurrencyCode());
         }
 
         if (auction.getMaxBid() != null) {
             maxBid.setAmount(auction.getMaxBid().originalAmount());
             maxBidCurrencyLabel.setText(auction.getMaxBid().getOriginalCurrency().getCurrencyCode());
+        } else {
+            maxBidCurrencyLabel.setText(auction.getAuctionHouseCurrency().getCurrencyCode());
         }
 
         archivedCheckBox.setSelected(auction.isArchived() || auction.isFinished());
@@ -93,21 +97,41 @@ public class AuctionStateDialogController {
             return false;
         }
 
-        auction.setCurrentPrice(
-                Money.of(currentPrice.getAmount(), auction.getCurrentPrice().getOriginalCurrency()));
-
-        if (!maxBid.isEmpty()) {
-            auction.setMaxBid(Money.of(maxBid.getAmount(), auction.getCurrentPrice().getOriginalCurrency()));
+        if (!currentPrice.isEmpty()) {
+            MultiCurrencyMonetaryAmount oldCurrentPrice = auction.getCurrentPrice();
+            auction.setCurrentPrice(
+                    Money.of(currentPrice.getAmount(),
+                            oldCurrentPrice != null ? oldCurrentPrice.getOriginalCurrency() :
+                                    auction.getAuctionHouseCurrency()));
+        } else {
+            auction.setCurrentPrice(null);
         }
 
-        // If the auction is being archived, take a snapshot of the current catalog value
+        if (!maxBid.isEmpty()) {
+            MultiCurrencyMonetaryAmount oldMaxBid = auction.getMaxBid();
+            auction.setMaxBid(Money.of(maxBid.getAmount(),
+                    oldMaxBid != null ? oldMaxBid.getOriginalCurrency() : auction.getAuctionHouseCurrency()));
+        } else {
+            auction.setMaxBid(null);
+        }
+
         if (!initiallyArchived && archivedCheckBox.isSelected() && auction.getCatalogValue() != null) {
-            auction.setArchivedCatalogValue(auction.getCatalogValue());
+            setArchivedValues();
         }
 
         auction.setArchived(archivedCheckBox.isSelected());
 
         return true;
+    }
+
+    private void setArchivedValues() {
+        auction.setArchivedCatalogValue(auction.getCatalogValue());
+
+        if (auction.getCatalogValue() != null && auction.getCurrentPrice() != null) {
+            Double catalogValue = auction.getCatalogValue().defaultCurrencyAmount().getNumber().doubleValue();
+            Double currentPrice = auction.getCurrentPrice().defaultCurrencyAmount().getNumber().doubleValue();
+            auction.setArchivedCatalogValuePercentage(currentPrice / catalogValue);
+        }
     }
 
     @FXML
@@ -116,14 +140,6 @@ public class AuctionStateDialogController {
     }
 
     private boolean isInputValid() {
-        if (currentPrice.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle("Invalid Field");
-            alert.setHeaderText("Current price cannot be empty.");
-            alert.showAndWait();
-            return false;
-        }
         return true;
     }
 }
