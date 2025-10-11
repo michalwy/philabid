@@ -1,64 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.philabid.ui.control.AuctionItemSelector?>
+<?import com.philabid.ui.control.BaseEditDialog?>
 <?import com.philabid.ui.control.MonetaryField?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/17.0.2-ea"
-          fx:controller="com.philabid.ui.AuctionEditDialogController">
-    <padding>
-        <Insets bottom="10" left="10" right="10" top="10"/>
-    </padding>
+<BaseEditDialog xmlns:fx="http://javafx.com/fxml/1" fx:id="baseEditDialog" xmlns="http://javafx.com/javafx/17.0.2-ea"
+                fx:controller="com.philabid.ui.AuctionEditDialogController">
+    <GridPane hgap="10" vgap="10">
+        <Label text="%auctions.label.url" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <HBox spacing="5" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <TextField fx:id="urlField" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="fetchUrlButton" onAction="#handleFetchUrlData" prefHeight="26" prefWidth="26">
+                <graphic>
+                    <SVGPath content="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </graphic>
+            </Button>
+        </HBox>
 
-    <Label text="%auctions.label.url" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-    <HBox spacing="5" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="0">
-        <TextField fx:id="urlField" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="fetchUrlButton" onAction="#handleFetchUrlData" prefHeight="26" prefWidth="26">
-            <graphic>
-                <SVGPath content="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-            </graphic>
-        </Button>
-    </HBox>
+        <Label text="%auctions.label.house" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="auctionHouseComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-    <Label text="%auctions.label.house" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-    <ComboBox fx:id="auctionHouseComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Label text="%auctions.label.item" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.valignment="TOP"/>
+        <AuctionItemSelector fx:id="auctionItemSelector" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                             GridPane.rowSpan="2"/>
 
-    <Label text="%auctions.label.item" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.valignment="TOP"/>
-    <AuctionItemSelector fx:id="auctionItemSelector" GridPane.columnIndex="1" GridPane.rowIndex="2"
-                         GridPane.rowSpan="2"/>
+        <Label text="%auctions.label.condition" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <ComboBox fx:id="conditionComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
-    <Label text="%auctions.label.condition" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-    <ComboBox fx:id="conditionComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        <Label text="%auctions.label.lotId" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+        <TextField fx:id="lotIdField" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
-    <Label text="%auctions.label.lotId" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-    <TextField fx:id="lotIdField" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+        <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
-    <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-    <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
-    <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
-    <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+        <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="8">
+            <DatePicker fx:id="endDatePicker" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="endTimeField" promptText="HH:mm" prefWidth="80"/>
+        </HBox>
 
-    <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
-    <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="8">
-        <DatePicker fx:id="endDatePicker" HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="endTimeField" promptText="HH:mm" prefWidth="80"/>
-    </HBox>
+        <Label text="%auctions.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
+        <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
 
-    <Label text="%auctions.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
-    <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
-
-    <ButtonBar GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="11">
-        <buttons>
-            <Button fx:id="saveButton" onAction="#handleSave" text="%common.save" defaultButton="true"/>
-            <Button fx:id="cancelButton" onAction="#handleCancel" text="%common.cancel" cancelButton="true"/>
-        </buttons>
-    </ButtonBar>
-
-    <columnConstraints>
-        <ColumnConstraints/>
-        <ColumnConstraints hgrow="ALWAYS"/>
-    </columnConstraints>
-</GridPane>
+        <columnConstraints>
+            <ColumnConstraints/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+    </GridPane>
+</BaseEditDialog>

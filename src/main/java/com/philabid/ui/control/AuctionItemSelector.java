@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
@@ -37,13 +36,10 @@ public class AuctionItemSelector extends VBox {
     private ComboBox<Category> categoryComboBox;
 
     public AuctionItemSelector() {
-    }
-
-    public void load(ResourceBundle resources) {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/control/AuctionItemSelector.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
-        fxmlLoader.setResources(resources); // Pass the resource bundle
+        fxmlLoader.setResources(AppContext.getI18nManager().getResourceBundle()); // Pass the resource bundle
 
         try {
             fxmlLoader.load();
@@ -161,7 +157,7 @@ public class AuctionItemSelector extends VBox {
             newAuctionItem.setCatalogNumber(auctionItemField.getText());
             newAuctionItem.setOrderNumber(AuctionItem.calculateOrderNumber(auctionItemField.getText()));
             newAuctionItem.setCategoryId(categoryComboBox.getSelectionModel().getSelectedItem().getId());
-            AppContext.getAuctionItemService().saveAuctionItem(newAuctionItem);
+            AppContext.getAuctionItemService().save(newAuctionItem);
             logger.info("Created new AuctionItem with ID: {}", newAuctionItem.getId());
             return newAuctionItem.getId();
         }

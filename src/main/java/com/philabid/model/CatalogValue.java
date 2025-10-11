@@ -8,9 +8,8 @@ import java.time.LocalDateTime;
 /**
  * Represents a catalog value for a specific auction item in a given condition.
  */
-public class CatalogValue {
+public class CatalogValue extends BaseModel<CatalogValue> {
 
-    private Long id;
     private Long auctionItemId;
     private Long conditionId;
     private Long catalogId;
@@ -33,14 +32,6 @@ public class CatalogValue {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getAuctionItemId() {
         return auctionItemId;
     }
@@ -155,5 +146,15 @@ public class CatalogValue {
 
     public void setAuctionItemOrderNumber(Long auctionItemOrderNumber) {
         this.auctionItemOrderNumber = auctionItemOrderNumber;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return this.getAuctionItemCatalogNumber() + " - " + this.getConditionName();
+    }
+
+    @Override
+    public CatalogValue create() {
+        return new CatalogValue();
     }
 }

@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * Service layer for managing Auction Items.
  */
-public class AuctionItemService {
+public class AuctionItemService implements CrudService<AuctionItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionItemService.class);
     private final AuctionItemRepository auctionItemRepository;
@@ -22,6 +22,10 @@ public class AuctionItemService {
         this.auctionItemRepository = auctionItemRepository;
     }
 
+    public AuctionItem create() {
+        return new AuctionItem();
+    }
+    
     public List<AuctionItem> getAllAuctionItems() {
         try {
             return auctionItemRepository.findAll();
@@ -31,7 +35,7 @@ public class AuctionItemService {
         }
     }
 
-    public Optional<AuctionItem> saveAuctionItem(AuctionItem auctionItem) {
+    public Optional<AuctionItem> save(AuctionItem auctionItem) {
         if (auctionItem.getCatalogNumber() == null || auctionItem.getCatalogNumber().trim().isEmpty()) {
             logger.warn("Attempted to save an auction item with an empty catalog number.");
             return Optional.empty();
@@ -45,7 +49,7 @@ public class AuctionItemService {
         }
     }
 
-    public boolean deleteAuctionItem(long id) {
+    public boolean delete(Long id) {
         try {
             return auctionItemRepository.deleteById(id);
         } catch (SQLException e) {

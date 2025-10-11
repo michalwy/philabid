@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="ToolBar" xmlns="http://javafx.com/javafx/17.0.2-ea">
+    <Button fx:id="addButton" mnemonicParsing="false" text="%common.new"/>
+    <Button fx:id="editButton" mnemonicParsing="false" text="%common.edit"/>
+    <Button fx:id="deleteButton" mnemonicParsing="false" text="%common.delete"/>
+</fx:root>

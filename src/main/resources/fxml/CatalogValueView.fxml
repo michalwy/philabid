@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.philabid.ui.control.CrudToolbar?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
@@ -8,28 +9,18 @@
     <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
     </padding>
-    <children>
-        <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="%catalogValues.title"/>
-        <ToolBar>
-            <items>
-                <Button fx:id="addButton" mnemonicParsing="false" onAction="#handleAddCatalogValue" text="%common.new"/>
-                <Button fx:id="editButton" mnemonicParsing="false" onAction="#handleEditCatalogValue"
-                        text="%common.edit"/>
-                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#handleDeleteCatalogValue"
-                        text="%common.delete"/>
-            </items>
-        </ToolBar>
-        <TableView fx:id="table" VBox.vgrow="ALWAYS">
-            <columns>
-                <TableColumn fx:id="categoryColumn" prefWidth="200.0" text="%catalogValues.column.category"/>
-                <TableColumn fx:id="catalogNumberColumn" prefWidth="200.0" text="%catalogValues.column.catalogNumber"/>
-                <TableColumn fx:id="conditionColumn" prefWidth="150.0" text="%catalogValues.column.condition"/>
-                <TableColumn fx:id="catalogColumn" prefWidth="200.0" text="%catalogValues.column.catalog"/>
-                <TableColumn fx:id="valueColumn" prefWidth="100.0" text="%catalogValues.column.value"/>
-            </columns>
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-            </columnResizePolicy>
-        </TableView>
-    </children>
+    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="%catalogValues.title"/>
+    <CrudToolbar fx:id="crudToolbar"/>
+    <TableView fx:id="table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="categoryColumn" prefWidth="200.0" text="%catalogValues.column.category"/>
+            <TableColumn fx:id="catalogNumberColumn" prefWidth="200.0" text="%catalogValues.column.catalogNumber"/>
+            <TableColumn fx:id="conditionColumn" prefWidth="150.0" text="%catalogValues.column.condition"/>
+            <TableColumn fx:id="catalogColumn" prefWidth="200.0" text="%catalogValues.column.catalog"/>
+            <TableColumn fx:id="valueColumn" prefWidth="100.0" text="%catalogValues.column.value"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
 </VBox>

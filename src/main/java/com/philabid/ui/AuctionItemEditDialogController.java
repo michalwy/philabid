@@ -7,18 +7,22 @@ import com.philabid.model.Category;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
 /**
  * Controller for the auction item edit dialog.
  */
-public class AuctionItemEditDialogController {
+public class AuctionItemEditDialogController extends BaseEditDialogController<AuctionItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionItemEditDialogController.class);
     @FXML
@@ -35,13 +39,9 @@ public class AuctionItemEditDialogController {
     private Button saveAndAddAnotherButton;
     @FXML
     private Button cancelButton;
-    private Stage dialogStage;
-    private AuctionItem auctionItem;
-    private boolean saveClicked = false;
-    private boolean addAnother = false;
 
-    @FXML
-    private void initialize() {
+    @Override
+    protected void initContent() {
         Platform.runLater(() -> {
             catalogNumberField.requestFocus();
         });
@@ -54,13 +54,14 @@ public class AuctionItemEditDialogController {
         logger.debug("AuctionItemEditDialogController initialized.");
     }
 
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
+    private void populateCategoryComboBox() {
+        List<Category> categories = AppContext.getCategoryService().getAllCategories();
+        categoryComboBox.setItems(FXCollections.observableArrayList(categories));
+        logger.debug("Populated category ComboBox with {} items.", categories.size());
     }
 
-    public void setAuctionItem(AuctionItem auctionItem) {
-        this.auctionItem = auctionItem;
-
+    @Override
+    public void loadEntity(AuctionItem auctionItem) {
         catalogNumberField.setText(auctionItem.getCatalogNumber());
         orderNumberField.setText(String.valueOf(auctionItem.getOrderNumber()));
         notesArea.setText(auctionItem.getNotes());
@@ -73,20 +74,8 @@ public class AuctionItemEditDialogController {
         }
     }
 
-    private void populateCategoryComboBox() {
-        List<Category> categories = AppContext.getCategoryService().getAllCategories();
-        categoryComboBox.setItems(FXCollections.observableArrayList(categories));
-        logger.debug("Populated category ComboBox with {} items.", categories.size());
-    }
-
-    public boolean isSaveClicked() {
-        return saveClicked;
-    }
-
-    private boolean handleSaveCommon() {
-        if (!isInputValid()) {
-            return false;
-        }
+    @Override
+    protected void updateEntity(AuctionItem auctionItem) {
         auctionItem.setCatalogNumber(catalogNumberField.getText());
         auctionItem.setOrderNumber(Long.parseLong(orderNumberField.getText()));
         auctionItem.setNotes(notesArea.getText());
@@ -109,61 +98,26 @@ public class AuctionItemEditDialogController {
             auctionItem.setCatalogName(null);
             auctionItem.setCatalogIssueYear(null);
         }
-
-        return true;
     }
 
-    @FXML
-    private void handleSave() {
-        if (handleSaveCommon()) {
-            saveClicked = true;
-            dialogStage.close();
-        }
-    }
+    @Override
+    protected Collection<ValidationError> validate() {
+        List<ValidationError> errors = new ArrayList<>();
 
-    @FXML
-    private void handleSaveAndAddAnother() {
-        if (handleSaveCommon()) {
-            saveClicked = true;
-            addAnother = true;
-            dialogStage.close();
-        }
-    }
-
-    @FXML
-    private void handleCancel() {
-        dialogStage.close();
-    }
-
-    private boolean isInputValid() {
-        String errorMessage = "";
         ResourceBundle bundle = AppContext.getI18nManager().getResourceBundle();
 
         if (categoryComboBox.getSelectionModel().getSelectedItem() == null) {
-            errorMessage += (bundle != null ? bundle.getString("auctionItems.validation.noCategorySelected") : "No " +
-                    "category selected!") + "\n";
+            errors.add(new ValidationError(
+                    (bundle != null ? bundle.getString("auctionItems.validation.noCategorySelected") : "No " +
+                            "category selected."), categoryComboBox));
         }
         if (catalogNumberField.getText() == null || catalogNumberField.getText().trim().isEmpty()) {
-            errorMessage += (bundle != null ? bundle.getString("auctionItems.validation.noCatalogNumber") : "No valid" +
-                    " catalog number!") + "\n";
+            errors.add(new ValidationError(
+                    (bundle != null ? bundle.getString("auctionItems.validation.noCatalogNumber") : "No valid" +
+                            " catalog number."), catalogNumberField));
         }
 
-        if (errorMessage.isEmpty()) {
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle(bundle != null ? bundle.getString("common.error.title") : "Error");
-            alert.setHeaderText(bundle != null ? bundle.getString("common.error.header") : "Please correct invalid " +
-                    "fields");
-            alert.setContentText(errorMessage);
-            alert.showAndWait();
-            return false;
-        }
-    }
-
-    public boolean shouldAddAnother() {
-        return addAnother;
+        return errors;
     }
 
     /**

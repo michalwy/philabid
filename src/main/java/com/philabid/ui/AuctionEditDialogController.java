@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
@@ -24,12 +23,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 /**
  * Controller for the auction edit dialog.
  */
-public class AuctionEditDialogController {
+public class AuctionEditDialogController extends BaseEditDialogController<Auction> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionEditDialogController.class);
     // Static field to remember the last used end date across dialog instances
@@ -60,13 +62,11 @@ public class AuctionEditDialogController {
     @FXML
     private CheckBox archivedCheckBox;
 
-    private Stage dialogStage;
-    private Auction auction;
     private boolean saveClicked = false;
     private boolean initiallyArchived;
 
-    @FXML
-    private void initialize() {
+    @Override
+    protected void initContent() {
         logger.debug("AuctionEditDialogController initialized.");
 
         Platform.runLater(() -> urlField.requestFocus());
@@ -74,7 +74,8 @@ public class AuctionEditDialogController {
         // Add a listener to auto-trigger parsing when a URL is pasted
         urlField.textProperty().addListener((obs, oldVal, newVal) -> {
             // A simple heuristic to detect a paste of a URL
-            if (newVal != null && !newVal.equals(oldVal) && newVal.trim().startsWith("http")) {
+            if (getEntity() != null && getEntity().getId() == null && newVal != null && !newVal.equals(oldVal) &&
+                    newVal.trim().startsWith("http")) {
                 handleFetchUrlData();
             }
         });
@@ -139,18 +140,33 @@ public class AuctionEditDialogController {
             }
         });
 
-        auctionItemSelector.load(AppContext.getI18nManager().getResourceBundle());
-
         populateComboBoxes();
     }
 
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
+    private void populateComboBoxes() {
+        auctionHouseComboBox.setItems(
+                FXCollections.observableArrayList(AppContext.getAuctionHouseService().getAllAuctionHouses()));
+        conditionComboBox.setItems(
+                FXCollections.observableArrayList(AppContext.getConditionService().getAllConditions()));
+        currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
     }
 
-    public void setAuction(Auction auction) {
-        this.auction = auction;
+    private <T> void selectComboBoxValue(ComboBox<T> comboBox, Object id) {
+        if (id == null || comboBox.getItems() == null) return;
+        comboBox.getItems().stream()
+                .filter(item -> {
+                    if (item instanceof Condition) return ((Condition) item).getId().equals(id);
+                    if (item instanceof CurrencyUnit) return ((CurrencyUnit) item).getCurrencyCode().equals(id);
+                    if (item instanceof AuctionStatus) return item.equals(id);
+                    if (item instanceof AuctionHouse) return ((AuctionHouse) item).getId().equals(id);
+                    return false;
+                })
+                .findFirst()
+                .ifPresent(comboBox.getSelectionModel()::select);
+    }
 
+    @Override
+    public void loadEntity(Auction auction) {
         lotIdField.setText(auction.getLotId());
         urlField.setText(auction.getUrl());
         if (auction.getCurrentPrice() != null) {
@@ -192,111 +208,73 @@ public class AuctionEditDialogController {
         initiallyArchived = auction.isArchived();
     }
 
-    private void populateComboBoxes() {
-        auctionHouseComboBox.setItems(
-                FXCollections.observableArrayList(AppContext.getAuctionHouseService().getAllAuctionHouses()));
-        conditionComboBox.setItems(
-                FXCollections.observableArrayList(AppContext.getConditionService().getAllConditions()));
-        currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
-    }
-
-    private <T> void selectComboBoxValue(ComboBox<T> comboBox, Object id) {
-        if (id == null || comboBox.getItems() == null) return;
-        comboBox.getItems().stream()
-                .filter(item -> {
-                    if (item instanceof Condition) return ((Condition) item).getId().equals(id);
-                    if (item instanceof CurrencyUnit) return ((CurrencyUnit) item).getCurrencyCode().equals(id);
-                    if (item instanceof AuctionStatus) return item.equals(id);
-                    if (item instanceof AuctionHouse) return ((AuctionHouse) item).getId().equals(id);
-                    return false;
-                })
-                .findFirst()
-                .ifPresent(comboBox.getSelectionModel()::select);
-    }
-
     public boolean isSaveClicked() {
         return saveClicked;
     }
 
-    @FXML
-    private void handleSave() {
-        if (isInputValid()) {
-            AuctionHouse selectedAuctionHouse = auctionHouseComboBox.getValue();
-            auction.setAuctionHouseId(selectedAuctionHouse.getId());
-            auction.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
-            auction.setConditionId(conditionComboBox.getValue().getId());
-            auction.setLotId(lotIdField.getText());
-            auction.setUrl(urlField.getText());
-            BigDecimal currentPrice = priceField.getAmount();
-            auction.setCurrentPrice(currentPrice != null ? Money.of(currentPrice, currencyComboBox.getValue()) : null);
+    protected void updateEntity(Auction auction) {
+        AuctionHouse selectedAuctionHouse = auctionHouseComboBox.getValue();
+        auction.setAuctionHouseId(selectedAuctionHouse.getId());
+        auction.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
+        auction.setConditionId(conditionComboBox.getValue().getId());
+        auction.setLotId(lotIdField.getText());
+        auction.setUrl(urlField.getText());
+        BigDecimal currentPrice = priceField.getAmount();
+        auction.setCurrentPrice(currentPrice != null ? Money.of(currentPrice, currencyComboBox.getValue()) : null);
 
-            LocalDate localDate = endDatePicker.getValue();
-            LocalDateTime newEndDate = null;
-            if (localDate != null) {
-                LocalTime localTime = LocalTime.MIDNIGHT; // Default time
-                if (endTimeField.getText() != null && !endTimeField.getText().isBlank()) {
-                    try {
-                        // Use a formatter to be more robust
-                        localTime = LocalTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
-                    } catch (DateTimeParseException e) {
-                        // This case is handled by isInputValid(), but it's good practice
-                        logger.warn("Could not parse time, defaulting to midnight: {}", endTimeField.getText());
-                    }
+        LocalDate localDate = endDatePicker.getValue();
+        LocalDateTime newEndDate = null;
+        if (localDate != null) {
+            LocalTime localTime = LocalTime.MIDNIGHT; // Default time
+            if (endTimeField.getText() != null && !endTimeField.getText().isBlank()) {
+                try {
+                    // Use a formatter to be more robust
+                    localTime = LocalTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
+                } catch (DateTimeParseException e) {
+                    // This case is handled by isInputValid(), but it's good practice
+                    logger.warn("Could not parse time, defaulting to midnight: {}", endTimeField.getText());
                 }
-                newEndDate = LocalDateTime.of(localDate, localTime);
-                auction.setEndDate(newEndDate);
             }
-            if (!initiallyArchived && archivedCheckBox.isSelected() && auction.getCatalogValue() != null) {
-                auction.setArchivedCatalogValue(auction.getCatalogValue());
-            }
-            auction.setArchived(archivedCheckBox.isSelected());
-
-            // Remember the date for the next time
-            lastUsedEndDate = newEndDate;
-            lastUsedAuctionHouse = selectedAuctionHouse;
-
-            saveClicked = true;
-            dialogStage.close();
+            newEndDate = LocalDateTime.of(localDate, localTime);
+            auction.setEndDate(newEndDate);
         }
+        if (!initiallyArchived && archivedCheckBox.isSelected() && auction.getCatalogValue() != null) {
+            auction.setArchivedCatalogValue(auction.getCatalogValue());
+        }
+        auction.setArchived(archivedCheckBox.isSelected());
+
+        // Remember the date for the next time
+        lastUsedEndDate = newEndDate;
+        lastUsedAuctionHouse = selectedAuctionHouse;
+
+        saveClicked = true;
     }
 
-    @FXML
-    private void handleCancel() {
-        dialogStage.close();
-    }
-
-    private boolean isInputValid() {
-        String errorMessage = "";
-        if (auctionHouseComboBox.getSelectionModel().getSelectedItem() == null)
-            errorMessage += "Auction House is required.\n";
+    @Override
+    protected Collection<ValidationError> validate() {
+        List<ValidationError> errors = new ArrayList<>();
+        if (auctionHouseComboBox.getSelectionModel().getSelectedItem() == null) {
+            errors.add(new ValidationError("Auction House is required.", auctionHouseComboBox));
+        }
         if (auctionItemSelector.getText() == null || auctionItemSelector.getText().isBlank()) {
-            errorMessage += "Catalog Number cannot be empty!\n";
+            errors.add(new ValidationError("Catalog Number is required.", auctionItemSelector));
         }
         if (auctionItemSelector.getSelectedAuctionItem() == null && auctionItemSelector.getSelectedCategory() == null) {
-            errorMessage += "Category must be selected for a new catalog number!\n";
+            errors.add(new ValidationError("Category must be selected for a new catalog number.", auctionItemSelector));
         }
-        if (conditionComboBox.getValue() == null) errorMessage += "Condition is required.\n";
+        if (conditionComboBox.getValue() == null) {
+            errors.add(new ValidationError("Condition is required.", conditionComboBox));
+        }
 
-        // Validate time format if provided
         if (endTimeField.getText() != null && !endTimeField.getText().isBlank()) {
             try {
                 LocalTime.parse(endTimeField.getText(), DateTimeFormatter.ofPattern("HH:mm"));
             } catch (DateTimeParseException e) {
-                errorMessage += "Invalid time format. Please use HH:mm.\n";
+                errors.add(new ValidationError("Invalid time format. Please use HH:mm.", endTimeField));
             }
         }
 
-        if (errorMessage.isEmpty()) {
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle("Invalid Fields");
-            alert.setHeaderText("Please correct invalid fields");
-            alert.setContentText(errorMessage);
-            alert.showAndWait();
-            return false;
-        }
+        return errors;
     }
 
     @FXML

@@ -11,9 +11,8 @@ import java.util.List;
 /**
  * Represents an auction for a specific philatelic item.
  */
-public class Auction {
+public class Auction extends BaseModel<Auction> {
 
-    private Long id;
     private Long auctionHouseId;
     private Long auctionItemId;
     private Long conditionId;
@@ -50,14 +49,6 @@ public class Auction {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getAuctionHouseId() {
         return auctionHouseId;
     }
@@ -300,5 +291,16 @@ public class Auction {
 
     public void setCurrency(String currencyCode) {
         this.auctionHouseCurrency = Monetary.getCurrency(currencyCode);
+    }
+
+    @Override
+    public String getDisplayName() {
+        return this.getLotId() + ": " + this.getAuctionItemCategoryName() + " - " + this.getAuctionItemCatalogNumber() +
+                " - " + this.getConditionName();
+    }
+
+    @Override
+    public Auction create() {
+        return new Auction();
     }
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This is the internal template for the BaseEditDialog custom component. -->
+<!-- It is loaded by the BaseEditDialog.java class. -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.layout.BorderPane?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/17.0.2-ea">
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10"/>
+    </padding>
+
+    <bottom>
+        <ButtonBar>
+            <buttons>
+                <Button fx:id="saveButton" text="%common.save" defaultButton="true"/>
+                <Button fx:id="cancelButton" text="%common.cancel" cancelButton="true"/>
+            </buttons>
+        </ButtonBar>
+    </bottom>
+</fx:root>

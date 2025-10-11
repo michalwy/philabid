@@ -16,13 +16,17 @@ import java.util.Optional;
 /**
  * Service layer for managing Auctions.
  */
-public class AuctionService {
+public class AuctionService implements CrudService<Auction> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
     private final AuctionRepository auctionRepository;
 
     public AuctionService(AuctionRepository auctionRepository) {
         this.auctionRepository = auctionRepository;
+    }
+
+    public Auction create() {
+        return new Auction();
     }
 
     public List<Auction> getAllAuctions() {
@@ -60,7 +64,7 @@ public class AuctionService {
         }
     }
 
-    public Optional<Auction> saveAuction(Auction auction) {
+    public Optional<Auction> save(Auction auction) {
         // Basic validation
         if (auction.getAuctionHouseId() == null || auction.getAuctionItemId() == null ||
                 auction.getConditionId() == null) {
@@ -76,7 +80,7 @@ public class AuctionService {
         }
     }
 
-    public boolean deleteAuction(long id) {
+    public boolean delete(Long id) {
         try {
             return auctionRepository.deleteById(id);
         } catch (SQLException e) {

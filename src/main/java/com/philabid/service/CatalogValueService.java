@@ -13,13 +13,17 @@ import java.util.Optional;
 /**
  * Service layer for managing Catalog Values.
  */
-public class CatalogValueService {
+public class CatalogValueService implements CrudService<CatalogValue> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueService.class);
     private final CatalogValueRepository catalogValueRepository;
 
     public CatalogValueService(CatalogValueRepository catalogValueRepository) {
         this.catalogValueRepository = catalogValueRepository;
+    }
+
+    public CatalogValue create() {
+        return new CatalogValue();
     }
 
     public List<CatalogValue> getAllCatalogValues() {
@@ -31,7 +35,7 @@ public class CatalogValueService {
         }
     }
 
-    public Optional<CatalogValue> saveCatalogValue(CatalogValue catalogValue) {
+    public Optional<CatalogValue> save(CatalogValue catalogValue) {
         if (catalogValue.getAuctionItemId() == null || catalogValue.getConditionId() == null ||
                 catalogValue.getCatalogId() == null || catalogValue.getValue() == null) {
             logger.warn("Attempted to save a catalog value with missing required fields.");
@@ -53,7 +57,7 @@ public class CatalogValueService {
         }
     }
 
-    public boolean deleteCatalogValue(long id) {
+    public boolean delete(Long id) {
         try {
             return catalogValueRepository.deleteById(id);
         } catch (SQLException e) {
@@ -66,7 +70,8 @@ public class CatalogValueService {
         try {
             return catalogValueRepository.findByAuctionItemAndCondition(auctionItemId, conditionId);
         } catch (SQLException e) {
-            logger.error("Failed to find catalog value for item ID {} and condition ID {}", auctionItemId, conditionId, e);
+            logger.error("Failed to find catalog value for item ID {} and condition ID {}", auctionItemId, conditionId,
+                    e);
             return Optional.empty();
         }
     }

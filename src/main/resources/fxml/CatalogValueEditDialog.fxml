@@ -1,41 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.philabid.ui.control.AuctionItemSelector?>
+<?import com.philabid.ui.control.BaseEditDialog?>
 <?import com.philabid.ui.control.MonetaryField?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/17.0.2-ea"
-          fx:controller="com.philabid.ui.CatalogValueEditDialogController">
-    <padding>
-        <Insets bottom="10" left="10" right="10" top="10"/>
-    </padding>
+<BaseEditDialog xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea"
+                fx:controller="com.philabid.ui.CatalogValueEditDialogController" fx:id="baseEditDialog">
+    <GridPane hgap="10" vgap="10">
+        <AuctionItemSelector fx:id="auctionItemSelector" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                             GridPane.rowSpan="2"/>
+        <Label text="%auctions.label.item" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.valignment="TOP"/>
 
-    <AuctionItemSelector fx:id="auctionItemSelector" GridPane.columnIndex="1" GridPane.rowIndex="0"
-                         GridPane.rowSpan="2"/>
-    <Label text="%auctions.label.item" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.valignment="TOP"/>
+        <Label text="%catalogValues.label.condition" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <ComboBox fx:id="conditionComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-    <Label text="%catalogValues.label.condition" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-    <ComboBox fx:id="conditionComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <Label text="%catalogValues.label.catalog" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="catalogComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
-    <Label text="%catalogValues.label.catalog" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-    <ComboBox fx:id="catalogComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <Label text="%catalogValues.label.value" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <MonetaryField fx:id="valueField" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
-    <Label text="%catalogValues.label.value" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-    <MonetaryField fx:id="valueField" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        <Label text="%catalogValues.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
-    <Label text="%catalogValues.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-    <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-
-    <ButtonBar GridPane.columnSpan="2" GridPane.rowIndex="6">
-        <buttons>
-            <Button fx:id="saveButton" onAction="#handleSave" text="%common.save" defaultButton="true"/>
-            <Button fx:id="cancelButton" onAction="#handleCancel" text="%common.cancel" cancelButton="true"/>
-        </buttons>
-    </ButtonBar>
-
-    <columnConstraints>
-        <ColumnConstraints/>
-        <ColumnConstraints hgrow="ALWAYS"/>
-    </columnConstraints>
-</GridPane>
+        <columnConstraints>
+            <ColumnConstraints/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+    </GridPane>
+</BaseEditDialog>

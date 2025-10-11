@@ -7,10 +7,9 @@ import java.util.regex.Pattern;
 /**
  * Represents an item that can be put up for auction.
  */
-public class AuctionItem {
+public class AuctionItem extends BaseModel<AuctionItem> {
 
     private final static Pattern ORDER_NUMBER_PATTERN = Pattern.compile("\\d+");
-    private Long id;
     private Long categoryId;
     private String catalogNumber;
     private Long orderNumber;
@@ -43,14 +42,6 @@ public class AuctionItem {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getCategoryId() {
         return categoryId;
     }
@@ -132,7 +123,12 @@ public class AuctionItem {
     }
 
     @Override
-    public String toString() {
-        return "Item #" + id + " (Cat: " + catalogNumber + ")";
+    public String getDisplayName() {
+        return this.getCategoryName() + " - " + this.getCatalogNumber();
+    }
+
+    @Override
+    public AuctionItem create() {
+        return new AuctionItem();
     }
 }

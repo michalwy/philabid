@@ -139,11 +139,6 @@ public class ActiveAuctionController extends BaseAuctionController {
         newCatalogValue.setAuctionItemId(auction.getAuctionItemId());
         newCatalogValue.setConditionId(auction.getConditionId());
 
-//                    if (auction.getAuctionItemCategoryCatalog != null) {
-//                        newCatalogValue.setCatalogId(AppContext.getCategoryService().getCategoryById(item
-//                        .getCategoryId()).get().getCatalogId());
-//                    }
-
         EditDialogResult result = showCatalogValueEditDialog(newCatalogValue);
         if (result != null && result.saved()) {
             refreshTable(); // Refresh to show the new value
@@ -190,7 +185,7 @@ public class ActiveAuctionController extends BaseAuctionController {
 
             EditDialogResult editDialogResult = controller.getEditDialogResult();
             if (editDialogResult != null && editDialogResult.saved()) {
-                AppContext.getAuctionService().saveAuction(selectedAuction);
+                AppContext.getAuctionService().save(selectedAuction);
 
                 final int selectedIndex = table.getSelectionModel().getSelectedIndex();
                 final boolean archived = selectedAuction.isArchived();
@@ -233,7 +228,7 @@ public class ActiveAuctionController extends BaseAuctionController {
 
             CatalogValueEditDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setCatalogValue(catalogValue);
+            controller.setEntity(catalogValue);
 
             dialogStage.showAndWait();
 

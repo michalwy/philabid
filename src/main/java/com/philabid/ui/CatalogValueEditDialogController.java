@@ -11,20 +11,21 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.stage.Stage;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Controller for the catalog value edit dialog.
  */
-public class CatalogValueEditDialogController {
+public class CatalogValueEditDialogController extends BaseEditDialogController<CatalogValue> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueEditDialogController.class);
     @FXML
@@ -37,18 +38,10 @@ public class CatalogValueEditDialogController {
     private MonetaryField valueField;
     @FXML
     private ComboBox<CurrencyUnit> currencyComboBox;
-    @FXML
-    private Button saveButton;
-    @FXML
-    private Button cancelButton;
-    private Stage dialogStage;
-    private CatalogValue catalogValue;
     private EditDialogResult editDialogResult;
 
-    @FXML
-    private void initialize() {
-        logger.debug("CatalogValueEditDialogController initialized.");
-
+    @Override
+    protected void initContent() {
         catalogComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 currencyComboBox.getSelectionModel().select(newVal.getCurrency());
@@ -62,18 +55,12 @@ public class CatalogValueEditDialogController {
 
         auctionItemSelector.selectedCategoryProperty()
                 .addListener((obs, oldVal, newVal) -> autoSelectCatalogAndCurrency(newVal));
-        auctionItemSelector.load(AppContext.getI18nManager().getResourceBundle());
 
         populateComboBoxes();
     }
 
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
-    }
-
-    public void setCatalogValue(CatalogValue catalogValue) {
-        this.catalogValue = catalogValue;
-
+    @Override
+    protected void loadEntity(CatalogValue catalogValue) {
         if (catalogValue.getValue() != null) {
             valueField.setAmount(catalogValue.getValue().originalAmount());
         }
@@ -131,78 +118,61 @@ public class CatalogValueEditDialogController {
         }
     }
 
-    @FXML
-    private void handleSave() {
-        if (isInputValid()) {
-            catalogValue.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
-            catalogValue.setConditionId(conditionComboBox.getSelectionModel().getSelectedItem().getId());
-            catalogValue.setCatalogId(catalogComboBox.getSelectionModel().getSelectedItem().getId());
-            try {
-                catalogValue.setValue(Money.of(valueField.getAmount(),
-                        currencyComboBox.getSelectionModel().getSelectedItem()));
-            } catch (NumberFormatException e) {
-                logger.error("Invalid number format for value field: {}", valueField.getText());
-                return;
-            }
+    @Override
+    protected void updateEntity(CatalogValue catalogValue) {
+        catalogValue.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
+        catalogValue.setConditionId(conditionComboBox.getSelectionModel().getSelectedItem().getId());
+        catalogValue.setCatalogId(catalogComboBox.getSelectionModel().getSelectedItem().getId());
+        try {
+            catalogValue.setValue(Money.of(valueField.getAmount(),
+                    currencyComboBox.getSelectionModel().getSelectedItem()));
+        } catch (NumberFormatException e) {
+            logger.error("Invalid number format for value field: {}", valueField.getText());
+            return;
+        }
 
-            Optional<CatalogValue> savedValue = AppContext.getCatalogValueService().saveCatalogValue(catalogValue);
+        Optional<CatalogValue> savedValue = AppContext.getCatalogValueService().save(catalogValue);
 
-            if (savedValue.isPresent()) {
-                editDialogResult = new EditDialogResult(true, false);
-                dialogStage.close();
-            } else {
-                // Save failed, likely due to a duplicate entry
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.initOwner(dialogStage);
-                alert.setTitle(AppContext.getI18nManager().getString("common.error.title"));
-                alert.setHeaderText("Duplicate Entry");
-                alert.setContentText("A catalog value for this item and condition already exists. Please " +
-                        "edit the existing entry instead of creating a new one.");
-                alert.showAndWait();
-            }
+        if (savedValue.isPresent()) {
+            editDialogResult = new EditDialogResult(true, false);
+            //dialogStage.close();
+        } else {
+            // Save failed, likely due to a duplicate entry
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            //alert.initOwner(dialogStage);
+            alert.setTitle(AppContext.getI18nManager().getString("common.error.title"));
+            alert.setHeaderText("Duplicate Entry");
+            alert.setContentText("A catalog value for this item and condition already exists. Please " +
+                    "edit the existing entry instead of creating a new one.");
+            alert.showAndWait();
         }
     }
 
-    @FXML
-    private void handleCancel() {
-        dialogStage.close();
-    }
-
-    private boolean isInputValid() {
-        StringBuilder errorMessage = new StringBuilder();
+    @Override
+    protected Collection<ValidationError> validate() {
+        List<ValidationError> errors = new ArrayList<>();
 
         if (auctionItemSelector.getText() == null || auctionItemSelector.getText().isBlank()) {
-            errorMessage.append("Catalog Number cannot be empty!\n");
+            errors.add(new ValidationError("Catalog Number cannot be empty.", auctionItemSelector));
         }
 
         // If it's a new item, a category must be selected
         if (auctionItemSelector.getSelectedAuctionItem() == null && auctionItemSelector.getSelectedCategory() == null) {
-            errorMessage.append("Category must be selected for a new catalog number!\n");
+            errors.add(new ValidationError("Category must be selected for a new catalog number.", auctionItemSelector));
         }
         if (conditionComboBox.getSelectionModel().getSelectedItem() == null) {
-            errorMessage.append("Condition must be selected!\n");
+            errors.add(new ValidationError("Condition must be selected.", conditionComboBox));
         }
         if (catalogComboBox.getSelectionModel().getSelectedItem() == null) {
-            errorMessage.append("Catalog must be selected!\n");
+            errors.add(new ValidationError("Catalog must be selected.", catalogComboBox));
         }
         if (currencyComboBox.getSelectionModel().getSelectedItem() == null) {
-            errorMessage.append("Currency must be selected!\n");
+            errors.add(new ValidationError("Currency must be selected.", currencyComboBox));
         }
         if (valueField.isEmpty()) {
-            errorMessage.append("Value cannot be empty!\n");
+            errors.add(new ValidationError("Value cannot be empty.", valueField));
         }
-
-        if (errorMessage.isEmpty()) {
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle(AppContext.getI18nManager().getString("common.invalidFields"));
-            alert.setHeaderText(AppContext.getI18nManager().getString("common.correctInvalidFields"));
-            alert.setContentText(errorMessage.toString());
-            alert.showAndWait();
-            return false;
-        }
+        return errors;
     }
 
     public EditDialogResult getEditDialogResult() {
