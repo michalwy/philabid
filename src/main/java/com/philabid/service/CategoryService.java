@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * Service layer for managing Categories.
  */
-public class CategoryService {
+public class CategoryService implements CrudService<Category> {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
     private final CategoryRepository categoryRepository;
@@ -22,7 +22,8 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Category> getAllCategories() {
+    @Override
+    public List<Category> getAll() {
         try {
             return categoryRepository.findAll();
         } catch (SQLException e) {
@@ -31,7 +32,13 @@ public class CategoryService {
         }
     }
 
-    public Optional<Category> saveCategory(Category category) {
+    @Override
+    public Category create() {
+        return new Category();
+    }
+
+    @Override
+    public Optional<Category> save(Category category) {
         if (category.getName() == null || category.getName().trim().isEmpty() ||
                 category.getCode() == null || category.getCode().trim().isEmpty()) {
             logger.warn("Attempted to save a category with an empty name or code.");
@@ -46,7 +53,8 @@ public class CategoryService {
         }
     }
 
-    public boolean deleteCategory(long id) {
+    @Override
+    public boolean delete(Long id) {
         try {
             return categoryRepository.deleteById(id);
         } catch (SQLException e) {

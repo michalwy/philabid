@@ -29,7 +29,8 @@ public class AuctionService implements CrudService<Auction> {
         return new Auction();
     }
 
-    public List<Auction> getAllAuctions() {
+    @Override
+    public List<Auction> getAll() {
         try {
             return auctionRepository.findAll();
         } catch (SQLException e) {

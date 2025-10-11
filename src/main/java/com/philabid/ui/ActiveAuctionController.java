@@ -88,28 +88,29 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         Platform.runLater(() -> {
             endDateColumn.setSortType(TableColumn.SortType.ASCENDING);
-            table.getSortOrder().setAll(List.of(endDateColumn));
+            getTableView().getSortOrder().setAll(List.of(endDateColumn));
         });
     }
 
     @Override
     protected List<MenuItem> getContextMenuItems() {
         MenuItem archiveItem = new MenuItem("Edit state...");
-        archiveItem.setOnAction(event -> handleEditState(table.getSelectionModel().getSelectedItem()));
+        archiveItem.setOnAction(event -> handleEditState(getTableView().getSelectionModel().getSelectedItem()));
 
         MenuItem addCatalogValueItem = new MenuItem("Add Catalog Value...");
-        addCatalogValueItem.setOnAction(event -> handleAddCatalogValue(table.getSelectionModel().getSelectedItem()));
+        addCatalogValueItem.setOnAction(
+                event -> handleAddCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
         MenuItem updateCatalogValueItem = new MenuItem("Update Catalog Value...");
         updateCatalogValueItem.setOnAction(
-                event -> handleUpdateCatalogValue(table.getSelectionModel().getSelectedItem()));
+                event -> handleUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
         return List.of(archiveItem, addCatalogValueItem, updateCatalogValueItem);
     }
 
     @Override
     protected void onContextMenuShowing(ContextMenu contextMenu) {
-        Auction selectedAuction = table.getSelectionModel().getSelectedItem();
+        Auction selectedAuction = getTableView().getSelectionModel().getSelectedItem();
         if (selectedAuction == null) return;
 
         // Show/hide context menu items based on the auction's state
@@ -174,7 +175,7 @@ public class ActiveAuctionController extends BaseAuctionController {
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Auction State");
             dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(table.getScene().getWindow());
+            dialogStage.initOwner(getTableView().getScene().getWindow());
             dialogStage.setScene(new Scene(page));
 
             AuctionStateDialogController controller = loader.getController();
@@ -187,7 +188,7 @@ public class ActiveAuctionController extends BaseAuctionController {
             if (editDialogResult != null && editDialogResult.saved()) {
                 AppContext.getAuctionService().save(selectedAuction);
 
-                final int selectedIndex = table.getSelectionModel().getSelectedIndex();
+                final int selectedIndex = getTableView().getSelectionModel().getSelectedIndex();
                 final boolean archived = selectedAuction.isArchived();
 
                 refreshTable();
@@ -198,11 +199,11 @@ public class ActiveAuctionController extends BaseAuctionController {
                         if (!archived) {
                             nextIndex++;
                         }
-                        table.getSelectionModel().select(nextIndex);
-                        table.scrollTo(nextIndex);
-                        table.requestFocus();
-                        table.getFocusModel().focus(nextIndex);
-                        handleEditState(table.getSelectionModel().getSelectedItem());
+                        getTableView().getSelectionModel().select(nextIndex);
+                        getTableView().scrollTo(nextIndex);
+                        getTableView().requestFocus();
+                        getTableView().getFocusModel().focus(nextIndex);
+                        handleEditState(getTableView().getSelectionModel().getSelectedItem());
                     });
                 }
             }
@@ -222,7 +223,7 @@ public class ActiveAuctionController extends BaseAuctionController {
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Add Catalog Value");
             dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(table.getScene().getWindow());
+            dialogStage.initOwner(getTableView().getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
@@ -241,6 +242,6 @@ public class ActiveAuctionController extends BaseAuctionController {
 
     @Override
     protected void handleDoubleClick() {
-        handleEditState(table.getSelectionModel().getSelectedItem());
+        handleEditState(getTableView().getSelectionModel().getSelectedItem());
     }
 }

@@ -25,7 +25,7 @@ import java.util.Optional;
 /**
  * Controller for the catalog value edit dialog.
  */
-public class CatalogValueEditDialogController extends BaseEditDialogController<CatalogValue> {
+public class CatalogValueEditDialogController extends CrudEditDialogController<CatalogValue> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueEditDialogController.class);
     @FXML
@@ -98,8 +98,8 @@ public class CatalogValueEditDialogController extends BaseEditDialogController<C
 
     private void populateComboBoxes() {
         conditionComboBox.setItems(
-                FXCollections.observableArrayList(AppContext.getConditionService().getAllConditions()));
-        catalogComboBox.setItems(FXCollections.observableArrayList(AppContext.getCatalogService().getAllCatalogs()));
+                FXCollections.observableArrayList(AppContext.getConditionService().getAll()));
+        catalogComboBox.setItems(FXCollections.observableArrayList(AppContext.getCatalogService().getAll()));
         currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
     }
 

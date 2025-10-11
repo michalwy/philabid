@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 /**
  * Represents an auction house entity.
  */
-public class AuctionHouse {
-    private Long id;
+public class AuctionHouse extends BaseModel<AuctionHouse> {
     private String name;
     private String website;
     private String contactEmail;
@@ -31,14 +30,6 @@ public class AuctionHouse {
     }
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -116,7 +107,7 @@ public class AuctionHouse {
     }
 
     @Override
-    public String toString() {
+    public String getDisplayName() {
         return name;
     }
 }

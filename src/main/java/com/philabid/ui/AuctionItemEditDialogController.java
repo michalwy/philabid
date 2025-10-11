@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 /**
  * Controller for the auction item edit dialog.
  */
-public class AuctionItemEditDialogController extends BaseEditDialogController<AuctionItem> {
+public class AuctionItemEditDialogController extends CrudEditDialogController<AuctionItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionItemEditDialogController.class);
     @FXML
@@ -55,7 +55,7 @@ public class AuctionItemEditDialogController extends BaseEditDialogController<Au
     }
 
     private void populateCategoryComboBox() {
-        List<Category> categories = AppContext.getCategoryService().getAllCategories();
+        List<Category> categories = AppContext.getCategoryService().getAll();
         categoryComboBox.setItems(FXCollections.observableArrayList(categories));
         logger.debug("Populated category ComboBox with {} items.", categories.size());
     }

@@ -5,9 +5,8 @@ import java.time.LocalDateTime;
 /**
  * Represents a category for philatelic lots, typically corresponding to a country or a specific period.
  */
-public class Category {
+public class Category extends BaseModel<Category> {
 
-    private Long id;
     private String name;
     private String code;
     private Long catalogId;
@@ -22,14 +21,6 @@ public class Category {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -87,7 +78,7 @@ public class Category {
     }
 
     @Override
-    public String toString() {
+    public String getDisplayName() {
         return name;
     }
 }

@@ -4,17 +4,21 @@ import com.philabid.AppContext;
 import com.philabid.model.Catalog;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Controller for the catalog edit dialog.
  */
-public class CatalogEditDialogController {
+public class CatalogEditDialogController extends CrudEditDialogController<Catalog> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogEditDialogController.class);
 
@@ -26,28 +30,15 @@ public class CatalogEditDialogController {
     private ComboBox<CurrencyUnit> currencyComboBox;
     @FXML
     private CheckBox activeCheckBox;
-    @FXML
-    private Button saveButton;
-    @FXML
-    private Button cancelButton;
 
-    private Stage dialogStage;
-    private Catalog catalog;
-    private boolean saveClicked = false;
-
-    @FXML
-    private void initialize() {
+    @Override
+    protected void initContent() {
         populateCurrencyComboBox();
         logger.debug("CatalogEditDialogController initialized.");
     }
 
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
-    }
-
-    public void setCatalog(Catalog catalog) {
-        this.catalog = catalog;
-
+    @Override
+    protected void loadEntity(Catalog catalog) {
         nameField.setText(catalog.getName());
         if (catalog.getIssueYear() != null) {
             issueYearField.setText(catalog.getIssueYear().toString());
@@ -66,61 +57,38 @@ public class CatalogEditDialogController {
         currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
     }
 
-    public boolean isSaveClicked() {
-        return saveClicked;
-    }
-
-    @FXML
-    private void handleSave() {
-        if (isInputValid()) {
-            catalog.setName(nameField.getText());
-            try {
-                catalog.setIssueYear(Integer.parseInt(issueYearField.getText()));
-            } catch (NumberFormatException e) {
-                catalog.setIssueYear(null); // Or handle error
-            }
-
-            CurrencyUnit selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
-            catalog.setCurrency(selectedCurrency);
-            catalog.setActive(activeCheckBox.isSelected());
-
-            saveClicked = true;
-            dialogStage.close();
+    @Override
+    protected void updateEntity(Catalog catalog) {
+        catalog.setName(nameField.getText());
+        try {
+            catalog.setIssueYear(Integer.parseInt(issueYearField.getText()));
+        } catch (NumberFormatException e) {
+            catalog.setIssueYear(null); // Or handle error
         }
+
+        CurrencyUnit selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
+        catalog.setCurrency(selectedCurrency);
+        catalog.setActive(activeCheckBox.isSelected());
     }
 
-    @FXML
-    private void handleCancel() {
-        dialogStage.close();
-    }
+    @Override
+    protected Collection<ValidationError> validate() {
 
-    private boolean isInputValid() {
-        String errorMessage = "";
-
+        List<ValidationError> errors = new ArrayList<>();
         if (nameField.getText() == null || nameField.getText().trim().isEmpty()) {
-            errorMessage += "No valid name!\n";
+            errors.add(new ValidationError("Name cannot be empty.", nameField));
         }
         if (issueYearField.getText() != null && !issueYearField.getText().trim().isEmpty()) {
             try {
                 Integer.parseInt(issueYearField.getText());
             } catch (NumberFormatException e) {
-                errorMessage += "Issue year must be a valid number!\n";
+                errors.add(new ValidationError("Issue year must be a valid number.", issueYearField));
             }
         }
         if (currencyComboBox.getSelectionModel().getSelectedItem() == null) {
-            errorMessage += "No currency selected!\n";
+            errors.add(new ValidationError("Currency must be selected.", currencyComboBox));
         }
 
-        if (errorMessage.isEmpty()) {
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle("Invalid Fields");
-            alert.setHeaderText("Please correct invalid fields");
-            alert.setContentText(errorMessage);
-            alert.showAndWait();
-            return false;
-        }
+        return errors;
     }
 }

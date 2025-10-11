@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.philabid.ui.control.BaseEditDialog?>
+<?import com.philabid.ui.control.CrudEditDialog?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BaseEditDialog xmlns:fx="http://javafx.com/fxml/1" fx:id="baseEditDialog"
+<CrudEditDialog xmlns:fx="http://javafx.com/fxml/1" fx:id="crudEditDialog"
                 fx:controller="com.philabid.ui.AuctionItemEditDialogController">
     <GridPane hgap="10" vgap="10" xmlns="http://javafx.com/javafx/17.0.2-ea">
         <padding>
@@ -28,4 +28,4 @@
             <ColumnConstraints hgrow="ALWAYS"/>
         </columnConstraints>
     </GridPane>
-</BaseEditDialog>
+</CrudEditDialog>

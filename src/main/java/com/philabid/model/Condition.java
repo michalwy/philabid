@@ -5,26 +5,18 @@ import java.time.LocalDateTime;
 /**
  * Represents a condition of a philatelic item (e.g., MNH, Used).
  */
-public class Condition {
+public class Condition extends BaseModel<Condition> {
 
-    private Long id;
     private String name;
     private String code;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     // Constructors
-    public Condition() {}
+    public Condition() {
+    }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -58,7 +50,7 @@ public class Condition {
     }
 
     @Override
-    public String toString() {
+    public String getDisplayName() {
         return name + " (" + code + ")";
     }
 }

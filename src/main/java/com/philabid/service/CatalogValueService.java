@@ -26,7 +26,8 @@ public class CatalogValueService implements CrudService<CatalogValue> {
         return new CatalogValue();
     }
 
-    public List<CatalogValue> getAllCatalogValues() {
+    @Override
+    public List<CatalogValue> getAll() {
         try {
             return catalogValueRepository.findAll();
         } catch (SQLException e) {

@@ -17,14 +17,14 @@ import java.io.IOException;
  * The specific form content can be nested inside this component in FXML.
  */
 @DefaultProperty("center")
-public class BaseEditDialog<T extends BaseModel<T>> extends BorderPane {
+public class CrudEditDialog<T extends BaseModel<T>> extends BorderPane {
     @FXML
     private Button saveButton;
     @FXML
     private Button cancelButton;
 
-    public BaseEditDialog() {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/control/BaseEditDialog.fxml"));
+    public CrudEditDialog() {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/control/CrudEditDialog.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
         fxmlLoader.setResources(AppContext.getI18nManager().getResourceBundle());

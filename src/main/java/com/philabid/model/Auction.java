@@ -298,9 +298,4 @@ public class Auction extends BaseModel<Auction> {
         return this.getLotId() + ": " + this.getAuctionItemCategoryName() + " - " + this.getAuctionItemCatalogNumber() +
                 " - " + this.getConditionName();
     }
-
-    @Override
-    public Auction create() {
-        return new Auction();
-    }
 }

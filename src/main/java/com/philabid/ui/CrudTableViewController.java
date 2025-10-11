@@ -4,8 +4,8 @@ import com.philabid.AppContext;
 import com.philabid.model.BaseModel;
 import com.philabid.model.CatalogValue;
 import com.philabid.service.CrudService;
-import com.philabid.ui.control.BaseEditDialog;
-import com.philabid.ui.control.CrudToolbar;
+import com.philabid.ui.control.CrudEditDialog;
+import com.philabid.ui.control.CrudTableView;
 import com.philabid.util.TriConsumer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,25 +23,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class BaseTableViewController<T extends BaseModel<T>> {
-    private static final Logger logger = LoggerFactory.getLogger(BaseTableViewController.class);
+public abstract class CrudTableViewController<T extends BaseModel<T>> extends TableViewController {
+    private static final Logger logger = LoggerFactory.getLogger(CrudTableViewController.class);
 
     protected final ObservableList<T> tableItems = FXCollections.observableArrayList();
     private final List<TriConsumer<TableRow<T>, T, Boolean>> rowFormatters = new ArrayList<>();
     private final CrudService<T> crudService;
 
     @FXML
-    protected TableView<T> table;
-    @FXML
-    private CrudToolbar crudToolbar;
+    private CrudTableView<T> crudTableView;
 
-    protected BaseTableViewController(CrudService<T> crudService) {
+    protected CrudTableViewController(CrudService<T> crudService) {
         this.crudService = crudService;
     }
 
     @FXML
     protected void initialize() {
-        table.setItems(tableItems);
+        crudTableView.setItems(tableItems);
         initializeView();
         initializeToolbar();
         setRowFactories();
@@ -51,17 +49,18 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
 
     protected void refreshTable() {
         tableItems.setAll(loadTableItems());
-        table.sort();
+        crudTableView.sort();
     }
 
     protected void initializeView() {
     }
 
     private void initializeToolbar() {
-        crudToolbar.setAddAction(e -> handleAdd());
-        crudToolbar.setEditAction(e -> handleEdit());
-        crudToolbar.setDeleteAction(e -> handleDelete());
-        crudToolbar.bindButtonsDisabledProperty(table.getSelectionModel().selectedItemProperty().isNull());
+        crudTableView.setAddAction(e -> handleAdd());
+        crudTableView.setEditAction(e -> handleEdit());
+        crudTableView.setDeleteAction(e -> handleDelete());
+        crudTableView.bindButtonsDisabledProperty(
+                crudTableView.getTableView().getSelectionModel().selectedItemProperty().isNull());
     }
 
     protected void addRowFormatter(TriConsumer<TableRow<T>, T, Boolean> formatter) {
@@ -69,7 +68,7 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
     }
 
     private void setRowFactories() {
-        table.setRowFactory(param -> {
+        crudTableView.getTableView().setRowFactory(param -> {
             TableRow<T> row = new TableRow<>() {
                 @Override
                 protected void updateItem(T item, boolean empty) {
@@ -100,9 +99,9 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
         contextMenu.getItems().setAll(menuItems);
 
         // Show context menu only for non-empty rows
-        table.setContextMenu(contextMenu);
+        crudTableView.getTableView().setContextMenu(contextMenu);
         contextMenu.setOnShowing(e -> {
-            if (table.getSelectionModel().isEmpty()) {
+            if (crudTableView.getTableView().getSelectionModel().isEmpty()) {
                 e.consume(); // Don't show the menu
             }
             onContextMenuShowing(contextMenu);
@@ -123,7 +122,9 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
         // Default implementation does nothing.
     }
 
-    protected abstract List<T> loadTableItems();
+    protected List<T> loadTableItems() {
+        return crudService.getAll();
+    }
 
     protected abstract String getDialogFXMLResourcePath();
 
@@ -142,7 +143,7 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
     }
 
     protected void handleEdit() {
-        T selected = table.getSelectionModel().getSelectedItem();
+        T selected = crudTableView.getTableView().getSelectionModel().getSelectedItem();
         if (selected != null) {
             logger.info("Edit button clicked for entity: {}", selected.getDisplayName());
             EditDialogResult result = showEntityEditDialog(selected);
@@ -159,16 +160,16 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
             loader.setLocation(getClass().getResource(getDialogFXMLResourcePath()));
             loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
-            BaseEditDialog<CatalogValue> page = loader.load();
+            CrudEditDialog<CatalogValue> page = loader.load();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle(entity.getId() == null ? "Create" : "Edit");
             dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(table.getScene().getWindow());
+            dialogStage.initOwner(crudTableView.getTableView().getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            BaseEditDialogController<T> controller = loader.getController();
+            CrudEditDialogController<T> controller = loader.getController();
             controller.setDialogStage(dialogStage);
             controller.setEntity(entity);
 
@@ -182,7 +183,7 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
     }
 
     protected void handleDelete() {
-        T selected = table.getSelectionModel().getSelectedItem();
+        T selected = crudTableView.getTableView().getSelectionModel().getSelectedItem();
         if (selected != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirm Deletion");
@@ -207,5 +208,9 @@ public abstract class BaseTableViewController<T extends BaseModel<T>> {
                 }
             }
         }
+    }
+
+    protected TableView<T> getTableView() {
+        return crudTableView.getTableView();
     }
 }

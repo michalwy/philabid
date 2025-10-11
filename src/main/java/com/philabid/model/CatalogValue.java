@@ -152,9 +152,4 @@ public class CatalogValue extends BaseModel<CatalogValue> {
     public String getDisplayName() {
         return this.getAuctionItemCatalogNumber() + " - " + this.getConditionName();
     }
-
-    @Override
-    public CatalogValue create() {
-        return new CatalogValue();
-    }
 }

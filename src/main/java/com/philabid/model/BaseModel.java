@@ -11,7 +11,5 @@ public abstract class BaseModel<T extends BaseModel<T>> {
         this.id = id;
     }
 
-    public abstract T create();
-
     public abstract String getDisplayName();
 }

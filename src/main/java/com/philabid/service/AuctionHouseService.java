@@ -14,7 +14,7 @@ import java.util.Optional;
  * Service layer for managing auction houses.
  * Encapsulates business logic and separates it from the UI and database layers.
  */
-public class AuctionHouseService {
+public class AuctionHouseService implements CrudService<AuctionHouse> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionHouseService.class);
     private final AuctionHouseRepository auctionHouseRepository;
@@ -28,7 +28,8 @@ public class AuctionHouseService {
      *
      * @return A list of all auction houses, or an empty list in case of an error.
      */
-    public List<AuctionHouse> getAllAuctionHouses() {
+    @Override
+    public List<AuctionHouse> getAll() {
         try {
             return auctionHouseRepository.findAll();
         } catch (SQLException e) {
@@ -53,6 +54,11 @@ public class AuctionHouseService {
         }
     }
 
+    @Override
+    public AuctionHouse create() {
+        return new AuctionHouse();
+    }
+
     /**
      * Saves an auction house (creates a new one or updates an existing one).
      * You could add validation logic here.
@@ -60,7 +66,8 @@ public class AuctionHouseService {
      * @param auctionHouse The auction house to save.
      * @return An Optional containing the saved auction house, or empty on failure.
      */
-    public Optional<AuctionHouse> saveAuctionHouse(AuctionHouse auctionHouse) {
+    @Override
+    public Optional<AuctionHouse> save(AuctionHouse auctionHouse) {
         // Example of business logic: ensure name is not null or empty.
         if (auctionHouse.getName() == null || auctionHouse.getName().trim().isEmpty()) {
             logger.warn("Attempted to save an auction house with an empty name.");
@@ -81,7 +88,8 @@ public class AuctionHouseService {
      * @param id The ID of the auction house to delete.
      * @return true if deletion was successful, false otherwise.
      */
-    public boolean deleteAuctionHouse(long id) {
+    @Override
+    public boolean delete(Long id) {
         try {
             return auctionHouseRepository.deleteById(id);
         } catch (SQLException e) {

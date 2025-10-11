@@ -99,14 +99,14 @@ public class AuctionItemSelector extends VBox {
 
     private void populateComboBoxes() {
         categoryComboBox.setItems(
-                FXCollections.observableArrayList(AppContext.getCategoryService().getAllCategories()));
+                FXCollections.observableArrayList(AppContext.getCategoryService().getAll()));
     }
 
     private void setupAuctionItemAutocomplete() {
         AutoCompletionBinding<AuctionItemSuggestion> binding = TextFields.bindAutoCompletion(auctionItemField,
                 suggestionRequest -> {
                     String filter = suggestionRequest.getUserText().toLowerCase();
-                    List<AuctionItem> allItems = AppContext.getAuctionItemService().getAllAuctionItems();
+                    List<AuctionItem> allItems = AppContext.getAuctionItemService().getAll();
                     return allItems.stream()
                             .filter(item -> item.getCatalogNumber().toLowerCase().contains(filter) ||
                                     (item.getCategoryName() != null &&

@@ -7,9 +7,8 @@ import java.time.LocalDateTime;
 /**
  * Represents a stamp catalog entity.
  */
-public class Catalog {
+public class Catalog extends BaseModel<Catalog> {
 
-    private Long id;
     private String name;
     private Integer issueYear;
     private CurrencyUnit currency;
@@ -23,14 +22,6 @@ public class Catalog {
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
@@ -82,9 +73,9 @@ public class Catalog {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
+    
     @Override
-    public String toString() {
+    public String getDisplayName() {
         return name + " (" + issueYear + ")";
     }
 }

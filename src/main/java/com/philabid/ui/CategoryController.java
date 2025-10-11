@@ -3,34 +3,18 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.model.Category;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Controller for the Category management view (CategoryView.fxml).
  */
-public class CategoryController {
+public class CategoryController extends CrudTableViewController<Category> {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
-    private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
-    @FXML
-    private TableView<Category> categoryTable;
     @FXML
     private TableColumn<Category, String> nameColumn;
     @FXML
@@ -38,8 +22,12 @@ public class CategoryController {
     @FXML
     private TableColumn<Category, String> catalogColumn;
 
-    @FXML
-    private void initialize() {
+    public CategoryController() {
+        super(AppContext.getCategoryService());
+    }
+
+    @Override
+    protected void initializeView() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
 
@@ -49,91 +37,10 @@ public class CategoryController {
             return new SimpleStringProperty(String.format("%s (%d)", category.getCatalogName(),
                     category.getCatalogIssueYear()));
         });
-
-        categoryTable.setItems(categoryList);
-
-        loadCategories();
     }
 
-    private void loadCategories() {
-        categoryList.setAll(AppContext.getCategoryService().getAllCategories());
-        logger.info("Loaded {} categories into the table.", categoryList.size());
-    }
-
-    @FXML
-    private void handleAddCategory() {
-        logger.info("Add category button clicked.");
-        Category newCategory = new Category();
-        boolean saveClicked = showCategoryEditDialog(newCategory);
-        if (saveClicked) {
-            AppContext.getCategoryService().saveCategory(newCategory);
-            loadCategories();
-        }
-    }
-
-    @FXML
-    private void handleEditCategory() {
-        Category selected = categoryTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            logger.info("Edit category button clicked for: {}", selected.getName());
-            boolean saveClicked = showCategoryEditDialog(selected);
-            if (saveClicked) {
-                AppContext.getCategoryService().saveCategory(selected);
-                loadCategories();
-            }
-        }
-    }
-
-    @FXML
-    private void handleDeleteCategory() {
-        Category selected = categoryTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            logger.info("Delete category button clicked for: {}", selected.getName());
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirm Deletion");
-            alert.setHeaderText("Delete Category");
-            alert.setContentText("Are you sure you want to delete the selected category: " + selected.getName() + "?");
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                boolean deleted = AppContext.getCategoryService().deleteCategory(selected.getId());
-                if (deleted) {
-                    loadCategories();
-                } else {
-                    logger.error("Failed to delete category with ID: {}", selected.getId());
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setTitle("Deletion Failed");
-                    errorAlert.showAndWait();
-                }
-            }
-        }
-    }
-
-    private boolean showCategoryEditDialog(Category category) {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/CategoryEditDialog.fxml"));
-            loader.setResources(AppContext.getI18nManager().getResourceBundle());
-
-            GridPane page = loader.load();
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(category.getId() == null ? "Add Category" : "Edit Category");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(categoryTable.getScene().getWindow());
-            Scene scene = new Scene(page);
-            dialogStage.setScene(scene);
-
-            CategoryEditDialogController controller = loader.getController();
-            controller.setDialogStage(dialogStage);
-            controller.setCategory(category);
-
-            dialogStage.showAndWait();
-
-            return controller.isSaveClicked();
-        } catch (IOException e) {
-            logger.error("Failed to load the category edit dialog.", e);
-            return false;
-        }
+    @Override
+    protected String getDialogFXMLResourcePath() {
+        return "/fxml/CategoryEditDialog.fxml";
     }
 }

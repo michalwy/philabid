@@ -25,8 +25,9 @@ public class AuctionItemService implements CrudService<AuctionItem> {
     public AuctionItem create() {
         return new AuctionItem();
     }
-    
-    public List<AuctionItem> getAllAuctionItems() {
+
+    @Override
+    public List<AuctionItem> getAll() {
         try {
             return auctionItemRepository.findAll();
         } catch (SQLException e) {

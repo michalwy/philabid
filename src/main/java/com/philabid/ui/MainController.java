@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-    private final Map<Tab, BaseTableViewController<?>> tabControllerMap = new HashMap<>();
+    private final Map<Tab, TableViewController> tabControllerMap = new HashMap<>();
     // FXML Injected Fields from main.fxml
     @FXML
     private BorderPane rootPane;
@@ -151,7 +151,7 @@ public class MainController implements Initializable {
     private void setupTabListeners() {
         mainTabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab != null) {
-                BaseTableViewController<?> controller = tabControllerMap.get(newTab);
+                TableViewController controller = tabControllerMap.get(newTab);
                 if (controller != null) {
                     logger.info("'{}' tab selected, refreshing data.", newTab.getText());
                     controller.refreshTable();

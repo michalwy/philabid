@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * Service layer for managing Conditions.
  */
-public class ConditionService {
+public class ConditionService implements CrudService<Condition> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConditionService.class);
     private final ConditionRepository conditionRepository;
@@ -22,7 +22,8 @@ public class ConditionService {
         this.conditionRepository = conditionRepository;
     }
 
-    public List<Condition> getAllConditions() {
+    @Override
+    public List<Condition> getAll() {
         try {
             return conditionRepository.findAll();
         } catch (SQLException e) {
@@ -31,9 +32,15 @@ public class ConditionService {
         }
     }
 
-    public Optional<Condition> saveCondition(Condition condition) {
+    @Override
+    public Condition create() {
+        return new Condition();
+    }
+
+    @Override
+    public Optional<Condition> save(Condition condition) {
         if (condition.getName() == null || condition.getName().trim().isEmpty() ||
-            condition.getCode() == null || condition.getCode().trim().isEmpty()) {
+                condition.getCode() == null || condition.getCode().trim().isEmpty()) {
             logger.warn("Attempted to save a condition with an empty name or code.");
             return Optional.empty();
         }
@@ -46,7 +53,8 @@ public class ConditionService {
         }
     }
 
-    public boolean deleteCondition(long id) {
+    @Override
+    public boolean delete(Long id) {
         try {
             return conditionRepository.deleteById(id);
         } catch (SQLException e) {

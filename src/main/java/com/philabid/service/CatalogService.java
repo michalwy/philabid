@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * Service layer for managing catalogs.
  */
-public class CatalogService {
+public class CatalogService implements CrudService<Catalog> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogService.class);
     private final CatalogRepository catalogRepository;
@@ -22,7 +22,8 @@ public class CatalogService {
         this.catalogRepository = catalogRepository;
     }
 
-    public List<Catalog> getAllCatalogs() {
+    @Override
+    public List<Catalog> getAll() {
         try {
             return catalogRepository.findAll();
         } catch (SQLException e) {
@@ -31,7 +32,13 @@ public class CatalogService {
         }
     }
 
-    public Optional<Catalog> saveCatalog(Catalog catalog) {
+    @Override
+    public Catalog create() {
+        return new Catalog();
+    }
+
+    @Override
+    public Optional<Catalog> save(Catalog catalog) {
         if (catalog.getName() == null || catalog.getName().trim().isEmpty()) {
             logger.warn("Attempted to save a catalog with an empty name.");
             return Optional.empty();
@@ -45,7 +52,8 @@ public class CatalogService {
         }
     }
 
-    public boolean deleteCatalog(long id) {
+    @Override
+    public boolean delete(Long id) {
         try {
             return catalogRepository.deleteById(id);
         } catch (SQLException e) {

@@ -12,12 +12,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 /**
  * Controller for the Catalog Value management view (CatalogValueView.fxml).
  */
-public class CatalogValueController extends BaseTableViewController<CatalogValue> {
+public class CatalogValueController extends CrudTableViewController<CatalogValue> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueController.class);
     @FXML
@@ -56,11 +54,6 @@ public class CatalogValueController extends BaseTableViewController<CatalogValue
 
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         valueColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>());
-    }
-
-    @Override
-    protected List<CatalogValue> loadTableItems() {
-        return AppContext.getCatalogValueService().getAllCatalogValues();
     }
 
     @Override

@@ -10,12 +10,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 /**
  * Controller for the Auction Item management view (AuctionItemView.fxml).
  */
-public class AuctionItemController extends BaseTableViewController<AuctionItem> {
+public class AuctionItemController extends CrudTableViewController<AuctionItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionItemController.class);
     @FXML
@@ -46,10 +44,6 @@ public class AuctionItemController extends BaseTableViewController<AuctionItem> 
                 AuctionItem::getCatalogName, AuctionItem::getCatalogIssueYear));
 
         logger.debug("AuctionItemController initialized.");
-    }
-
-    public List<AuctionItem> loadTableItems() {
-        return AppContext.getAuctionItemService().getAllAuctionItems();
     }
 
     @Override

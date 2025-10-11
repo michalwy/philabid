@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.philabid.ui.control.AuctionItemSelector?>
-<?import com.philabid.ui.control.BaseEditDialog?>
+<?import com.philabid.ui.control.CrudEditDialog?>
 <?import com.philabid.ui.control.MonetaryField?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
-<BaseEditDialog xmlns:fx="http://javafx.com/fxml/1" fx:id="baseEditDialog" xmlns="http://javafx.com/javafx/17.0.2-ea"
+<CrudEditDialog xmlns:fx="http://javafx.com/fxml/1" fx:id="crudEditDialog" xmlns="http://javafx.com/javafx/17.0.2-ea"
                 fx:controller="com.philabid.ui.AuctionEditDialogController">
     <GridPane hgap="10" vgap="10">
         <Label text="%auctions.label.url" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
@@ -52,4 +52,4 @@
             <ColumnConstraints hgrow="ALWAYS"/>
         </columnConstraints>
     </GridPane>
-</BaseEditDialog>
+</CrudEditDialog>

@@ -1,7 +1,7 @@
 package com.philabid.ui;
 
 import com.philabid.model.BaseModel;
-import com.philabid.ui.control.BaseEditDialog;
+import com.philabid.ui.control.CrudEditDialog;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
@@ -15,9 +15,9 @@ import java.util.Collection;
  *
  * @param <T> The type of the entity being edited.
  */
-public abstract class BaseEditDialogController<T extends BaseModel<T>> {
+public abstract class CrudEditDialogController<T extends BaseModel<T>> {
     @FXML
-    protected BaseEditDialog<T> baseEditDialog;
+    protected CrudEditDialog<T> crudEditDialog;
     private EditDialogResult result = new EditDialogResult.Builder()
             .saved(false)
             .editNext(false)
@@ -27,10 +27,10 @@ public abstract class BaseEditDialogController<T extends BaseModel<T>> {
 
     @FXML
     protected void initialize() {
-        baseEditDialog.setOnCancel(() -> {
+        crudEditDialog.setOnCancel(() -> {
             dialogStage.close();
         });
-        baseEditDialog.setOnSave(() -> {
+        crudEditDialog.setOnSave(() -> {
             if (handleSave()) {
                 result = new EditDialogResult.Builder()
                         .saved(true)

@@ -5,21 +5,21 @@ import com.philabid.model.AuctionHouse;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Controller for the auction house edit dialog.
  * Handles the logic for creating and editing an AuctionHouse entity.
  */
-public class AuctionHouseEditDialogController {
+public class AuctionHouseEditDialogController extends CrudEditDialogController<AuctionHouse> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionHouseEditDialogController.class);
 
@@ -37,29 +37,16 @@ public class AuctionHouseEditDialogController {
     private TextField countryField;
     @FXML
     private ComboBox<CurrencyUnit> currencyComboBox;
-    @FXML
-    private Button saveButton;
-    @FXML
-    private Button cancelButton;
 
-    private Stage dialogStage;
-    private AuctionHouse auctionHouse;
-    private boolean saveClicked = false;
-
-    @FXML
-    private void initialize() {
+    @Override
+    protected void initContent() {
         Platform.runLater(() -> nameField.requestFocus());
         logger.debug("AuctionHouseEditDialogController initialized.");
         populateCurrencyComboBox();
     }
 
-    public void setDialogStage(Stage dialogStage) {
-        this.dialogStage = dialogStage;
-    }
-
-    public void setAuctionHouse(AuctionHouse auctionHouse) {
-        this.auctionHouse = auctionHouse;
-
+    @Override
+    protected void loadEntity(AuctionHouse auctionHouse) {
         nameField.setText(auctionHouse.getName());
         websiteField.setText(auctionHouse.getWebsite());
         emailField.setText(auctionHouse.getContactEmail());
@@ -78,55 +65,28 @@ public class AuctionHouseEditDialogController {
         logger.debug("Populated currency ComboBox with {} items.", currencyComboBox.getItems().size());
     }
 
-    public boolean isSaveClicked() {
-        return saveClicked;
+    @Override
+    protected void updateEntity(AuctionHouse auctionHouse) {
+        auctionHouse.setName(nameField.getText());
+        auctionHouse.setWebsite(websiteField.getText());
+        auctionHouse.setContactEmail(emailField.getText());
+        auctionHouse.setContactPhone(phoneField.getText());
+        auctionHouse.setAddress(addressField.getText());
+        auctionHouse.setCountry(countryField.getText());
+
+        CurrencyUnit selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
+        auctionHouse.setCurrency(selectedCurrency);
     }
 
-    @FXML
-    private void handleSave() {
-        if (isInputValid()) {
-            auctionHouse.setName(nameField.getText());
-            auctionHouse.setWebsite(websiteField.getText());
-            auctionHouse.setContactEmail(emailField.getText());
-            auctionHouse.setContactPhone(phoneField.getText());
-            auctionHouse.setAddress(addressField.getText());
-            auctionHouse.setCountry(countryField.getText());
-
-            CurrencyUnit selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
-            auctionHouse.setCurrency(selectedCurrency);
-
-            saveClicked = true;
-            dialogStage.close();
-        }
-    }
-
-    @FXML
-    private void handleCancel() {
-        dialogStage.close();
-    }
-
-    private boolean isInputValid() {
-        String errorMessage = "";
+    protected Collection<ValidationError> validate() {
+        List<ValidationError> errors = new ArrayList<>();
 
         if (nameField.getText() == null || nameField.getText().trim().isEmpty()) {
-            errorMessage += "No valid name!\n";
+            errors.add(new ValidationError("Name cannot be empty.", nameField));
         }
         if (currencyComboBox.getSelectionModel().getSelectedItem() == null) {
-            errorMessage += "No currency selected!\n";
+            errors.add(new ValidationError("Currency must be selected.", currencyComboBox));
         }
-
-        if (errorMessage.isEmpty()) {
-            return true;
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.initOwner(dialogStage);
-            alert.setTitle("Invalid Fields");
-            alert.setHeaderText("Please correct invalid fields");
-            alert.setContentText(errorMessage);
-
-            alert.showAndWait();
-
-            return false;
-        }
+        return errors;
     }
 }

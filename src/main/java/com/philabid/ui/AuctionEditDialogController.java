@@ -31,7 +31,7 @@ import java.util.function.UnaryOperator;
 /**
  * Controller for the auction edit dialog.
  */
-public class AuctionEditDialogController extends BaseEditDialogController<Auction> {
+public class AuctionEditDialogController extends CrudEditDialogController<Auction> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionEditDialogController.class);
     // Static field to remember the last used end date across dialog instances
@@ -145,9 +145,9 @@ public class AuctionEditDialogController extends BaseEditDialogController<Auctio
 
     private void populateComboBoxes() {
         auctionHouseComboBox.setItems(
-                FXCollections.observableArrayList(AppContext.getAuctionHouseService().getAllAuctionHouses()));
+                FXCollections.observableArrayList(AppContext.getAuctionHouseService().getAll()));
         conditionComboBox.setItems(
-                FXCollections.observableArrayList(AppContext.getConditionService().getAllConditions()));
+                FXCollections.observableArrayList(AppContext.getConditionService().getAll()));
         currencyComboBox.setItems(FXCollections.observableArrayList(AppContext.getCurrencyService().getCurrencies()));
     }
 

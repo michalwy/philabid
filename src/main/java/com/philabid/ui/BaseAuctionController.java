@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * An abstract base controller containing shared logic for auction views.
  */
-public abstract class BaseAuctionController extends BaseTableViewController<Auction> {
+public abstract class BaseAuctionController extends CrudTableViewController<Auction> {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseAuctionController.class);
 

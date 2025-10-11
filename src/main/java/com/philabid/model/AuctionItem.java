@@ -126,9 +126,4 @@ public class AuctionItem extends BaseModel<AuctionItem> {
     public String getDisplayName() {
         return this.getCategoryName() + " - " + this.getCatalogNumber();
     }
-
-    @Override
-    public AuctionItem create() {
-        return new AuctionItem();
-    }
 }
