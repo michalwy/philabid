@@ -2,7 +2,6 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.BaseModel;
-import com.philabid.model.CatalogValue;
 import com.philabid.service.CrudService;
 import com.philabid.ui.control.CrudEditDialog;
 import com.philabid.ui.control.CrudTableView;
@@ -42,12 +41,14 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         crudTableView.setItems(tableItems);
         initializeView();
         initializeToolbar();
+        initializeFilterToolbar();
         setRowFactories();
         setupContextMenu();
         refreshTable();
     }
 
     protected void refreshTable() {
+        logger.info("Refreshing table view");
         tableItems.setAll(loadTableItems());
         crudTableView.sort();
     }
@@ -61,6 +62,13 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         crudTableView.setDeleteAction(e -> handleDelete());
         crudTableView.bindButtonsDisabledProperty(
                 crudTableView.getTableView().getSelectionModel().selectedItemProperty().isNull());
+    }
+
+    protected CrudService<T> getCrudService() {
+        return crudService;
+    }
+
+    protected void initializeFilterToolbar() {
     }
 
     protected void addRowFormatter(TriConsumer<TableRow<T>, T, Boolean> formatter) {
@@ -112,6 +120,10 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         return List.of();
     }
 
+    protected CrudTableView<T> getCrudTableView() {
+        return crudTableView;
+    }
+
     /**
      * A hook for subclasses to customize the context menu just before it is shown.
      * For example, to hide or disable certain items based on the selected row.
@@ -160,7 +172,7 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
             loader.setLocation(getClass().getResource(getDialogFXMLResourcePath()));
             loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
-            CrudEditDialog<CatalogValue> page = loader.load();
+            CrudEditDialog<T> page = loader.load();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle(entity.getId() == null ? "Create" : "Edit");

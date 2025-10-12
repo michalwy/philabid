@@ -12,4 +12,11 @@ public abstract class BaseModel<T extends BaseModel<T>> {
     }
 
     public abstract String getDisplayName();
+
+    public abstract String getFilterField();
+
+    @Override
+    public String toString() {
+        return getDisplayName();
+    }
 }

@@ -5,6 +5,7 @@ import com.philabid.model.Auction;
 import com.philabid.ui.cell.CatalogValueCell;
 import com.philabid.ui.cell.RightAlignedDateCell;
 import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
+import com.philabid.ui.control.FilterCondition;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.ui.util.CellValueFactoryProvider;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
@@ -15,12 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * An abstract base controller containing shared logic for auction views.
  */
-public abstract class BaseAuctionController extends CrudTableViewController<Auction> {
+public abstract class BaseAuctionController extends FilteredCrudTableViewController<Auction> {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseAuctionController.class);
 
@@ -79,10 +81,10 @@ public abstract class BaseAuctionController extends CrudTableViewController<Auct
         endDateColumn.setCellFactory(column -> new RightAlignedDateCell<>());
     }
 
-    public abstract List<Auction> loadAuctions();
+    public abstract List<Auction> loadAuctions(Collection<FilterCondition> filterConditions);
 
     protected List<Auction> loadTableItems() {
-        return loadAuctions();
+        return loadAuctions(getCrudTableView().getFilterConditions());
     }
 
     @Override

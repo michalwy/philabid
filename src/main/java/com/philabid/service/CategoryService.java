@@ -2,10 +2,12 @@ package com.philabid.service;
 
 import com.philabid.database.CategoryRepository;
 import com.philabid.model.Category;
+import com.philabid.ui.control.FilterCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,7 @@ public class CategoryService implements CrudService<Category> {
     }
 
     @Override
-    public List<Category> getAll() {
+    public List<Category> getAll(Collection<FilterCondition> filterConditions) {
         try {
             return categoryRepository.findAll();
         } catch (SQLException e) {

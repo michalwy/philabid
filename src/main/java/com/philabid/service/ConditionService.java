@@ -2,10 +2,12 @@ package com.philabid.service;
 
 import com.philabid.database.ConditionRepository;
 import com.philabid.model.Condition;
+import com.philabid.ui.control.FilterCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,7 @@ public class ConditionService implements CrudService<Condition> {
     }
 
     @Override
-    public List<Condition> getAll() {
+    public List<Condition> getAll(Collection<FilterCondition> filterConditions) {
         try {
             return conditionRepository.findAll();
         } catch (SQLException e) {

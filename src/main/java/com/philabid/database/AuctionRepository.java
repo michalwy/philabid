@@ -1,6 +1,7 @@
 package com.philabid.database;
 
 import com.philabid.model.Auction;
+import com.philabid.ui.control.FilterCondition;
 import org.javamoney.moneta.Money;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
@@ -77,7 +78,7 @@ public class AuctionRepository {
     public Optional<Auction> findById(long id) throws SQLException {
         final Auction[] result = new Auction[1];
         new FindQueryBuilder()
-                .withWhereClause("a.id = ?", id)
+                .withWhereClause("a.id = ?", List.of(id))
                 .execute((rs, auction) -> result[0] = auction);
         return result[0] != null ? Optional.of(result[0]) : Optional.empty();
     }
@@ -86,22 +87,24 @@ public class AuctionRepository {
      * @deprecated Use findAllActive() or findAllArchived() instead.
      */
     @Deprecated
-    public List<Auction> findAll() throws SQLException {
-        return findAllActive();
+    public List<Auction> findAll(Collection<FilterCondition> filterConditions) throws SQLException {
+        return findAllActive(filterConditions);
     }
 
-    public List<Auction> findAllActive() throws SQLException {
-        return findByArchivedStatus(false);
+    public List<Auction> findAllActive(Collection<FilterCondition> filterConditions) throws SQLException {
+        return findByArchivedStatus(false, filterConditions);
     }
 
-    public List<Auction> findAllArchived() throws SQLException {
-        return findByArchivedStatus(true);
+    public List<Auction> findAllArchived(Collection<FilterCondition> filterConditions) throws SQLException {
+        return findByArchivedStatus(true, filterConditions);
     }
 
-    private List<Auction> findByArchivedStatus(boolean isArchived) throws SQLException {
+    private List<Auction> findByArchivedStatus(boolean isArchived, Collection<FilterCondition> filterConditions)
+            throws SQLException {
         List<Auction> auctions = new ArrayList<>();
         new FindQueryBuilder()
-                .withWhereClause("a.archived = ?", isArchived)
+                .withWhereClause("a.archived = ?", List.of(isArchived))
+                .withFilterConditions(filterConditions)
                 .withOrderClause("a.end_date DESC")
                 .execute((rs, auction) -> auctions.add(auction));
         return auctions;
@@ -354,10 +357,25 @@ public class AuctionRepository {
             return this;
         }
 
-        public FindQueryBuilder withWhereClause(String clause, Object... clauseParams) {
-            whereClauses.add(clause);
-            params.addAll(Arrays.asList(clauseParams));
+        public FindQueryBuilder withWhereClause(String clause) {
+            return withWhereClause(clause, List.of());
+        }
+
+        public FindQueryBuilder withWhereClause(String clause, Collection<Object> clauseParams) {
+            addWhereClause(clause, clauseParams);
             return this;
+        }
+
+        public FindQueryBuilder withFilterConditions(Collection<FilterCondition> filterConditions) {
+            filterConditions.forEach(fc -> {
+                addWhereClause(fc.getSqlText(), fc.getSqlParams());
+            });
+            return this;
+        }
+
+        protected void addWhereClause(String clause, Collection<Object> clauseParams) {
+            whereClauses.add(clause);
+            params.addAll(clauseParams);
         }
 
         public FindQueryBuilder withOrderClause(String clause) {

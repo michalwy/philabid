@@ -5,6 +5,8 @@ import com.philabid.model.Auction;
 import com.philabid.model.CatalogValue;
 import com.philabid.ui.cell.EndingDateCell;
 import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
+import com.philabid.ui.control.CrudEditDialog;
+import com.philabid.ui.control.FilterCondition;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -19,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 public class ActiveAuctionController extends BaseAuctionController {
@@ -32,8 +35,8 @@ public class ActiveAuctionController extends BaseAuctionController {
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> maxBidColumn;
 
     @Override
-    public List<Auction> loadAuctions() {
-        return AppContext.getAuctionService().getActiveAuctions();
+    public List<Auction> loadAuctions(Collection<FilterCondition> filterConditions) {
+        return AppContext.getAuctionService().getActiveAuctions(filterConditions);
     }
 
     @Override
@@ -218,7 +221,7 @@ public class ActiveAuctionController extends BaseAuctionController {
             loader.setLocation(getClass().getResource("/fxml/CatalogValueEditDialog.fxml"));
             loader.setResources(AppContext.getI18nManager().getResourceBundle());
 
-            GridPane page = loader.load();
+            CrudEditDialog<CatalogValue> page = loader.load();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Add Catalog Value");

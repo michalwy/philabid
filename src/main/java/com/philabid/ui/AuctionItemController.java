@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Controller for the Auction Item management view (AuctionItemView.fxml).
  */
-public class AuctionItemController extends CrudTableViewController<AuctionItem> {
+public class AuctionItemController extends FilteredCrudTableViewController<AuctionItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionItemController.class);
     @FXML

@@ -2,10 +2,12 @@ package com.philabid.service;
 
 import com.philabid.database.AuctionItemRepository;
 import com.philabid.model.AuctionItem;
+import com.philabid.ui.control.FilterCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +29,7 @@ public class AuctionItemService implements CrudService<AuctionItem> {
     }
 
     @Override
-    public List<AuctionItem> getAll() {
+    public List<AuctionItem> getAll(Collection<FilterCondition> filterConditions) {
         try {
             return auctionItemRepository.findAll();
         } catch (SQLException e) {

@@ -1,6 +1,7 @@
 package com.philabid.database;
 
 import com.philabid.model.CatalogValue;
+import com.philabid.ui.control.FilterCondition;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +70,8 @@ public class CatalogValueRepository {
         return Optional.empty();
     }
 
-    public Optional<CatalogValue> findByAuctionItemAndCondition(long auctionItemId, long conditionId) throws SQLException {
+    public Optional<CatalogValue> findByAuctionItemAndCondition(long auctionItemId, long conditionId)
+            throws SQLException {
         // This might return one of many if multiple catalogs have a value.
         // It's assumed for now that the combination is unique enough for this context.
         String sql = FIND_QUERY + " WHERE cv.auction_item_id = ? AND cv.condition_id = ? LIMIT 1";
@@ -86,6 +89,10 @@ public class CatalogValueRepository {
     }
 
     public List<CatalogValue> findAll() throws SQLException {
+        return findAll(List.of());
+    }
+
+    public List<CatalogValue> findAll(Collection<FilterCondition> filterConditions) throws SQLException {
         String sql = FIND_QUERY + " ORDER BY ai.catalog_number, cond.name";
         List<CatalogValue> catalogValues = new ArrayList<>();
         try (Connection conn = databaseManager.getConnection();

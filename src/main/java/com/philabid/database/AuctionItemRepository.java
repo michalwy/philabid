@@ -34,14 +34,14 @@ public class AuctionItemRepository {
         String sql = "SELECT " +
                 "    ai.id, ai.category_id, ai.catalog_number, ai.order_number, ai.notes, ai.created_at, " +
                 "ai.updated_at, " +
-                "    c.name AS category_name, c.code AS category_code, " +
+                "    catg.name AS category_name, catg.code AS category_code, " +
                 "    cat.name AS catalog_name, cat.issue_year AS catalog_issue_year " +
                 "FROM " +
                 "    auction_items ai " +
                 "LEFT JOIN " +
-                "    categories c ON ai.category_id = c.id " +
+                "    categories catg ON ai.category_id = catg.id " +
                 "LEFT JOIN " +
-                "    catalogs cat ON c.catalog_id = cat.id " +
+                "    catalogs cat ON catg.catalog_id = cat.id " +
                 "WHERE ai.id = ?";
         try (Connection conn = databaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -2,10 +2,12 @@ package com.philabid.service;
 
 import com.philabid.database.CatalogRepository;
 import com.philabid.model.Catalog;
+import com.philabid.ui.control.FilterCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,7 @@ public class CatalogService implements CrudService<Catalog> {
     }
 
     @Override
-    public List<Catalog> getAll() {
+    public List<Catalog> getAll(Collection<FilterCondition> filterConditions) {
         try {
             return catalogRepository.findAll();
         } catch (SQLException e) {

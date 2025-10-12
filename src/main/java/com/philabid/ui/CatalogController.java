@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Controller for the Catalog management view (CatalogView.fxml).
  */
-public class CatalogController extends CrudTableViewController<Catalog> {
+public class CatalogController extends SimpleCrudTableViewController<Catalog> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogController.class);
 

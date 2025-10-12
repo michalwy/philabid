@@ -110,4 +110,9 @@ public class AuctionHouse extends BaseModel<AuctionHouse> {
     public String getDisplayName() {
         return name;
     }
+
+    @Override
+    public String getFilterField() {
+        return "ah.id";
+    }
 }

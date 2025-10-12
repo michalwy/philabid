@@ -152,4 +152,9 @@ public class CatalogValue extends BaseModel<CatalogValue> {
     public String getDisplayName() {
         return this.getAuctionItemCatalogNumber() + " - " + this.getConditionName();
     }
+
+    @Override
+    public String getFilterField() {
+        return "cv.id";
+    }
 }

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Controller for the Catalog Value management view (CatalogValueView.fxml).
  */
-public class CatalogValueController extends CrudTableViewController<CatalogValue> {
+public class CatalogValueController extends FilteredCrudTableViewController<CatalogValue> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueController.class);
     @FXML

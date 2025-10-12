@@ -73,9 +73,14 @@ public class Catalog extends BaseModel<Catalog> {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
+
     @Override
     public String getDisplayName() {
         return name + " (" + issueYear + ")";
+    }
+
+    @Override
+    public String getFilterField() {
+        return "cat.id";
     }
 }

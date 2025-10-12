@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Controller for the Condition management view (ConditionView.fxml).
  */
-public class ConditionController extends CrudTableViewController<Condition> {
+public class ConditionController extends SimpleCrudTableViewController<Condition> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConditionController.class);
     @FXML

@@ -3,15 +3,13 @@ package com.philabid.service;
 import com.philabid.AppContext;
 import com.philabid.database.AuctionRepository;
 import com.philabid.model.Auction;
+import com.philabid.ui.control.FilterCondition;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Service layer for managing Auctions.
@@ -30,18 +28,18 @@ public class AuctionService implements CrudService<Auction> {
     }
 
     @Override
-    public List<Auction> getAll() {
+    public List<Auction> getAll(Collection<FilterCondition> filterConditions) {
         try {
-            return auctionRepository.findAll();
+            return auctionRepository.findAll(filterConditions);
         } catch (SQLException e) {
             logger.error("Failed to retrieve all auctions", e);
             return Collections.emptyList();
         }
     }
 
-    public List<Auction> getActiveAuctions() {
+    public List<Auction> getActiveAuctions(Collection<FilterCondition> filterConditions) {
         try {
-            List<Auction> auctions = auctionRepository.findAllActive();
+            List<Auction> auctions = auctionRepository.findAllActive(filterConditions);
             Map<Long, List<Auction>> auctionsArchiveMap = auctionRepository.findArchivedForActiveAuctions();
             Map<Pair<Long, Long>, List<Auction>> categoriesArchiveMap =
                     auctionRepository.findArchivedForActiveCategories();
@@ -54,9 +52,9 @@ public class AuctionService implements CrudService<Auction> {
         }
     }
 
-    public List<Auction> getArchivedAuctions() {
+    public List<Auction> getArchivedAuctions(Collection<FilterCondition> filterConditions) {
         try {
-            List<Auction> auctions = auctionRepository.findAllArchived();
+            List<Auction> auctions = auctionRepository.findAllArchived(filterConditions);
             auctions.forEach(this::enrichAuction);
             return auctions;
         } catch (SQLException e) {

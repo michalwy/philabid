@@ -53,4 +53,9 @@ public class Condition extends BaseModel<Condition> {
     public String getDisplayName() {
         return name + " (" + code + ")";
     }
+
+    @Override
+    public String getFilterField() {
+        return "cond.id";
+    }
 }

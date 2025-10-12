@@ -81,4 +81,9 @@ public class Category extends BaseModel<Category> {
     public String getDisplayName() {
         return name;
     }
+
+    @Override
+    public String getFilterField() {
+        return "catg.id";
+    }
 }
