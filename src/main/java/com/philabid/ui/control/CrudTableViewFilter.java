@@ -1,5 +1,6 @@
 package com.philabid.ui.control;
 
+import com.philabid.database.util.FilterCondition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;

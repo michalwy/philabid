@@ -1,21 +1,47 @@
 package com.philabid.service;
 
-import com.philabid.ui.control.FilterCondition;
+import com.philabid.database.CrudRepository;
+import com.philabid.database.util.FilterCondition;
+import com.philabid.model.BaseModel;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface CrudService<T> {
-    T create();
+public abstract class CrudService<T extends BaseModel<T>> {
+    private final CrudRepository<T> crudRepository;
 
-    Optional<T> save(T item);
+    public CrudService(CrudRepository<T> crudRepository) {
+        this.crudRepository = crudRepository;
+    }
 
-    boolean delete(Long id);
+    public final T create() {
+        return crudRepository.create();
+    }
 
-    List<T> getAll(Collection<FilterCondition> filterConditions);
+    public final Optional<T> save(T entity) {
+        if (!validate(entity)) {
+            return Optional.empty();
+        }
 
-    default List<T> getAll() {
+        return crudRepository.save(entity);
+    }
+
+    protected abstract boolean validate(T entity);
+
+    public final boolean delete(Long id) {
+        return crudRepository.delete(id);
+    }
+
+    public final Collection<T> getAll() {
         return getAll(List.of());
+    }
+
+    public final Collection<T> getAll(Collection<FilterCondition> filterConditions) {
+        return crudRepository.findAll(filterConditions);
+    }
+
+    public Optional<T> getById(Long id) {
+        return crudRepository.findById(id);
     }
 }

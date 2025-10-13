@@ -1,6 +1,5 @@
 package com.philabid.model;
 
-import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,8 +13,7 @@ public class AuctionItem extends BaseModel<AuctionItem> {
     private String catalogNumber;
     private Long orderNumber;
     private String notes;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
     // Fields for joined data from Category and Catalog
     private String categoryName;
     private String categoryCode;
@@ -74,22 +72,6 @@ public class AuctionItem extends BaseModel<AuctionItem> {
         this.notes = notes;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public String getCategoryName() {
         return categoryName;
     }
@@ -125,10 +107,5 @@ public class AuctionItem extends BaseModel<AuctionItem> {
     @Override
     public String getDisplayName() {
         return this.getCategoryName() + " - " + this.getCatalogNumber();
-    }
-
-    @Override
-    public String getFilterField() {
-        return "ai.id";
     }
 }

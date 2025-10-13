@@ -1,7 +1,5 @@
 package com.philabid.model;
 
-import java.time.LocalDateTime;
-
 /**
  * Represents a category for philatelic lots, typically corresponding to a country or a specific period.
  */
@@ -10,8 +8,6 @@ public class Category extends BaseModel<Category> {
     private String name;
     private String code;
     private Long catalogId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     private String catalogName;
     private Integer catalogIssueYear;
@@ -45,22 +41,6 @@ public class Category extends BaseModel<Category> {
         this.catalogId = catalogId;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public String getCatalogName() {
         return catalogName;
     }
@@ -80,10 +60,5 @@ public class Category extends BaseModel<Category> {
     @Override
     public String getDisplayName() {
         return name;
-    }
-
-    @Override
-    public String getFilterField() {
-        return "catg.id";
     }
 }

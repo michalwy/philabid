@@ -22,8 +22,6 @@ public class Auction extends BaseModel<Auction> {
     private MultiCurrencyMonetaryAmount maxBid;
     private LocalDateTime endDate;
     private boolean archived;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     private String auctionHouseName;
     private CurrencyUnit auctionHouseCurrency;
@@ -94,11 +92,11 @@ public class Auction extends BaseModel<Auction> {
     }
 
     public void setCurrentPrice(MonetaryAmount currentPrice) {
-        this.currentPrice = currentPrice != null ? MultiCurrencyMonetaryAmount.of(currentPrice) : null;
+        this.currentPrice = MultiCurrencyMonetaryAmount.of(currentPrice);
     }
 
     public void setRawCurrentPrice(MonetaryAmount currentPrice) {
-        this.currentPrice = currentPrice != null ? new MultiCurrencyMonetaryAmount(currentPrice, null) : null;
+        this.currentPrice = MultiCurrencyMonetaryAmount.of(currentPrice, null);
     }
 
     public LocalDateTime getEndDate() {
@@ -107,22 +105,6 @@ public class Auction extends BaseModel<Auction> {
 
     public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public String getAuctionItemCatalogNumber() {
@@ -202,7 +184,7 @@ public class Auction extends BaseModel<Auction> {
     }
 
     public void setRawCatalogValue(MonetaryAmount catalogValue) {
-        this.catalogValue = new MultiCurrencyMonetaryAmount(catalogValue, null);
+        this.catalogValue = MultiCurrencyMonetaryAmount.of(catalogValue, null);
     }
 
     public MultiCurrencyMonetaryAmount getArchivedCatalogValue() {
@@ -214,7 +196,7 @@ public class Auction extends BaseModel<Auction> {
     }
 
     public void setRawArchivedCatalogValue(MonetaryAmount archivedCatalogValue) {
-        this.archivedCatalogValue = new MultiCurrencyMonetaryAmount(archivedCatalogValue, null);
+        this.archivedCatalogValue = MultiCurrencyMonetaryAmount.of(archivedCatalogValue, null);
     }
 
     public Double getArchivedCatalogValuePercentage() {
@@ -297,10 +279,5 @@ public class Auction extends BaseModel<Auction> {
     public String getDisplayName() {
         return this.getLotId() + ": " + this.getAuctionItemCategoryName() + " - " + this.getAuctionItemCatalogNumber() +
                 " - " + this.getConditionName();
-    }
-
-    @Override
-    public String getFilterField() {
-        return "a.id";
     }
 }

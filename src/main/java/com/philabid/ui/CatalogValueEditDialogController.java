@@ -67,7 +67,7 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
 
         // Pre-select items in ComboBoxes if editing an existing value
         if (catalogValue.getAuctionItemId() != null) {
-            AppContext.getAuctionItemService().getAuctionItemById(catalogValue.getAuctionItemId())
+            AppContext.getAuctionItemService().getById(catalogValue.getAuctionItemId())
                     .ifPresent(auctionItemSelector::setSelectedAuctionItem);
         }
         if (catalogValue.getConditionId() != null) {
@@ -76,7 +76,7 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
         }
         if (catalogValue.getCatalogId() != null) {
             catalogComboBox.getSelectionModel()
-                    .select(AppContext.getCatalogService().getCatalogById(catalogValue.getCatalogId()).orElse(null));
+                    .select(AppContext.getCatalogService().getById(catalogValue.getCatalogId()).orElse(null));
         }
         if (catalogValue.getValue() != null) {
             currencyComboBox.getSelectionModel().select(catalogValue.getValue().getOriginalCurrency());
@@ -105,7 +105,7 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
 
     private void autoSelectCatalogAndCurrency(Category category) {
         if (category != null && category.getCatalogId() != null) {
-            AppContext.getCatalogService().getCatalogById(category.getCatalogId()).ifPresent(defaultCatalog -> {
+            AppContext.getCatalogService().getById(category.getCatalogId()).ifPresent(defaultCatalog -> {
                 catalogComboBox.getSelectionModel().select(defaultCatalog);
                 // Auto-select currency based on catalog
                 if (defaultCatalog.getCurrency() != null) {

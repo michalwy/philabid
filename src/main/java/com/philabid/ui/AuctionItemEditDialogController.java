@@ -55,7 +55,7 @@ public class AuctionItemEditDialogController extends CrudEditDialogController<Au
     }
 
     private void populateCategoryComboBox() {
-        List<Category> categories = AppContext.getCategoryService().getAll();
+        Collection<Category> categories = AppContext.getCategoryService().getAll();
         categoryComboBox.setItems(FXCollections.observableArrayList(categories));
         logger.debug("Populated category ComboBox with {} items.", categories.size());
     }
@@ -85,7 +85,7 @@ public class AuctionItemEditDialogController extends CrudEditDialogController<Au
             auctionItem.setCategoryId(selectedCategory.getId());
             // Set catalog info from selected category's catalog
             Catalog associatedCatalog =
-                    AppContext.getCatalogService().getCatalogById(selectedCategory.getCatalogId()).orElse(null);
+                    AppContext.getCatalogService().getById(selectedCategory.getCatalogId()).orElse(null);
             if (associatedCatalog != null) {
                 auctionItem.setCatalogName(associatedCatalog.getName());
                 auctionItem.setCatalogIssueYear(associatedCatalog.getIssueYear());

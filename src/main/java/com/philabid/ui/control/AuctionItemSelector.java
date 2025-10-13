@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -106,7 +106,7 @@ public class AuctionItemSelector extends VBox {
         AutoCompletionBinding<AuctionItemSuggestion> binding = TextFields.bindAutoCompletion(auctionItemField,
                 suggestionRequest -> {
                     String filter = suggestionRequest.getUserText().toLowerCase();
-                    List<AuctionItem> allItems = AppContext.getAuctionItemService().getAll();
+                    Collection<AuctionItem> allItems = AppContext.getAuctionItemService().getAll();
                     return allItems.stream()
                             .filter(item -> item.getCatalogNumber().toLowerCase().contains(filter) ||
                                     (item.getCategoryName() != null &&
@@ -125,7 +125,7 @@ public class AuctionItemSelector extends VBox {
 
     private void autoSelectCategory(AuctionItem auctionItem) {
         if (auctionItem != null && auctionItem.getCategoryId() != null) {
-            AppContext.getCategoryService().getCategoryById(auctionItem.getCategoryId())
+            AppContext.getCategoryService().getById(auctionItem.getCategoryId())
                     .ifPresentOrElse(category -> {
                                 categoryComboBox.getSelectionModel().select(category);
                                 selectedCategory.set(category);

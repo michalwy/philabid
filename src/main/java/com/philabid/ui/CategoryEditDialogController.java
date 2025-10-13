@@ -48,7 +48,7 @@ public class CategoryEditDialogController extends CrudEditDialogController<Categ
     }
 
     private void populateCatalogComboBox() {
-        List<Catalog> catalogs = AppContext.getCatalogService().getAll();
+        Collection<Catalog> catalogs = AppContext.getCatalogService().getAll();
         catalogComboBox.setItems(FXCollections.observableArrayList(catalogs));
         logger.debug("Populated catalog ComboBox with {} items.", catalogs.size());
     }

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -134,7 +135,7 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         // Default implementation does nothing.
     }
 
-    protected List<T> loadTableItems() {
+    protected Collection<T> loadTableItems() {
         return crudService.getAll();
     }
 

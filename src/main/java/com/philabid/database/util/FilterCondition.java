@@ -1,4 +1,4 @@
-package com.philabid.ui.control;
+package com.philabid.database.util;
 
 import java.util.Collection;
 

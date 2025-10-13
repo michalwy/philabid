@@ -2,7 +2,6 @@ package com.philabid.model;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
-import java.time.LocalDateTime;
 
 /**
  * Represents an auction house entity.
@@ -15,8 +14,6 @@ public class AuctionHouse extends BaseModel<AuctionHouse> {
     private String address;
     private String country;
     private CurrencyUnit currency;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     // Constructors
     public AuctionHouse() {
@@ -25,8 +22,6 @@ public class AuctionHouse extends BaseModel<AuctionHouse> {
     public AuctionHouse(String name) {
         this.name = name;
         this.currency = Monetary.getCurrency("USD");
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     // Getters and setters
@@ -90,29 +85,8 @@ public class AuctionHouse extends BaseModel<AuctionHouse> {
         this.currency = Monetary.getCurrency(currencyCode);
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     @Override
     public String getDisplayName() {
         return name;
-    }
-
-    @Override
-    public String getFilterField() {
-        return "ah.id";
     }
 }

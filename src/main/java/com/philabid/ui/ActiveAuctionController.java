@@ -1,12 +1,12 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
+import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Auction;
 import com.philabid.model.CatalogValue;
 import com.philabid.ui.cell.EndingDateCell;
 import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.control.CrudEditDialog;
-import com.philabid.ui.control.FilterCondition;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -35,7 +35,7 @@ public class ActiveAuctionController extends BaseAuctionController {
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> maxBidColumn;
 
     @Override
-    public List<Auction> loadAuctions(Collection<FilterCondition> filterConditions) {
+    public Collection<Auction> loadAuctions(Collection<FilterCondition> filterConditions) {
         return AppContext.getAuctionService().getActiveAuctions(filterConditions);
     }
 

@@ -1,6 +1,7 @@
 package com.philabid.ui.control;
 
 import com.philabid.AppContext;
+import com.philabid.database.util.FilterCondition;
 import com.philabid.model.BaseModel;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ListProperty;

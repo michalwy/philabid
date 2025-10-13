@@ -2,7 +2,6 @@ package com.philabid.model;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
-import java.time.LocalDateTime;
 
 /**
  * Represents a stamp catalog entity.
@@ -13,8 +12,6 @@ public class Catalog extends BaseModel<Catalog> {
     private Integer issueYear;
     private CurrencyUnit currency;
     private boolean active;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     // Constructors
     public Catalog() {
@@ -58,29 +55,8 @@ public class Catalog extends BaseModel<Catalog> {
         this.active = active;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     @Override
     public String getDisplayName() {
         return name + " (" + issueYear + ")";
-    }
-
-    @Override
-    public String getFilterField() {
-        return "cat.id";
     }
 }

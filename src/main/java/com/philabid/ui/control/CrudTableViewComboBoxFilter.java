@@ -1,5 +1,6 @@
 package com.philabid.ui.control;
 
+import com.philabid.database.util.EntityFilterCondition;
 import com.philabid.model.BaseModel;
 import com.philabid.service.CrudService;
 import javafx.collections.FXCollections;

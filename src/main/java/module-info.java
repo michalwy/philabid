@@ -14,6 +14,7 @@ module philabid {
     requires okhttp3;
     requires org.javamoney.moneta.convert;
     requires org.jetbrains.annotations;
+    requires java.money;
 
     opens com.philabid to javafx.fxml;
     opens com.philabid.ui to javafx.fxml;
@@ -30,4 +31,6 @@ module philabid {
     exports com.philabid.i18n;
     exports com.philabid.util;
     opens com.philabid.ui.control to javafx.fxml;
+    exports com.philabid.database.util;
+    opens com.philabid.database.util to javafx.fxml;
 }

@@ -2,44 +2,34 @@ package com.philabid.service;
 
 import com.philabid.AppContext;
 import com.philabid.database.AuctionRepository;
+import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Auction;
-import com.philabid.ui.control.FilterCondition;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Service layer for managing Auctions.
  */
-public class AuctionService implements CrudService<Auction> {
+public class AuctionService extends CrudService<Auction> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
     private final AuctionRepository auctionRepository;
 
     public AuctionService(AuctionRepository auctionRepository) {
+        super(auctionRepository);
         this.auctionRepository = auctionRepository;
     }
 
-    public Auction create() {
-        return new Auction();
-    }
-
-    @Override
-    public List<Auction> getAll(Collection<FilterCondition> filterConditions) {
+    public Collection<Auction> getActiveAuctions(Collection<FilterCondition> filterConditions) {
         try {
-            return auctionRepository.findAll(filterConditions);
-        } catch (SQLException e) {
-            logger.error("Failed to retrieve all auctions", e);
-            return Collections.emptyList();
-        }
-    }
-
-    public List<Auction> getActiveAuctions(Collection<FilterCondition> filterConditions) {
-        try {
-            List<Auction> auctions = auctionRepository.findAllActive(filterConditions);
+            Collection<Auction> auctions = auctionRepository.findAllActive(filterConditions);
             Map<Long, List<Auction>> auctionsArchiveMap = auctionRepository.findArchivedForActiveAuctions();
             Map<Pair<Long, Long>, List<Auction>> categoriesArchiveMap =
                     auctionRepository.findArchivedForActiveCategories();
@@ -52,40 +42,19 @@ public class AuctionService implements CrudService<Auction> {
         }
     }
 
-    public List<Auction> getArchivedAuctions(Collection<FilterCondition> filterConditions) {
-        try {
-            List<Auction> auctions = auctionRepository.findAllArchived(filterConditions);
-            auctions.forEach(this::enrichAuction);
-            return auctions;
-        } catch (SQLException e) {
-            logger.error("Failed to retrieve archived auctions", e);
-            return Collections.emptyList();
-        }
+    public Collection<Auction> getArchivedAuctions(Collection<FilterCondition> filterConditions) {
+        Collection<Auction> auctions = auctionRepository.findAllArchived(filterConditions);
+        auctions.forEach(this::enrichAuction);
+        return auctions;
     }
 
-    public Optional<Auction> save(Auction auction) {
-        // Basic validation
+    protected boolean validate(Auction auction) {
         if (auction.getAuctionHouseId() == null || auction.getAuctionItemId() == null ||
                 auction.getConditionId() == null) {
             logger.warn("Attempted to save an auction with missing required IDs.");
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(auctionRepository.save(auction));
-        } catch (SQLException e) {
-            logger.error("Failed to save auction for item ID: {}", auction.getAuctionItemId(), e);
-            return Optional.empty();
-        }
-    }
-
-    public boolean delete(Long id) {
-        try {
-            return auctionRepository.deleteById(id);
-        } catch (SQLException e) {
-            logger.error("Failed to delete auction with ID: {}", id, e);
             return false;
         }
+        return true;
     }
 
     private void enrichAuction(Auction auction) {

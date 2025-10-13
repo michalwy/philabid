@@ -5,7 +5,7 @@ import com.philabid.service.CrudService;
 import com.philabid.ui.control.CrudTableViewCategoryFilter;
 import com.philabid.ui.control.CrudTableViewMultiFilter;
 
-import java.util.List;
+import java.util.Collection;
 
 public abstract class FilteredCrudTableViewController<T extends BaseModel<T>> extends CrudTableViewController<T> {
     protected FilteredCrudTableViewController(CrudService<T> crudService) {
@@ -13,7 +13,7 @@ public abstract class FilteredCrudTableViewController<T extends BaseModel<T>> ex
     }
 
     @Override
-    protected List<T> loadTableItems() {
+    protected Collection<T> loadTableItems() {
         return getCrudService().getAll(getCrudTableView().getFilterConditions());
     }
 

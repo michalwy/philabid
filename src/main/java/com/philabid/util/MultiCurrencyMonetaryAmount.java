@@ -26,7 +26,7 @@ public record MultiCurrencyMonetaryAmount(MonetaryAmount originalAmount, Monetar
      */
     public static MultiCurrencyMonetaryAmount of(MonetaryAmount amount) {
         if (amount == null) {
-            return new MultiCurrencyMonetaryAmount(null, null);
+            return null;
         }
 
         CurrencyUnit defaultCurrency = AppContext.getConfigurationService().getDefaultCurrency();
@@ -41,6 +41,13 @@ public record MultiCurrencyMonetaryAmount(MonetaryAmount originalAmount, Monetar
             // No conversion needed, both amounts are the same
             return new MultiCurrencyMonetaryAmount(amount, amount);
         }
+    }
+
+    public static MultiCurrencyMonetaryAmount of(MonetaryAmount amount, MonetaryAmount defaultCurrencyAmount) {
+        if (amount == null) {
+            return null;
+        }
+        return new MultiCurrencyMonetaryAmount(amount, defaultCurrencyAmount);
     }
 
     public boolean isDefaultCurrency() {

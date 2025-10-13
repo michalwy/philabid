@@ -192,11 +192,11 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
         // Select items in ComboBoxes
         if (auction.getAuctionHouseId() != null) {
             auctionHouseComboBox.getSelectionModel()
-                    .select(AppContext.getAuctionHouseService().getAuctionHouseById(auction.getAuctionHouseId())
+                    .select(AppContext.getAuctionHouseService().getById(auction.getAuctionHouseId())
                             .orElse(null));
         }
         if (auction.getAuctionItemId() != null) {
-            AppContext.getAuctionItemService().getAuctionItemById(auction.getAuctionItemId())
+            AppContext.getAuctionItemService().getById(auction.getAuctionItemId())
                     .ifPresent(auctionItemSelector::setSelectedAuctionItem);
         }
         selectComboBoxValue(conditionComboBox, auction.getConditionId());

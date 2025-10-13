@@ -3,7 +3,6 @@ package com.philabid.model;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 
 import javax.money.MonetaryAmount;
-import java.time.LocalDateTime;
 
 /**
  * Represents a catalog value for a specific auction item in a given condition.
@@ -14,8 +13,6 @@ public class CatalogValue extends BaseModel<CatalogValue> {
     private Long conditionId;
     private Long catalogId;
     private MultiCurrencyMonetaryAmount value;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     // Joined fields for display purposes
     private String auctionItemCatalogNumber;
@@ -66,22 +63,6 @@ public class CatalogValue extends BaseModel<CatalogValue> {
 
     public void setValue(MonetaryAmount value) {
         this.value = MultiCurrencyMonetaryAmount.of(value);
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public String getAuctionItemCatalogNumber() {
@@ -151,10 +132,5 @@ public class CatalogValue extends BaseModel<CatalogValue> {
     @Override
     public String getDisplayName() {
         return this.getAuctionItemCatalogNumber() + " - " + this.getConditionName();
-    }
-
-    @Override
-    public String getFilterField() {
-        return "cv.id";
     }
 }

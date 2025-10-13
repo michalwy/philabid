@@ -1,7 +1,11 @@
 package com.philabid.model;
 
+import java.time.LocalDateTime;
+
 public abstract class BaseModel<T extends BaseModel<T>> {
     private Long id;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -11,10 +15,24 @@ public abstract class BaseModel<T extends BaseModel<T>> {
         this.id = id;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public abstract String getDisplayName();
-
-    public abstract String getFilterField();
-
+    
     @Override
     public String toString() {
         return getDisplayName();
