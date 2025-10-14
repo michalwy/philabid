@@ -28,7 +28,16 @@ public final class Valuation extends BaseModel<Valuation> {
     private MultiCurrencyMonetaryAmount minPrice;
     private MultiCurrencyMonetaryAmount maxPrice;
     private MultiCurrencyMonetaryAmount categoryAveragePrice;
+    private MultiCurrencyMonetaryAmount recommendedPrice;
     private Integer auctionCount;
+
+    public MultiCurrencyMonetaryAmount getRecommendedPrice() {
+        return recommendedPrice;
+    }
+
+    public void setRecommendedPrice(MultiCurrencyMonetaryAmount recommendedPrice) {
+        this.recommendedPrice = recommendedPrice;
+    }
 
     public Long getAuctionItemCategoryId() {
         return auctionItemCategoryId;

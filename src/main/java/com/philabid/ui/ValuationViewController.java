@@ -17,6 +17,8 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
     @FXML
     private TableColumn<Valuation, String> conditionColumn;
     @FXML
+    private TableColumn<Valuation, MultiCurrencyMonetaryAmount> recommendedPrice;
+    @FXML
     private TableColumn<Valuation, MultiCurrencyMonetaryAmount> catalogValueColumn;
     @FXML
     private TableColumn<Valuation, MultiCurrencyMonetaryAmount> averagePriceColumn;
@@ -42,6 +44,8 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
         setCatalogValueColumn(catalogValueColumn, "catalogValue", Valuation::getCatalogValue,
                 Valuation::isCatalogActive);
 
+        setPriceWithThresholdColumn(recommendedPrice, "recommendedPrice", Valuation::getCategoryAveragePrice,
+                Valuation::getCatalogValue);
         setPriceWithThresholdColumn(minPriceColumn, "minPrice", Valuation::getCategoryAveragePrice,
                 Valuation::getCatalogValue);
         setPriceWithThresholdColumn(averagePriceColumn, "averagePrice", Valuation::getCategoryAveragePrice,

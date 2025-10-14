@@ -78,13 +78,16 @@ public class ValuationService extends VirtualCrudService<Valuation> {
                     valuation.setMinPrice(MultiCurrencyMonetaryAmount.of(stats.min));
                     valuation.setMaxPrice(MultiCurrencyMonetaryAmount.of(stats.max));
                     valuation.setAuctionCount(stats.count);
-                    if (valuation.getCatalogValue() != null) {
-                        Optional.ofNullable(categoryAveragePercentages.get(
-                                        Pair.with(valuation.getAuctionItemCategoryId(), valuation.getConditionId())))
-                                .ifPresent(d -> valuation.setCategoryAveragePrice(MultiCurrencyMonetaryAmount.of(
-                                        valuation.getCatalogValue().defaultCurrencyAmount().multiply(d))));
-                    }
                 });
+
+        if (valuation.getCatalogValue() != null) {
+            Optional.ofNullable(categoryAveragePercentages.get(
+                            Pair.with(valuation.getAuctionItemCategoryId(), valuation.getConditionId())))
+                    .ifPresent(d -> valuation.setCategoryAveragePrice(MultiCurrencyMonetaryAmount.of(
+                            valuation.getCatalogValue().defaultCurrencyAmount().multiply(d))));
+        }
+        AppContext.getPriceRecommendationService().calculateRecommendation(valuation)
+                .ifPresent(valuation::setRecommendedPrice);
     }
 
     @Override

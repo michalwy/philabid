@@ -2,6 +2,7 @@ package com.philabid.service;
 
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
+import com.philabid.model.Valuation;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import org.javatuples.Pair;
 
@@ -11,6 +12,11 @@ public class PriceRecommendationService {
     public Optional<MultiCurrencyMonetaryAmount> calculateRecommendation(Auction auction) {
         return calculateRecommendationFromAuctionItem(auction)
                 .or(() -> calculateRecommendationFromCategory(auction));
+    }
+
+    public Optional<MultiCurrencyMonetaryAmount> calculateRecommendation(Valuation valuation) {
+        return Optional.ofNullable(valuation.getAveragePrice())
+                .or(() -> Optional.ofNullable(valuation.getCategoryAveragePrice()));
     }
 
     private Optional<MultiCurrencyMonetaryAmount> calculateRecommendationFromAuctionItem(Auction auction) {
