@@ -2,13 +2,10 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.CatalogValue;
-import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
-import com.philabid.ui.util.CellValueFactoryProvider;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,25 +32,15 @@ public class CatalogValueController extends FilteredCrudTableViewController<Cata
 
     @Override
     protected void initializeView() {
-        // Use the provider for a consistent "Category (CODE)" format
-        categoryColumn.setCellValueFactory(CellValueFactoryProvider.forCategoryInfo(
-                CatalogValue::getAuctionItemCategoryCode, CatalogValue::getAuctionItemCategoryName));
+        setCategoryColumn(categoryColumn, CatalogValue::getAuctionItemCategoryCode,
+                CatalogValue::getAuctionItemCategoryName);
+        setCatalogNumberColumn(catalogNumberColumn, CatalogValue::getAuctionItemCatalogNumber,
+                CatalogValue::getAuctionItemOrderNumber);
 
-        // Use the provider for the complex catalog number column
-        catalogNumberColumn.setCellValueFactory(CellValueFactoryProvider.forCatalogNumber(
-                CatalogValue::getAuctionItemCatalogNumber, CatalogValue::getAuctionItemOrderNumber));
-        catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
+        setCatalogColumn(catalogColumn, CatalogValue::getCatalogName, CatalogValue::getCatalogIssueYear);
+        setConditionColumn(conditionColumn, CatalogValue::getConditionCode, CatalogValue::getConditionName);
 
-        // Use the provider for a consistent "Catalog (YEAR)" format
-        catalogColumn.setCellValueFactory(CellValueFactoryProvider.forCatalogInfo(
-                CatalogValue::getCatalogName, CatalogValue::getCatalogIssueYear));
-
-        // This formatting is specific enough to remain here for now
-        conditionColumn.setCellValueFactory(CellValueFactoryProvider.forConditionInfo(CatalogValue::getConditionCode,
-                CatalogValue::getConditionName));
-
-        valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
-        valueColumn.setCellFactory(column -> new MultiCurrencyMonetaryAmountCell<>());
+        setMonetaryColumn(valueColumn, "value");
     }
 
     @Override

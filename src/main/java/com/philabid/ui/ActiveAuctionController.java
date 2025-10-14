@@ -203,7 +203,6 @@ public class ActiveAuctionController extends BaseAuctionController {
                             nextIndex++;
                         }
                         getTableView().getSelectionModel().select(nextIndex);
-                        getTableView().scrollTo(nextIndex);
                         getTableView().requestFocus();
                         getTableView().getFocusModel().focus(nextIndex);
                         handleEditState(getTableView().getSelectionModel().getSelectedItem());

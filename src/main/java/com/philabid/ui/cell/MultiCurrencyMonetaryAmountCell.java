@@ -94,7 +94,8 @@ public class MultiCurrencyMonetaryAmountCell<T> extends TableCell<T, MultiCurren
             if (styler != null) {
                 T rowData = getTableRow().getItem();
                 // Styler now affects all labels in the cell
-                styler.accept(item, rowData, List.of(primaryAmountLabel, foreignCurrencyAmountLabel));
+                styler.accept(item, rowData,
+                        List.of(primaryAmountLabel, foreignCurrencyAmountLabel, defaultCurrencyAmountLabel));
             }
         }
     }

@@ -2,7 +2,7 @@ package com.philabid.ui.control;
 
 import com.philabid.database.util.EntityFilterCondition;
 import com.philabid.model.BaseModel;
-import com.philabid.service.CrudService;
+import com.philabid.service.AbstractCrudService;
 import javafx.collections.FXCollections;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -16,9 +16,9 @@ public abstract class CrudTableViewComboBoxFilter<T extends BaseModel<T>> extend
     protected final ComboBox<T> comboBox = new ComboBox<>();
     protected final Button clearButton = new Button("Clear");
     private final String filterField;
-    private final CrudService<T> crudService;
+    private final AbstractCrudService<T> crudService;
 
-    public CrudTableViewComboBoxFilter(String labelText, String filterField, CrudService<T> crudService) {
+    public CrudTableViewComboBoxFilter(String labelText, String filterField, AbstractCrudService<T> crudService) {
         super(labelText);
         this.filterField = filterField;
         this.crudService = crudService;

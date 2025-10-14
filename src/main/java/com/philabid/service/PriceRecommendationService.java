@@ -33,6 +33,7 @@ public class PriceRecommendationService {
         }
         return auction.getCategoryArchivedAuction().stream()
                 .map(Auction::getArchivedCatalogValuePercentage)
+                .filter(d -> d != null && d > 0)
                 .map(p -> Pair.with(p, 1))
                 .reduce((a, b) -> Pair.with(a.getValue0() + b.getValue0(), a.getValue1() + b.getValue1()))
                 .map(p -> p.getValue0() / p.getValue1())

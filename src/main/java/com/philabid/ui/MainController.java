@@ -72,9 +72,7 @@ public class MainController implements Initializable {
     @FXML
     private Tab archivedAuctionsTab;
     @FXML
-    private Tab catalogTab;
-    @FXML
-    private Tab bidsTab;
+    private Tab valuationTab;
     @FXML
     private Tab auctionItemsTab;
     @FXML
@@ -94,6 +92,8 @@ public class MainController implements Initializable {
     private ActiveAuctionController activeAuctionViewController;
     @FXML
     private ArchivedAuctionController archivedAuctionViewController;
+    @FXML
+    private ValuationViewController valuationViewController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -163,6 +163,7 @@ public class MainController implements Initializable {
     private void initializeTabControllerMap() {
         tabControllerMap.put(activeAuctionsTab, activeAuctionViewController);
         tabControllerMap.put(archivedAuctionsTab, archivedAuctionViewController);
+        tabControllerMap.put(valuationTab, valuationViewController);
         tabControllerMap.put(auctionItemsTab, auctionItemViewController);
         tabControllerMap.put(catalogValuesTab, catalogValueViewController);
     }
@@ -298,6 +299,7 @@ public class MainController implements Initializable {
             dashboardTab.setText(AppContext.getI18nManager().getString("tab.dashboard"));
             activeAuctionsTab.setText(AppContext.getI18nManager().getString("tab.auctions.active"));
             archivedAuctionsTab.setText(AppContext.getI18nManager().getString("tab.auctions.archived"));
+            valuationTab.setText(AppContext.getI18nManager().getString("tab.valuation"));
             auctionItemsTab.setText(AppContext.getI18nManager().getString("tab.auctionItems"));
             catalogValuesTab.setText(AppContext.getI18nManager().getString("tab.catalogValues"));
 

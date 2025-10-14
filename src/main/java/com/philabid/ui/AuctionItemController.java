@@ -3,7 +3,6 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.model.AuctionItem;
 import com.philabid.ui.util.CatalogNumberColumnValue;
-import com.philabid.ui.util.CellValueFactoryProvider;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -31,17 +30,12 @@ public class AuctionItemController extends FilteredCrudTableViewController<Aucti
 
     @Override
     protected void initializeView() {
-        categoryColumn.setCellValueFactory(CellValueFactoryProvider.forCategoryInfo(
-                AuctionItem::getCategoryCode, AuctionItem::getCategoryName));
+        setCategoryColumn(categoryColumn, AuctionItem::getCategoryCode, AuctionItem::getCategoryName);
+        setCatalogNumberColumn(catalogNumberColumn, AuctionItem::getCatalogNumber, AuctionItem::getOrderNumber);
+
         notesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
 
-        // Use the provider for the complex catalog number column
-        catalogNumberColumn.setCellValueFactory(CellValueFactoryProvider.forCatalogNumber(
-                AuctionItem::getCatalogNumber, AuctionItem::getOrderNumber));
-        catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
-
-        catalogInfoColumn.setCellValueFactory(CellValueFactoryProvider.forCatalogInfo(
-                AuctionItem::getCatalogName, AuctionItem::getCatalogIssueYear));
+        setCatalogColumn(catalogInfoColumn, AuctionItem::getCatalogName, AuctionItem::getCatalogIssueYear);
 
         logger.debug("AuctionItemController initialized.");
     }

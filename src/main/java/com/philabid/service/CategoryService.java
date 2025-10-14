@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Service layer for managing Categories.
  */
-public class CategoryService extends CrudService<Category> {
+public class CategoryService extends AbstractCrudService<Category> {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Service layer for managing Auction Items.
  */
-public class AuctionItemService extends CrudService<AuctionItem> {
+public class AuctionItemService extends AbstractCrudService<AuctionItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionItemService.class);
 

@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Service layer for managing Catalog Values.
  */
-public class CatalogValueService extends CrudService<CatalogValue> {
+public class CatalogValueService extends AbstractCrudService<CatalogValue> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueService.class);
     private final CatalogValueRepository catalogValueRepository;

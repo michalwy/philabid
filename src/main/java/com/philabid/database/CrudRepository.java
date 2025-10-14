@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public abstract class CrudRepository<T extends BaseModel<T>> {
@@ -27,6 +28,11 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
     }
 
     public CrudRepository(DatabaseManager databaseManager, Class<T> entityClass, String tableName, String tableAlias) {
+        this(databaseManager, entityClass, tableName, tableAlias, true);
+    }
+
+    public CrudRepository(DatabaseManager databaseManager, Class<T> entityClass, String tableName, String tableAlias,
+                          boolean includeCommonFields) {
         this.databaseManager = databaseManager;
         this.entityClass = entityClass;
         this.tableName = tableName;
@@ -34,13 +40,15 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
 
         String commonFieldsTable = tableAlias != null ? tableAlias : tableName;
 
-        fields.addAll(List.of(
-                new LongQueryField<>(commonFieldsTable, "id", "id", BaseModel<T>::setId),
-                new TimestampQueryField<>(commonFieldsTable, "created_at", "created_at", BaseModel<T>::setCreatedAt)
-                        .withEntityValue(BaseModel::getCreatedAt),
-                new TimestampQueryField<>(commonFieldsTable, "updated_at", "updated_at", BaseModel<T>::setUpdatedAt)
-                        .withEntityValue(BaseModel::getUpdatedAt)
-        ));
+        if (includeCommonFields) {
+            fields.addAll(List.of(
+                    new LongQueryField<>(commonFieldsTable, "id", "id", BaseModel<T>::setId),
+                    new TimestampQueryField<>(commonFieldsTable, "created_at", "created_at", BaseModel<T>::setCreatedAt)
+                            .withEntityValue(BaseModel::getCreatedAt),
+                    new TimestampQueryField<>(commonFieldsTable, "updated_at", "updated_at", BaseModel<T>::setUpdatedAt)
+                            .withEntityValue(BaseModel::getUpdatedAt)
+            ));
+        }
     }
 
     public void addFields(Collection<QueryField<T, ?>> fields) {
@@ -165,6 +173,13 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
         return findMany(filterConditions, List.of(), List.of());
     }
 
+    public void findAll(Collection<FilterCondition> filterConditions, Consumer<T> consumer) {
+        findMany(filterConditions, List.of(), List.of(), (rs, e) -> {
+            consumer.accept(e);
+            return true;
+        });
+    }
+
     private T mapResultSetToEntity(ResultSet rs, Collection<QueryField<T, ?>> fields) {
         T entity = create();
 
@@ -188,9 +203,9 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
         return entities;
     }
 
-    void findMany(Collection<FilterCondition> filterConditions,
-                  Collection<QueryField<T, ?>> additionalFields,
-                  Collection<QueryJoin> additionalJoins, EntityConsumer<T> consumer) {
+    public void findMany(Collection<FilterCondition> filterConditions,
+                         Collection<QueryField<T, ?>> additionalFields,
+                         Collection<QueryJoin> additionalJoins, EntityConsumer<T> consumer) {
         doFindQuery(filterConditions, additionalFields, additionalJoins, consumer);
     }
 

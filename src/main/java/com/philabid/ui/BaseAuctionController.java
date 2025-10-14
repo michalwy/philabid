@@ -3,11 +3,7 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Auction;
-import com.philabid.ui.cell.CatalogValueCell;
-import com.philabid.ui.cell.RightAlignedDateCell;
-import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
-import com.philabid.ui.util.CellValueFactoryProvider;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -50,34 +46,20 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
     protected void initializeView() {
         auctionHouseColumn.setCellValueFactory(new PropertyValueFactory<>("auctionHouseName"));
 
-        categoryColumn.setCellValueFactory(CellValueFactoryProvider.forCategoryInfo(Auction::getAuctionItemCategoryCode,
-                Auction::getAuctionItemCategoryName));
+        setCategoryColumn(categoryColumn, Auction::getAuctionItemCategoryCode, Auction::getAuctionItemCategoryName);
+        setCatalogNumberColumn(catalogNumberColumn, Auction::getAuctionItemCatalogNumber,
+                Auction::getAuctionItemOrderNumber);
 
-        catalogNumberColumn.setCellValueFactory(
-                CellValueFactoryProvider.forCatalogNumber(Auction::getAuctionItemCatalogNumber,
-                        Auction::getAuctionItemOrderNumber));
-        catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
+        setConditionColumn(conditionColumn, Auction::getConditionCode, Auction::getConditionName);
 
-        conditionColumn.setCellValueFactory(
-                CellValueFactoryProvider.forConditionInfo(Auction::getConditionCode, Auction::getConditionName));
+        setPriceWithThresholdColumn(currentPriceColumn, "currentPrice", Auction::getRecommendedPrice,
+                Auction::getCatalogValue);
+        setPriceWithThresholdColumn(recommendedPriceColumn, "recommendedPrice", Auction::getCatalogValue,
+                Auction::getCatalogValue);
 
-        // Use a reusable cell factory and add specific styling for the current price
-        currentPriceColumn.setCellValueFactory(new PropertyValueFactory<>("currentPrice"));
-        currentPriceColumn.setCellFactory(
-                column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(Auction::getRecommendedPrice,
-                        Auction::getCatalogValue));
+        setCatalogValueColumn(catalogValueColumn, "catalogValue", Auction::getCatalogValue, Auction::isCatalogActive);
 
-        // For now, recommended price is the same as catalog value
-        recommendedPriceColumn.setCellValueFactory(new PropertyValueFactory<>("recommendedPrice"));
-        recommendedPriceColumn.setCellFactory(
-                column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(Auction::getCatalogValue,
-                        Auction::getCatalogValue));
-
-        catalogValueColumn.setCellValueFactory(new PropertyValueFactory<>("catalogValue"));
-        catalogValueColumn.setCellFactory(column -> new CatalogValueCell());
-
-        endDateColumn.setCellValueFactory(new PropertyValueFactory<>("endDate"));
-        endDateColumn.setCellFactory(column -> new RightAlignedDateCell<>());
+        setDateTimeColumn(endDateColumn, "endDate");
     }
 
     public abstract Collection<Auction> loadAuctions(Collection<FilterCondition> filterConditions);

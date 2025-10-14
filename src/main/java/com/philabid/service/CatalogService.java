@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Service layer for managing catalogs.
  */
-public class CatalogService extends CrudService<Catalog> {
+public class CatalogService extends AbstractCrudService<Catalog> {
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogService.class);
 

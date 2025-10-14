@@ -12,7 +12,7 @@ import java.util.Optional;
  * Service layer for managing auction houses.
  * Encapsulates business logic and separates it from the UI and database layers.
  */
-public class AuctionHouseService extends CrudService<AuctionHouse> {
+public class AuctionHouseService extends AbstractCrudService<AuctionHouse> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionHouseService.class);
     private final AuctionHouseRepository auctionHouseRepository;

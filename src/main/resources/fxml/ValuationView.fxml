@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.philabid.ui.control.CrudTableView?>
+<?import javafx.scene.control.*?>
+<CrudTableView xmlns:fx="http://javafx.com/fxml/1" fx:id="crudTableView" xmlns="http://javafx.com/javafx/17.0.2-ea"
+               fx:controller="com.philabid.ui.ValuationViewController">
+    <columns>
+        <TableColumn fx:id="categoryColumn" prefWidth="150.0" text="Category"/>
+        <TableColumn fx:id="catalogNumberColumn" prefWidth="75.0" text="Catalog Number"/>
+        <TableColumn fx:id="conditionColumn" prefWidth="100.0" text="Condition"/>
+        <TableColumn fx:id="catalogValueColumn" prefWidth="120.0" text="Catalog Value"/>
+        <TableColumn fx:id="minPriceColumn" prefWidth="120.0" text="Min. Price"/>
+        <TableColumn fx:id="averagePriceColumn" prefWidth="120.0" text="Avg. Price"/>
+        <TableColumn fx:id="maxPriceColumn" prefWidth="120.0" text="Max. Price"/>
+        <TableColumn fx:id="categoryAveragePrice" prefWidth="120.0" text="Price by Category Average"/>
+        <TableColumn fx:id="auctionCountColumn" prefWidth="75.0" text="Auctions"/>
+    </columns>
+</CrudTableView>

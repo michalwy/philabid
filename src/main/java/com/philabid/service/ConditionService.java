@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Service layer for managing Conditions.
  */
-public class ConditionService extends CrudService<Condition> {
+public class ConditionService extends AbstractCrudService<Condition> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConditionService.class);
 

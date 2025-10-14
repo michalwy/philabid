@@ -33,6 +33,7 @@ public class AppContext {
     private final ConfigurationService configurationService;
     private final ExchangeRateService exchangeRateService;
     private final PriceRecommendationService priceRecommendationService;
+    private final ValuationService valuationService;
     private HostServices hostServices;
 
     private AppContext() {
@@ -48,6 +49,7 @@ public class AppContext {
         AuctionRepository auctionRepository = new AuctionRepository(databaseManager);
         CatalogValueRepository catalogValueRepository = new CatalogValueRepository(databaseManager);
         ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository(databaseManager);
+        ValuationEntryRepository valuationEntryRepository = new ValuationEntryRepository(databaseManager);
 
         currencyService = new CurrencyService();
         auctionHouseService = new AuctionHouseService(auctionHouseRepository);
@@ -61,6 +63,7 @@ public class AppContext {
                 new UrlParsingService(List.of(new AllegroUrlParser(), new EbayUrlParser()), auctionHouseService);
         exchangeRateService = new ExchangeRateService(exchangeRateRepository);
         priceRecommendationService = new PriceRecommendationService();
+        valuationService = new ValuationService(valuationEntryRepository);
     }
 
     public static AppContext get() {
@@ -124,6 +127,10 @@ public class AppContext {
 
     public static PriceRecommendationService getPriceRecommendationService() {
         return get().priceRecommendationService;
+    }
+
+    public static ValuationService getValuationService() {
+        return get().valuationService;
     }
 
     public static DatabaseManager getDatabaseManager() {

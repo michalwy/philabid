@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Service layer for managing Auctions.
  */
-public class AuctionService extends CrudService<Auction> {
+public class AuctionService extends AbstractCrudService<Auction> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
     private final AuctionRepository auctionRepository;
