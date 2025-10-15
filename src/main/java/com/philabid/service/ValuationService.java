@@ -45,6 +45,9 @@ public class ValuationService extends VirtualCrudService<Valuation> {
                         valuation.setCatalogActive(valuationEntry.isCatalogActive());
                         return valuation;
                     }).addValuationEntry(valuationEntry);
+        });
+
+        valuationEntryRepository.findAll(List.of(), valuationEntry -> {
             categoryAveragePercentageEntries.computeIfAbsent(
                     Pair.with(valuationEntry.getAuctionItemCategoryId(), valuationEntry.getConditionId()),
                     k -> new ArrayList<>()).add(valuationEntry.getArchivedCatalogValuePercentage());
