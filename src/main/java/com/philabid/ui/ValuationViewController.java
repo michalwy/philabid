@@ -13,6 +13,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.philabid.ui.util.TableViewHelpers.*;
 
 public class ValuationViewController extends FilteredCrudTableViewController<Valuation> {
 
@@ -76,6 +79,10 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
 
     @Override
     protected List<MenuItem> getContextMenuItems() {
+        MenuItem showHistoricalAuctions = new MenuItem("Show historical auctions...");
+        showHistoricalAuctions.setOnAction(
+                event -> handleShowHistoricalAuctions(getTableView().getSelectionModel().getSelectedItem()));
+
         MenuItem addCatalogValueItem = new MenuItem("Add Catalog Value...");
         addCatalogValueItem.setOnAction(
                 event -> handleAddCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
@@ -84,7 +91,7 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
         updateCatalogValueItem.setOnAction(
                 event -> handleUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
-        return List.of(addCatalogValueItem, updateCatalogValueItem);
+        return List.of(showHistoricalAuctions, addCatalogValueItem, updateCatalogValueItem);
     }
 
     @Override
@@ -162,8 +169,39 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
         }
     }
 
+    private void handleShowHistoricalAuctions(Valuation selectedItem) {
+        if (selectedItem == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HistoricalAuctionsDialog.fxml"));
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Historical Auctions");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(getTableView().getScene().getWindow());
+            dialogStage.setScene(new Scene(page));
+
+            HistoricalAuctionsDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setAuctionItem(selectedItem.getAuctionItemId(), selectedItem.getConditionId());
+
+            dialogStage.showAndWait();
+        } catch (IOException e) {
+            logger.error("Failed to load Archive Auction dialog.", e);
+        }
+    }
+
     @Override
     protected String getDialogFXMLResourcePath() {
         return null;
+    }
+
+    @Override
+    protected void handleDoubleClick() {
+        handleShowHistoricalAuctions(getTableView().getSelectionModel().getSelectedItem());
     }
 }

@@ -3,15 +3,8 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.model.BaseModel;
 import com.philabid.service.CrudService;
-import com.philabid.ui.cell.CatalogValueCell;
-import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
-import com.philabid.ui.cell.RightAlignedDateCell;
-import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.control.CrudEditDialog;
 import com.philabid.ui.control.CrudTableView;
-import com.philabid.ui.util.CatalogNumberColumnValue;
-import com.philabid.ui.util.CellValueFactoryProvider;
-import com.philabid.util.MultiCurrencyMonetaryAmount;
 import com.philabid.util.TriConsumer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,19 +12,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 public abstract class CrudTableViewController<T extends BaseModel<T>> extends TableViewController {
     private static final Logger logger = LoggerFactory.getLogger(CrudTableViewController.class);
@@ -84,59 +74,6 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
 
     protected void addRowFormatter(TriConsumer<TableRow<T>, T, Boolean> formatter) {
         rowFormatters.add(formatter);
-    }
-
-    protected void setCategoryColumn(TableColumn<T, String> categoryColumn, Function<T, String> categoryCodeGetter,
-                                     Function<T, String> categoryNameGetter) {
-        categoryColumn.setCellValueFactory(
-                CellValueFactoryProvider.forCategoryInfo(categoryCodeGetter, categoryNameGetter));
-    }
-
-    protected void setCatalogNumberColumn(TableColumn<T, CatalogNumberColumnValue> catalogNumberColumn,
-                                          Function<T, String> catalogNumberGetter,
-                                          Function<T, Long> orderNumberGetter) {
-        catalogNumberColumn.setCellValueFactory(
-                CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter));
-        catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
-    }
-
-    protected void setConditionColumn(TableColumn<T, String> conditionColumn, Function<T, String> conditionCodeGetter,
-                                      Function<T, String> conditionNameGetter) {
-        conditionColumn.setCellValueFactory(
-                CellValueFactoryProvider.forConditionInfo(conditionCodeGetter, conditionNameGetter));
-    }
-
-    protected void setCatalogColumn(TableColumn<T, String> catalogColumn, Function<T, String> nameGetter,
-                                    Function<T, Integer> issueYearGetter) {
-        catalogColumn.setCellValueFactory(CellValueFactoryProvider.forCatalogInfo(nameGetter, issueYearGetter));
-    }
-
-    protected void setCatalogValueColumn(TableColumn<T, MultiCurrencyMonetaryAmount> catalogValueColumn,
-                                         String property,
-                                         Function<T, MultiCurrencyMonetaryAmount> catalogValueGetter,
-                                         Function<T, Boolean> catalogActiveGetter) {
-        catalogValueColumn.setCellValueFactory(new PropertyValueFactory<>(property));
-        catalogValueColumn.setCellFactory(
-                column -> new CatalogValueCell<>(catalogValueGetter, catalogActiveGetter));
-    }
-
-    protected void setMonetaryColumn(TableColumn<T, MultiCurrencyMonetaryAmount> column, String property) {
-        column.setCellValueFactory(new PropertyValueFactory<>(property));
-        column.setCellFactory(c -> new MultiCurrencyMonetaryAmountCell<>());
-    }
-
-    protected void setPriceWithThresholdColumn(TableColumn<T, MultiCurrencyMonetaryAmount> priceColumn, String property,
-                                               Function<T, MultiCurrencyMonetaryAmount> warningThresholdGetter,
-                                               Function<T, MultiCurrencyMonetaryAmount> criticalThresholdGetter) {
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>(property));
-        priceColumn.setCellFactory(
-                column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(warningThresholdGetter,
-                        criticalThresholdGetter));
-    }
-
-    protected void setDateTimeColumn(TableColumn<T, LocalDateTime> column, String property) {
-        column.setCellValueFactory(new PropertyValueFactory<>(property));
-        column.setCellFactory(c -> new RightAlignedDateCell<>());
     }
 
     private void setRowFactories() {

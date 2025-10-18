@@ -2,16 +2,19 @@ package com.philabid.service;
 
 import com.philabid.AppContext;
 import com.philabid.database.ValuationEntryRepository;
+import com.philabid.database.util.EqualFilterCondition;
 import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Valuation;
 import com.philabid.model.ValuationEntry;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
+import org.javamoney.moneta.function.MonetaryOperators;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class ValuationService extends VirtualCrudService<Valuation> {
@@ -67,6 +70,14 @@ public class ValuationService extends VirtualCrudService<Valuation> {
         return entries.values().stream().peek(v -> calculateStatistics(v, categoryAveragePercentages)).toList();
     }
 
+    public Optional<Valuation> getForItem(Long auctionItemId, Long conditionId) {
+        Collection<Valuation> valuations =
+                getAll(List.of(new EqualFilterCondition<>("aiv.auction_item_id", auctionItemId),
+                        new EqualFilterCondition<>("aiv.condition_id", conditionId)));
+
+        return valuations.stream().findFirst();
+    }
+
     private void calculateStatistics(Valuation valuation, Map<Pair<Long, Long>, Double> categoryAveragePercentages) {
         CurrencyUnit defaultCurrency = AppContext.getConfigurationService().getDefaultCurrency();
         valuation.getValuationEntries().stream()
@@ -77,7 +88,8 @@ public class ValuationService extends VirtualCrudService<Valuation> {
                 .reduce((a, b) -> new StatsReductor(a.sum.add(b.sum), a.min.isLessThan(b.min) ? a.min : b.min,
                         a.max.isGreaterThan(b.max) ? a.max : b.max, a.count() + 1))
                 .ifPresent(stats -> {
-                    valuation.setAveragePrice(MultiCurrencyMonetaryAmount.of(stats.sum.divide(stats.count)));
+                    valuation.setAveragePrice(MultiCurrencyMonetaryAmount.of(
+                            stats.sum.divide(stats.count).with(MonetaryOperators.rounding(RoundingMode.HALF_UP, 2))));
                     valuation.setMinPrice(MultiCurrencyMonetaryAmount.of(stats.min));
                     valuation.setMaxPrice(MultiCurrencyMonetaryAmount.of(stats.max));
                     valuation.setAuctionCount(stats.count);
@@ -86,8 +98,12 @@ public class ValuationService extends VirtualCrudService<Valuation> {
         if (valuation.getCatalogValue() != null) {
             Optional.ofNullable(categoryAveragePercentages.get(
                             Pair.with(valuation.getAuctionItemCategoryId(), valuation.getConditionId())))
-                    .ifPresent(d -> valuation.setCategoryAveragePrice(MultiCurrencyMonetaryAmount.of(
-                            valuation.getCatalogValue().defaultCurrencyAmount().multiply(d))));
+                    .ifPresent(d -> {
+                        valuation.setCategoryAveragePrice(MultiCurrencyMonetaryAmount.of(
+                                valuation.getCatalogValue().defaultCurrencyAmount().multiply(d)
+                                        .with(MonetaryOperators.rounding(RoundingMode.HALF_UP, 2))));
+                        valuation.setCategoryAveragePercentage(d);
+                    });
         }
         AppContext.getPriceRecommendationService().calculateRecommendation(valuation)
                 .ifPresent(valuation::setRecommendedPrice);

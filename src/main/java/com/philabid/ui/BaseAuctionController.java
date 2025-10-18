@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
+import static com.philabid.ui.util.TableViewHelpers.*;
+
 /**
  * An abstract base controller containing shared logic for auction views.
  */

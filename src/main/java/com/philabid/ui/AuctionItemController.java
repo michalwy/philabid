@@ -9,6 +9,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.philabid.ui.util.TableViewHelpers.*;
+
 /**
  * Controller for the Auction Item management view (AuctionItemView.fxml).
  */

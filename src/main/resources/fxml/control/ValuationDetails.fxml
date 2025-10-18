@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="VBox" spacing="5">
+    <Label text="Historical Data" style="-fx-font-weight: bold;"/>
+    <TableView fx:id="historyTable" prefHeight="300.0" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="auctionHouseColumn" prefWidth="250.0" text="Auction House"/>
+            <TableColumn fx:id="urlColumn" prefWidth="350.0" text="URL"/>
+            <TableColumn fx:id="finalPriceColumn" prefWidth="200.0" text="Final Price"/>
+            <TableColumn fx:id="endDateColumn" prefWidth="200.0" text="End Date"/>
+        </columns>
+    </TableView>
+    <HBox spacing="20">
+        <VBox>
+            <Label text="Min Price:"/>
+            <Label text="Max Price:"/>
+            <Label text="Recommended price:"/>
+        </VBox>
+        <VBox alignment="TOP_RIGHT">
+            <Label fx:id="minPriceLabel"/>
+            <Label fx:id="maxPriceLabel"/>
+            <Label fx:id="recommendedPriceLabel"/>
+        </VBox>
+        <VBox>
+            <Label text="Avg Price:"/>
+            <Label text="Catalog Price:"/>
+        </VBox>
+        <VBox alignment="TOP_RIGHT">
+            <Label fx:id="avgPriceLabel"/>
+            <Label fx:id="catalogPriceLabel"/>
+        </VBox>
+        <VBox>
+            <Label text="Catg. Avg %:"/>
+            <Label text="Catg. Avg Price:"/>
+        </VBox>
+        <VBox alignment="TOP_RIGHT">
+            <Label fx:id="categoryAveragePercentageLabel"/>
+            <Label fx:id="categoryAveragePriceLabel"/>
+        </VBox>
+    </HBox>
+</fx:root>

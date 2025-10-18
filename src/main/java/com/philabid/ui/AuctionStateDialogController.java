@@ -3,6 +3,7 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import com.philabid.ui.control.MonetaryField;
+import com.philabid.ui.control.ValuationDetails;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -26,6 +27,8 @@ public class AuctionStateDialogController {
     private Label currencyLabel;
     @FXML
     private CheckBox archivedCheckBox;
+    @FXML
+    private ValuationDetails valuationDetails;
 
     private Stage dialogStage;
     private Auction auction;
@@ -39,11 +42,13 @@ public class AuctionStateDialogController {
     public void setAuction(Auction auction) {
         this.auction = auction;
 
-        urlLink.setText(auction.getAuctionItemCategoryCode() + " :: " + auction.getAuctionItemCatalogNumber() + " :: " +
-                auction.getConditionCode());
+        urlLink.setText(auction.getAuctionItemCatalogNumber() + "  (" + auction.getAuctionItemCategoryName() + ", " +
+                auction.getConditionName() + ")");
+        urlLink.setStyle("-fx-font-size: 16;");
         if (auction.getUrl() != null && !auction.getUrl().isBlank()) {
             urlLink.setOnAction(event -> {
                 AppContext.getHostServices().showDocument(auction.getUrl());
+                Platform.runLater(() -> currentPrice.requestFocus());
             });
         } else {
             urlLink.setDisable(true);
@@ -66,6 +71,8 @@ public class AuctionStateDialogController {
         archivedCheckBox.setSelected(auction.isArchived() || auction.isFinished());
 
         initiallyArchived = auction.isArchived();
+
+        valuationDetails.setAuctionItem(auction.getAuctionItemId(), auction.getConditionId());
 
         Platform.runLater(() -> {
             currentPrice.requestFocus();

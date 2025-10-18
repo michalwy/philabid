@@ -4,8 +4,10 @@ import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import com.philabid.model.Valuation;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
+import org.javamoney.moneta.function.MonetaryOperators;
 import org.javatuples.Pair;
 
+import java.math.RoundingMode;
 import java.util.Optional;
 
 public class PriceRecommendationService {
@@ -30,6 +32,7 @@ public class PriceRecommendationService {
                 .map(m -> Pair.with(m, 1))
                 .reduce((a, b) -> Pair.with(a.getValue0().add(b.getValue0()), a.getValue1() + b.getValue1()))
                 .map(p -> p.getValue0().divide(p.getValue1()))
+                .map(amount -> amount.with(MonetaryOperators.rounding(RoundingMode.HALF_UP, 2)))
                 .map(MultiCurrencyMonetaryAmount::of);
     }
 
@@ -44,6 +47,7 @@ public class PriceRecommendationService {
                 .reduce((a, b) -> Pair.with(a.getValue0() + b.getValue0(), a.getValue1() + b.getValue1()))
                 .map(p -> p.getValue0() / p.getValue1())
                 .map(p -> auction.getCatalogValue().originalAmount().multiply(p))
+                .map(amount -> amount.with(MonetaryOperators.rounding(RoundingMode.HALF_UP, 2)))
                 .map(MultiCurrencyMonetaryAmount::of);
     }
 }

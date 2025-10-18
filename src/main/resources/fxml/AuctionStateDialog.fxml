@@ -1,34 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.philabid.ui.control.MonetaryField?>
+<?import com.philabid.ui.control.ValuationDetails?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/17.0.2-ea"
-          fx:controller="com.philabid.ui.AuctionStateDialogController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" spacing="10" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      fx:controller="com.philabid.ui.AuctionStateDialogController">
     <padding>
         <Insets bottom="10" left="10" right="10" top="10"/>
     </padding>
 
-    <Label text="%auctions.state.label.url" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-    <Hyperlink fx:id="urlLink" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="3"/>
+    <Hyperlink fx:id="urlLink" text="-"/>
 
-    <Label text="%auctions.state.label.currentPrice" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-    <MonetaryField fx:id="currentPrice" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-    <Label fx:id="currencyLabel" text="CUR" GridPane.columnIndex="2" GridPane.rowIndex="1">
-        <GridPane.margin><Insets left="-5.0"/></GridPane.margin>
-    </Label>
+    <Separator>
 
-    <Label text="%auctions.state.label.maxBid" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-    <MonetaryField fx:id="maxBid" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-    <Label fx:id="maxBidCurrencyLabel" text="CUR" GridPane.columnIndex="2" GridPane.rowIndex="2">
-        <GridPane.margin><Insets left="-5.0"/></GridPane.margin>
-    </Label>
+    </Separator>
 
-    <Label text="%auctions.state.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-    <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="3"/>
+    <ValuationDetails GridPane.rowIndex="2" fx:id="valuationDetails" VBox.vgrow="ALWAYS"/>
 
-    <ButtonBar GridPane.columnSpan="4" GridPane.rowIndex="4">
+    <Separator>
+
+    </Separator>
+
+    <HBox spacing="5" alignment="CENTER_LEFT">
+        <Label text="%auctions.state.label.currentPrice"/>
+        <MonetaryField fx:id="currentPrice"/>
+        <Label fx:id="currencyLabel" text="CUR"/>
+
+        <Label text="%auctions.state.label.maxBid">
+            <HBox.margin>
+                <Insets left="20"/>
+            </HBox.margin>
+        </Label>
+        <MonetaryField fx:id="maxBid"/>
+        <Label fx:id="maxBidCurrencyLabel" text="CUR"/>
+    </HBox>
+
+    <CheckBox fx:id="archivedCheckBox" text="Archived"/>
+
+    <ButtonBar>
         <buttons>
             <Button fx:id="saveAndAddNextButton" onAction="#handleSaveAndNext" text="%common.saveAndNext"
                     defaultButton="true"/>
@@ -36,4 +47,4 @@
             <Button cancelButton="true" onAction="#handleCancel" text="%common.cancel"/>
         </buttons>
     </ButtonBar>
-</GridPane>
+</VBox>

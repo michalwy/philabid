@@ -12,9 +12,11 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -23,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+
+import static com.philabid.ui.util.TableViewHelpers.setUrlColumn;
 
 public class ActiveAuctionController extends BaseAuctionController {
 
@@ -42,25 +46,8 @@ public class ActiveAuctionController extends BaseAuctionController {
     @Override
     protected void initializeView() {
         super.initializeView();
-        urlColumn.setCellValueFactory(new PropertyValueFactory<>("url"));
-        urlColumn.setCellFactory(column -> new TableCell<>() {
-            private final Hyperlink link = new Hyperlink();
 
-            {
-                link.setOnAction(event -> {
-                    if (!link.getText().isEmpty()) {
-                        AppContext.getHostServices().showDocument(link.getText());
-                    }
-                });
-            }
-
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty || item == null ? null : link);
-                link.setText(item);
-            }
-        });
+        setUrlColumn(urlColumn, "url");
 
         maxBidColumn.setCellValueFactory(new PropertyValueFactory<>("maxBid"));
         maxBidColumn.setCellFactory(column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(
@@ -72,6 +59,7 @@ public class ActiveAuctionController extends BaseAuctionController {
             // Always remove classes first to handle row reuse
             row.getStyleClass().remove("winning-auction");
             row.getStyleClass().remove("expired-auction");
+            row.getStyleClass().remove("overpriced-auction");
 
             if (empty || auction == null) {
                 return;
@@ -84,6 +72,10 @@ public class ActiveAuctionController extends BaseAuctionController {
             if (auction.getMaxBid() != null && auction.getCurrentPrice() != null && auction.getMaxBid().originalAmount()
                     .isGreaterThanOrEqualTo(auction.getCurrentPrice().originalAmount())) {
                 row.getStyleClass().add("winning-auction");
+            } else if (auction.getCurrentPrice() != null && auction.getRecommendedPrice() != null &&
+                    auction.getCurrentPrice().defaultCurrencyAmount()
+                            .isGreaterThan(auction.getRecommendedPrice().defaultCurrencyAmount())) {
+                row.getStyleClass().add("overpriced-auction");
             }
         });
 
@@ -100,6 +92,10 @@ public class ActiveAuctionController extends BaseAuctionController {
         MenuItem archiveItem = new MenuItem("Edit state...");
         archiveItem.setOnAction(event -> handleEditState(getTableView().getSelectionModel().getSelectedItem()));
 
+        MenuItem showHistoricalAuctions = new MenuItem("Show historical auctions...");
+        showHistoricalAuctions.setOnAction(
+                event -> handleEditState(getTableView().getSelectionModel().getSelectedItem()));
+
         MenuItem addCatalogValueItem = new MenuItem("Add Catalog Value...");
         addCatalogValueItem.setOnAction(
                 event -> handleAddCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
@@ -108,7 +104,7 @@ public class ActiveAuctionController extends BaseAuctionController {
         updateCatalogValueItem.setOnAction(
                 event -> handleUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
-        return List.of(archiveItem, addCatalogValueItem, updateCatalogValueItem);
+        return List.of(showHistoricalAuctions, archiveItem, addCatalogValueItem, updateCatalogValueItem);
     }
 
     @Override
@@ -173,7 +169,7 @@ public class ActiveAuctionController extends BaseAuctionController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AuctionStateDialog.fxml"));
             loader.setResources(AppContext.getI18nManager().getResourceBundle());
-            GridPane page = loader.load();
+            VBox page = loader.load();
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Auction State");

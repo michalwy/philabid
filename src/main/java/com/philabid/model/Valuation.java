@@ -30,6 +30,15 @@ public final class Valuation extends BaseModel<Valuation> {
     private MultiCurrencyMonetaryAmount categoryAveragePrice;
     private MultiCurrencyMonetaryAmount recommendedPrice;
     private Integer auctionCount;
+    private Double categoryAveragePercentage;
+
+    public Double getCategoryAveragePercentage() {
+        return categoryAveragePercentage;
+    }
+
+    public void setCategoryAveragePercentage(Double categoryAveragePercentage) {
+        this.categoryAveragePercentage = categoryAveragePercentage;
+    }
 
     public MultiCurrencyMonetaryAmount getRecommendedPrice() {
         return recommendedPrice;

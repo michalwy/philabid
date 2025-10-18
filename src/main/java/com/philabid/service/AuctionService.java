@@ -8,9 +8,7 @@ import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,22 +26,23 @@ public class AuctionService extends AbstractCrudService<Auction> {
     }
 
     public Collection<Auction> getActiveAuctions(Collection<FilterCondition> filterConditions) {
-        try {
-            Collection<Auction> auctions = auctionRepository.findAllActive(filterConditions);
-            Map<Long, List<Auction>> auctionsArchiveMap = auctionRepository.findArchivedForActiveAuctions();
-            Map<Pair<Long, Long>, List<Auction>> categoriesArchiveMap =
-                    auctionRepository.findArchivedForActiveCategories();
-            auctionsArchiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);
-            auctions.forEach(auction -> enrichAuction(auction, auctionsArchiveMap, categoriesArchiveMap));
-            return auctions;
-        } catch (SQLException e) {
-            logger.error("Failed to retrieve active auctions", e);
-            return Collections.emptyList();
-        }
+        Collection<Auction> auctions = auctionRepository.findAllActive(filterConditions);
+        Map<Long, List<Auction>> auctionsArchiveMap = auctionRepository.findArchivedForActiveAuctions();
+        Map<Pair<Long, Long>, List<Auction>> categoriesArchiveMap =
+                auctionRepository.findArchivedForActiveCategories();
+        auctionsArchiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);
+        auctions.forEach(auction -> enrichAuction(auction, auctionsArchiveMap, categoriesArchiveMap));
+        return auctions;
     }
 
     public Collection<Auction> getArchivedAuctions(Collection<FilterCondition> filterConditions) {
         Collection<Auction> auctions = auctionRepository.findAllArchived(filterConditions);
+        auctions.forEach(this::enrichAuction);
+        return auctions;
+    }
+
+    public Collection<Auction> getArchivedAuctionsForItem(Long auctionItemId, Long conditionId) {
+        Collection<Auction> auctions = auctionRepository.findArchivedByItemAndCondition(auctionItemId, conditionId);
         auctions.forEach(this::enrichAuction);
         return auctions;
     }

@@ -4,7 +4,6 @@ import com.philabid.database.util.*;
 import com.philabid.model.Auction;
 import org.javatuples.Pair;
 
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -81,7 +80,7 @@ public class AuctionRepository extends CrudRepository<Auction> {
         return findAll(allConditions);
     }
 
-    public Map<Long, List<Auction>> findArchivedForActiveAuctions() throws SQLException {
+    public Map<Long, List<Auction>> findArchivedForActiveAuctions() {
         Map<Long, List<Auction>> archiveMap = new HashMap<>();
 
         findMany(
@@ -100,7 +99,7 @@ public class AuctionRepository extends CrudRepository<Auction> {
         return archiveMap;
     }
 
-    public Map<Pair<Long, Long>, List<Auction>> findArchivedForActiveCategories() throws SQLException {
+    public Map<Pair<Long, Long>, List<Auction>> findArchivedForActiveCategories() {
         Map<Pair<Long, Long>, List<Auction>> archiveMap = new HashMap<>();
 
         findMany(
@@ -119,5 +118,15 @@ public class AuctionRepository extends CrudRepository<Auction> {
                 }
         );
         return archiveMap;
+    }
+
+    public Collection<Auction> findArchivedByItemAndCondition(Long auctionItemId, Long conditionId) {
+        return findMany(
+                List.of(new EqualFilterCondition<>("a.archived", true),
+                        new EqualFilterCondition<>("a.auction_item_id", auctionItemId),
+                        new EqualFilterCondition<>("a.condition_id", conditionId)),
+                List.of(),
+                List.of()
+        );
     }
 }

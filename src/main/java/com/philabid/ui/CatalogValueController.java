@@ -9,6 +9,8 @@ import javafx.scene.control.TableColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.philabid.ui.util.TableViewHelpers.*;
+
 /**
  * Controller for the Catalog Value management view (CatalogValueView.fxml).
  */

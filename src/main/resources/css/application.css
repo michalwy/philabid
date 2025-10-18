@@ -22,6 +22,7 @@
 
     -fx-success-color: #e6ffed;
     -fx-warning-color: orange;
+    -fx-overpriced-color: rgba(255, 165, 0, 0.17);
     -fx-critical-color: red;
 
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
@@ -131,7 +132,11 @@
     -fx-background-color: -fx-success-color;
 }
 
-.table-row-cell.winning-auction:selected {
+.table-row-cell.overpriced-auction {
+    -fx-background-color: -fx-overpriced-color;
+}
+
+.table-row-cell.winning-auction:selected, .table-row-cell.overpriced-auction:selected {
     -fx-background-color: -fx-accent-primary;
     -fx-text-fill: -fx-text-light;
 }
