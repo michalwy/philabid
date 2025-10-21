@@ -2,11 +2,13 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
+import com.philabid.service.AllegroApiService;
 import com.philabid.ui.control.MonetaryField;
 import com.philabid.ui.control.ValuationDetails;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -27,6 +29,10 @@ public class AuctionStateDialogController {
     private Label currencyLabel;
     @FXML
     private CheckBox archivedCheckBox;
+    @FXML
+    private Button sendMaxBidButton;
+    @FXML
+    private Button refreshMaxBidButton;
     @FXML
     private ValuationDetails valuationDetails;
 
@@ -148,5 +154,25 @@ public class AuctionStateDialogController {
 
     private boolean isInputValid() {
         return true;
+    }
+
+    @FXML
+    private void handleSendMaxBid() {
+        AppContext.getAllegroApiService()
+                .sendBid(auction.getLotId(), Money.of(maxBid.getAmount(), auction.getAuctionHouseCurrency()))
+                .ifPresent(this::updateBidDetails);
+    }
+
+    @FXML
+    private void handleRefreshMaxBid() {
+        AppContext.getAllegroApiService().getBidDetails(auction.getLotId())
+                .ifPresent(this::updateBidDetails);
+    }
+
+    private void updateBidDetails(AllegroApiService.BidDetails details) {
+        currentPrice.setAmount(details.auction().currentPrice().asMultiCurrency().originalAmount());
+        currencyLabel.setText(details.auction().currentPrice().currency());
+        maxBid.setAmount(details.maxAmount().asMultiCurrency().originalAmount());
+        maxBidCurrencyLabel.setText(details.maxAmount().currency());
     }
 }

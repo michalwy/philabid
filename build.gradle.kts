@@ -25,6 +25,11 @@ dependencies {
     // Moneta for monetary handling
     implementation("org.javamoney:moneta:1.4.5")
 
+    // Google OAuth Client Library for Java
+    implementation("com.google.oauth-client:google-oauth-client-java6:1.39.0")
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.39.0")
+    implementation("com.google.http-client:google-http-client-jackson2:2.0.2")
+
     // SQLite database
     implementation("org.xerial:sqlite-jdbc:3.50.3.0")
 

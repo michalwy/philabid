@@ -34,6 +34,7 @@ public class AppContext {
     private final ExchangeRateService exchangeRateService;
     private final PriceRecommendationService priceRecommendationService;
     private final ValuationService valuationService;
+    private final AllegroApiService allegroApiService;
     private HostServices hostServices;
 
     private AppContext() {
@@ -64,6 +65,7 @@ public class AppContext {
         exchangeRateService = new ExchangeRateService(exchangeRateRepository);
         priceRecommendationService = new PriceRecommendationService();
         valuationService = new ValuationService(valuationEntryRepository);
+        allegroApiService = new AllegroApiService(configurationService);
     }
 
     public static AppContext get() {
@@ -131,6 +133,10 @@ public class AppContext {
 
     public static ValuationService getValuationService() {
         return get().valuationService;
+    }
+
+    public static AllegroApiService getAllegroApiService() {
+        return get().allegroApiService;
     }
 
     public static DatabaseManager getDatabaseManager() {

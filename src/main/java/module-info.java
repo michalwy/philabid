@@ -15,6 +15,9 @@ module philabid {
     requires org.javamoney.moneta.convert;
     requires org.jetbrains.annotations;
     requires java.money;
+    requires com.google.api.client.json.gson;
+    requires com.google.api.client;
+    requires com.google.api.client.auth;
 
     opens com.philabid to javafx.fxml;
     opens com.philabid.ui to javafx.fxml;

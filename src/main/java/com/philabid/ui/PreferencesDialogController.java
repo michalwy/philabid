@@ -1,11 +1,10 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +20,8 @@ public class PreferencesDialogController {
     private ComboBox<CurrencyUnit> defaultCurrencyComboBox;
     @FXML
     private Spinner<Integer> analysisDaysSpinner;
+    @FXML
+    private TextField allegroClientIdField;
 
     private Stage dialogStage;
 
@@ -36,6 +37,8 @@ public class PreferencesDialogController {
         analysisDaysSpinner.setValueFactory(valueFactory);
         analysisDaysSpinner.getEditor()
                 .setText(Integer.toString(AppContext.getConfigurationService().getRecommendationAnalysisDays()));
+
+        allegroClientIdField.setText(AppContext.getConfigurationService().getString("allegro.clientId", ""));
 
         // Load and set the current default currency
         String defaultCurrencyCode =
@@ -68,6 +71,8 @@ public class PreferencesDialogController {
         AppContext.getConfigurationService().setValue("auction.recommendationAnalysisDays", analysisDays);
         logger.info("Recommendation analysis days saved as: {}", analysisDays);
 
+        saveAllegroKeys();
+
         AppContext.getConfigurationService().saveConfiguration();
         closeDialog();
     }
@@ -81,5 +86,33 @@ public class PreferencesDialogController {
         if (dialogStage != null) {
             dialogStage.close();
         }
+    }
+
+    private void saveAllegroKeys() {
+        AppContext.getConfigurationService().setValue("allegro.clientId", allegroClientIdField.getText());
+        logger.info("Allegro API credentials saved.");
+    }
+
+    @FXML
+    private void handleAllegroAuth() {
+        saveAllegroKeys();
+        AppContext.getConfigurationService().saveConfiguration();
+
+        logger.info("Starting Allegro authorization flow...");
+        AppContext.getAllegroApiService().authorize().whenComplete((success, error) -> {
+            Platform.runLater(() -> {
+                if (error != null || !success) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Authorization Failed");
+                    alert.setHeaderText("Could not obtain authorization. Please check logs for details.");
+                    alert.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Authorization Successful");
+                    alert.setHeaderText("The application is now authorized to access your Allegro account.");
+                    alert.showAndWait();
+                }
+            });
+        });
     }
 }
