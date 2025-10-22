@@ -3,6 +3,7 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Auction;
+import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.util.CatalogNumberColumnValue;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
@@ -34,7 +35,7 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
     @FXML
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> currentPriceColumn;
     @FXML
-    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> recommendedPriceColumn;
+    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> maxBidColumn;
     @FXML
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> catalogValueColumn;
     @FXML
@@ -48,6 +49,29 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
     protected void initializeView() {
         auctionHouseColumn.setCellValueFactory(new PropertyValueFactory<>("auctionHouseName"));
 
+        maxBidColumn.setCellValueFactory(new PropertyValueFactory<>("maxBid"));
+        maxBidColumn.setCellFactory(column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(
+                Auction::getRecommendedPrice,
+                Auction::getCatalogValue));
+
+        addRowFormatter((row, auction, empty) -> {
+            row.getStyleClass().remove("winning-auction");
+            row.getStyleClass().remove("overpriced-auction");
+
+            if (empty || auction == null) {
+                return;
+            }
+
+            if (auction.getMaxBid() != null && auction.getCurrentPrice() != null && auction.getMaxBid().originalAmount()
+                    .isGreaterThanOrEqualTo(auction.getCurrentPrice().originalAmount())) {
+                row.getStyleClass().add("winning-auction");
+            } else if (auction.getCurrentPrice() != null && auction.getRecommendedPrice() != null &&
+                    auction.getCurrentPrice().defaultCurrencyAmount()
+                            .isGreaterThan(auction.getRecommendedPrice().defaultCurrencyAmount())) {
+                row.getStyleClass().add("overpriced-auction");
+            }
+        });
+
         setCategoryColumn(categoryColumn, Auction::getAuctionItemCategoryCode, Auction::getAuctionItemCategoryName);
         setCatalogNumberColumn(catalogNumberColumn, Auction::getAuctionItemCatalogNumber,
                 Auction::getAuctionItemOrderNumber);
@@ -55,8 +79,6 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
         setConditionColumn(conditionColumn, Auction::getConditionCode, Auction::getConditionName);
 
         setPriceWithThresholdColumn(currentPriceColumn, "currentPrice", Auction::getRecommendedPrice,
-                Auction::getCatalogValue);
-        setPriceWithThresholdColumn(recommendedPriceColumn, "recommendedPrice", Auction::getCatalogValue,
                 Auction::getCatalogValue);
 
         setCatalogValueColumn(catalogValueColumn, "catalogValue", Auction::getCatalogValue, Auction::isCatalogActive);

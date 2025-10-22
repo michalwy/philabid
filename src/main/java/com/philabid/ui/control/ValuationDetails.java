@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,9 +33,15 @@ public class ValuationDetails extends VBox {
     @FXML
     private Label minPriceLabel;
     @FXML
+    private Label minPricePercentageLabel;
+    @FXML
     private Label maxPriceLabel;
     @FXML
+    private Label maxPricePercentageLabel;
+    @FXML
     private Label avgPriceLabel;
+    @FXML
+    private Label avgPricePercentageLabel;
     @FXML
     private Label categoryAveragePercentageLabel;
     @FXML
@@ -43,6 +50,8 @@ public class ValuationDetails extends VBox {
     private Label catalogPriceLabel;
     @FXML
     private Label recommendedPriceLabel;
+    @FXML
+    private Label recommendedPricePercentageLabel;
     @FXML
     private TableView<Auction> historyTable;
     @FXML
@@ -135,18 +144,20 @@ public class ValuationDetails extends VBox {
         setMoneyLabel(catalogPriceLabel, valuation.getCatalogValue(), null, null);
         setMoneyLabel(recommendedPriceLabel, valuation.getRecommendedPrice(),
                 valuation.getCategoryAveragePrice(), valuation.getCatalogValue());
-        recommendedPriceLabel.setStyle("-fx-font-weight: bold;" + recommendedPriceLabel.getStyle());
 
-        if (valuation.getCategoryAveragePercentage() != null) {
-            categoryAveragePercentageLabel.setText(
-                    String.format(java.util.Locale.ROOT, "%.0f%%",
-                            valuation.getCategoryAveragePercentage() * 100.0));
-            if (valuation.getCategoryAveragePercentage() > 1.0) {
-                categoryAveragePercentageLabel.setStyle("-fx-text-fill: red;");
-            }
-        } else {
-            categoryAveragePercentageLabel.setText("-");
-        }
+        setPercentageLabel(categoryAveragePercentageLabel, valuation.getCategoryAveragePercentage(), null);
+        setPercentageLabel(minPricePercentageLabel, valuation.getMinPrice(), valuation.getCatalogValue(),
+                valuation.getCategoryAveragePercentage());
+        setPercentageLabel(maxPricePercentageLabel, valuation.getMaxPrice(), valuation.getCatalogValue(),
+                valuation.getCategoryAveragePercentage());
+        setPercentageLabel(avgPricePercentageLabel, valuation.getAveragePrice(), valuation.getCatalogValue(),
+                valuation.getCategoryAveragePercentage());
+        setPercentageLabel(recommendedPricePercentageLabel, valuation.getRecommendedPrice(),
+                valuation.getCatalogValue(),
+                valuation.getCategoryAveragePercentage());
+
+        recommendedPriceLabel.setStyle("-fx-font-weight: bold;" + recommendedPriceLabel.getStyle());
+        recommendedPricePercentageLabel.setStyle("-fx-font-weight: bold;" + recommendedPriceLabel.getStyle());
     }
 
     private String formatMoney(MultiCurrencyMonetaryAmount amount) {
@@ -162,6 +173,39 @@ public class ValuationDetails extends VBox {
                                MultiCurrencyMonetaryAmount warningThreshold,
                                MultiCurrencyMonetaryAmount criticalThreshold) {
         label.setText(formatMoney(amount));
+        formatThresholdLabel(label, amount, warningThreshold, criticalThreshold);
+    }
+
+    private void setPercentageLabel(Label label, MultiCurrencyMonetaryAmount value, MultiCurrencyMonetaryAmount ref,
+                                    Double warningPercentage) {
+        if (value == null || ref == null) {
+            return;
+        }
+        BigDecimal valueNumber = value.defaultCurrencyAmount().getNumber().numberValue(BigDecimal.class);
+        BigDecimal refNumber = ref.defaultCurrencyAmount().getNumber().numberValue(BigDecimal.class);
+        if (refNumber.equals(BigDecimal.ZERO)) {
+            return;
+        }
+        Double percentage = valueNumber.divide(refNumber, 6, RoundingMode.HALF_UP).doubleValue();
+        setPercentageLabel(label, percentage, warningPercentage);
+    }
+
+    private void setPercentageLabel(Label label, Double percentage, Double warningPercentage) {
+        if (percentage != null) {
+            label.setText(String.format(java.util.Locale.ROOT, "(%.0f%%)", percentage * 100.0));
+            if (percentage > 1.0) {
+                label.setStyle("-fx-text-fill: red;");
+            } else if (warningPercentage != null && percentage > warningPercentage) {
+                label.setStyle("-fx-text-fill: orange;");
+            }
+        } else {
+            label.setText("");
+        }
+    }
+
+    private void formatThresholdLabel(Label label, MultiCurrencyMonetaryAmount amount,
+                                      MultiCurrencyMonetaryAmount warningThreshold,
+                                      MultiCurrencyMonetaryAmount criticalThreshold) {
         if (amount == null) {
             return;
         }

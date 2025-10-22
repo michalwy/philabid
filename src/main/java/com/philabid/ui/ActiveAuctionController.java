@@ -5,7 +5,6 @@ import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Auction;
 import com.philabid.model.CatalogValue;
 import com.philabid.ui.cell.EndingDateCell;
-import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
 import com.philabid.ui.control.CrudEditDialog;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
@@ -15,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -26,6 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import static com.philabid.ui.util.TableViewHelpers.setPriceWithThresholdColumn;
 import static com.philabid.ui.util.TableViewHelpers.setUrlColumn;
 
 public class ActiveAuctionController extends BaseAuctionController {
@@ -34,9 +33,8 @@ public class ActiveAuctionController extends BaseAuctionController {
 
     @FXML
     protected TableColumn<Auction, String> urlColumn;
-
     @FXML
-    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> maxBidColumn;
+    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> recommendedPriceColumn;
 
     @Override
     public Collection<Auction> loadAuctions(Collection<FilterCondition> filterConditions) {
@@ -49,17 +47,13 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         setUrlColumn(urlColumn, "url");
 
-        maxBidColumn.setCellValueFactory(new PropertyValueFactory<>("maxBid"));
-        maxBidColumn.setCellFactory(column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(
-                Auction::getRecommendedPrice,
-                Auction::getCatalogValue));
+        endDateColumn.setCellFactory(column -> new EndingDateCell<>());
+
+        setPriceWithThresholdColumn(recommendedPriceColumn, "recommendedPrice", Auction::getCatalogValue,
+                Auction::getCatalogValue);
 
         addRowFormatter((row, auction, empty) -> {
-            row.setStyle("");
-            // Always remove classes first to handle row reuse
-            row.getStyleClass().remove("winning-auction");
             row.getStyleClass().remove("expired-auction");
-            row.getStyleClass().remove("overpriced-auction");
 
             if (empty || auction == null) {
                 return;
@@ -68,18 +62,7 @@ public class ActiveAuctionController extends BaseAuctionController {
             if (auction.isFinished()) {
                 row.getStyleClass().add("expired-auction");
             }
-
-            if (auction.getMaxBid() != null && auction.getCurrentPrice() != null && auction.getMaxBid().originalAmount()
-                    .isGreaterThanOrEqualTo(auction.getCurrentPrice().originalAmount())) {
-                row.getStyleClass().add("winning-auction");
-            } else if (auction.getCurrentPrice() != null && auction.getRecommendedPrice() != null &&
-                    auction.getCurrentPrice().defaultCurrencyAmount()
-                            .isGreaterThan(auction.getRecommendedPrice().defaultCurrencyAmount())) {
-                row.getStyleClass().add("overpriced-auction");
-            }
         });
-
-        endDateColumn.setCellFactory(column -> new EndingDateCell<>());
 
         Platform.runLater(() -> {
             endDateColumn.setSortType(TableColumn.SortType.ASCENDING);
