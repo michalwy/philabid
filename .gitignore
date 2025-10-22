@@ -76,3 +76,4 @@ philabid-config.json
 *.sqlite
 
 .resourceCache/
+backups/

@@ -37,6 +37,8 @@ public class PhilabidApplication extends Application {
 
         AppContext.get().init(getHostServices());
 
+        AppContext.getDatabaseBackupService().performBackup();
+
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
         fxmlLoader.setResources(AppContext.getI18nManager().getResourceBundle());

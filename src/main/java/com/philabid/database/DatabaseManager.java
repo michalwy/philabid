@@ -16,62 +16,66 @@ import java.sql.SQLException;
  * Handles database initialization, schema migrations using Flyway, and connection management.
  */
 public class DatabaseManager {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(DatabaseManager.class);
     private static final String DATABASE_FILE = "philabid.db";
     private static final String DATABASE_URL = "jdbc:sqlite:" + DATABASE_FILE;
-    
+
     /**
      * Initializes the database, creating the file if it doesn't exist and running migrations.
      */
     public void initialize() throws SQLException {
         logger.info("Initializing database at: {}", DATABASE_FILE);
-        
+
         try {
             // Ensure database directory exists
             Path dbPath = Paths.get(DATABASE_FILE).getParent();
             if (dbPath != null && !Files.exists(dbPath)) {
                 Files.createDirectories(dbPath);
             }
-            
+
             // Load SQLite JDBC driver
             Class.forName("org.sqlite.JDBC");
-            
+
             // Run Flyway migrations
             runMigrations();
-            
+
             logger.info("Database initialization completed successfully");
-            
         } catch (Exception e) {
             logger.error("Failed to initialize database", e);
             throw new SQLException("Database initialization failed", e);
         }
     }
-    
+
     /**
      * Runs database migrations using Flyway.
      */
     private void runMigrations() {
         logger.info("Running database migrations...");
-        
+
         Flyway flyway = Flyway.configure()
-            .dataSource(DATABASE_URL, null, null)
-            .locations("classpath:db/migration")
-            .load();
-        
+                .dataSource(DATABASE_URL, null, null)
+                .locations("classpath:db/migration")
+                .load();
+
         flyway.migrate();
-        
+
         logger.info("Database migrations completed successfully");
     }
-    
+
     /**
      * Gets a database connection.
-     * 
+     *
      * @return active database connection
      * @throws SQLException if connection is not available
      */
     public Connection getConnection() throws SQLException {
         // Always return a new connection. The calling code (using try-with-resources) is responsible for closing it.
         return DriverManager.getConnection(DATABASE_URL);
+    }
+
+    public Path getDatabasePath() {
+        Path relativeOrAbsolutePath = Path.of(DATABASE_URL.substring("jdbc:sqlite:".length()));
+        return relativeOrAbsolutePath.toAbsolutePath();
     }
 }
