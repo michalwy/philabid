@@ -2,8 +2,11 @@ package com.philabid.ui.control;
 
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
+import com.philabid.model.Valuation;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +28,7 @@ import static com.philabid.ui.util.TableViewHelpers.*;
 public class ValuationDetails extends VBox {
 
     private static final Logger logger = LoggerFactory.getLogger(ValuationDetails.class);
-
+    private final ObjectProperty<MultiCurrencyMonetaryAmount> selectedPrice = new SimpleObjectProperty<>(null);
     @FXML
     private Label minPriceLabel;
     @FXML
@@ -50,6 +53,8 @@ public class ValuationDetails extends VBox {
     private TableColumn<Auction, LocalDateTime> endDateColumn;
     @FXML
     private TableColumn<Auction, MultiCurrencyMonetaryAmount> finalPriceColumn;
+
+    private Valuation valuation;
 
     public ValuationDetails() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/control/ValuationDetails.fxml"));
@@ -77,38 +82,71 @@ public class ValuationDetails extends VBox {
             endDateColumn.setSortType(TableColumn.SortType.DESCENDING);
             historyTable.getSortOrder().setAll(List.of(endDateColumn));
         });
+
+        recommendedPriceLabel.setOnMouseClicked(event -> {
+            if (valuation != null) {
+                selectedPrice.set(valuation.getRecommendedPrice());
+            }
+        });
+        minPriceLabel.setOnMouseClicked(event -> {
+            if (valuation != null) {
+                selectedPrice.set(valuation.getMinPrice());
+            }
+        });
+        maxPriceLabel.setOnMouseClicked(event -> {
+            if (valuation != null) {
+                selectedPrice.set(valuation.getMaxPrice());
+            }
+        });
+        catalogPriceLabel.setOnMouseClicked(event -> {
+            if (valuation != null) {
+                selectedPrice.set(valuation.getCatalogValue());
+            }
+        });
+        categoryAveragePriceLabel.setOnMouseClicked(event -> {
+            if (valuation != null) {
+                selectedPrice.set(valuation.getCategoryAveragePrice());
+            }
+        });
+        avgPriceLabel.setOnMouseClicked(event -> {
+            if (valuation != null) {
+                selectedPrice.set(valuation.getAveragePrice());
+            }
+        });
     }
 
     public void setAuctionItem(Long auctionItemId, Long conditionId) {
         historyTable.setItems(FXCollections.observableArrayList(AppContext.getAuctionService()
                 .getArchivedAuctionsForItem(auctionItemId, conditionId)));
 
-        AppContext.getValuationService().getForItem(auctionItemId, conditionId)
-                .ifPresent(valuation -> {
-                    setMoneyLabel(minPriceLabel, valuation.getMinPrice(), valuation.getCategoryAveragePrice(),
-                            valuation.getCatalogValue());
-                    setMoneyLabel(maxPriceLabel, valuation.getMaxPrice(), valuation.getCategoryAveragePrice(),
-                            valuation.getCatalogValue());
-                    setMoneyLabel(avgPriceLabel, valuation.getAveragePrice(), valuation.getCategoryAveragePrice(),
-                            valuation.getCatalogValue());
-                    setMoneyLabel(categoryAveragePriceLabel, valuation.getCategoryAveragePrice(),
-                            valuation.getCatalogValue(), valuation.getCatalogValue());
-                    setMoneyLabel(catalogPriceLabel, valuation.getCatalogValue(), null, null);
-                    setMoneyLabel(recommendedPriceLabel, valuation.getRecommendedPrice(),
-                            valuation.getCategoryAveragePrice(), valuation.getCatalogValue());
-                    recommendedPriceLabel.setStyle("-fx-font-weight: bold;" + recommendedPriceLabel.getStyle());
+        valuation = AppContext.getValuationService().getForItem(auctionItemId, conditionId).orElse(null);
+        if (valuation == null) {
+            return;
+        }
 
-                    if (valuation.getCategoryAveragePercentage() != null) {
-                        categoryAveragePercentageLabel.setText(
-                                String.format(java.util.Locale.ROOT, "%.0f%%",
-                                        valuation.getCategoryAveragePercentage() * 100.0));
-                        if (valuation.getCategoryAveragePercentage() > 1.0) {
-                            categoryAveragePercentageLabel.setStyle("-fx-text-fill: red;");
-                        }
-                    } else {
-                        categoryAveragePercentageLabel.setText("-");
-                    }
-                });
+        setMoneyLabel(minPriceLabel, valuation.getMinPrice(), valuation.getCategoryAveragePrice(),
+                valuation.getCatalogValue());
+        setMoneyLabel(maxPriceLabel, valuation.getMaxPrice(), valuation.getCategoryAveragePrice(),
+                valuation.getCatalogValue());
+        setMoneyLabel(avgPriceLabel, valuation.getAveragePrice(), valuation.getCategoryAveragePrice(),
+                valuation.getCatalogValue());
+        setMoneyLabel(categoryAveragePriceLabel, valuation.getCategoryAveragePrice(),
+                valuation.getCatalogValue(), valuation.getCatalogValue());
+        setMoneyLabel(catalogPriceLabel, valuation.getCatalogValue(), null, null);
+        setMoneyLabel(recommendedPriceLabel, valuation.getRecommendedPrice(),
+                valuation.getCategoryAveragePrice(), valuation.getCatalogValue());
+        recommendedPriceLabel.setStyle("-fx-font-weight: bold;" + recommendedPriceLabel.getStyle());
+
+        if (valuation.getCategoryAveragePercentage() != null) {
+            categoryAveragePercentageLabel.setText(
+                    String.format(java.util.Locale.ROOT, "%.0f%%",
+                            valuation.getCategoryAveragePercentage() * 100.0));
+            if (valuation.getCategoryAveragePercentage() > 1.0) {
+                categoryAveragePercentageLabel.setStyle("-fx-text-fill: red;");
+            }
+        } else {
+            categoryAveragePercentageLabel.setText("-");
+        }
     }
 
     private String formatMoney(MultiCurrencyMonetaryAmount amount) {
@@ -134,5 +172,9 @@ public class ValuationDetails extends VBox {
                 amount.defaultCurrencyAmount().isGreaterThan(warningThreshold.defaultCurrencyAmount())) {
             label.setStyle("-fx-text-fill: orange;");
         }
+    }
+
+    public ObjectProperty<MultiCurrencyMonetaryAmount> selectedPrice() {
+        return selectedPrice;
     }
 }

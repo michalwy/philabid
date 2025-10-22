@@ -41,6 +41,16 @@ public class AuctionStateDialogController {
     private EditDialogResult editDialogResult;
     private boolean initiallyArchived;
 
+    @FXML
+    private void initialize() {
+        valuationDetails.selectedPrice().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                maxBid.setAmount(newValue.originalAmount());
+                maxBidCurrencyLabel.setText(newValue.getOriginalCurrency().getCurrencyCode());
+            }
+        });
+    }
+
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
