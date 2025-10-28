@@ -109,6 +109,10 @@ public class CrudTableView<T extends BaseModel<T>> extends VBox {
         crudToolbar.setDeleteAction(handler);
     }
 
+    public void setRefreshAction(EventHandler<ActionEvent> handler) {
+        crudToolbar.setRefreshAction(handler);
+    }
+
     public void bindButtonsDisabledProperty(BooleanBinding binding) {
         crudToolbar.bindButtonsDisabledProperty(binding);
     }

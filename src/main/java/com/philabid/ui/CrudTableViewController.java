@@ -45,13 +45,18 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         initializeFilterToolbar();
         setRowFactories();
         setupContextMenu();
-        refreshTable();
     }
 
+    @Override
     protected void refreshTable() {
         logger.info("Refreshing table view");
         tableItems.setAll(loadTableItems());
         crudTableView.sort();
+    }
+
+    @Override
+    public void unload() {
+        tableItems.clear();
     }
 
     protected void initializeView() {
@@ -61,6 +66,7 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         crudTableView.setAddAction(e -> handleAdd());
         crudTableView.setEditAction(e -> handleEdit());
         crudTableView.setDeleteAction(e -> handleDelete());
+        crudTableView.setRefreshAction(e -> refreshTable());
         crudTableView.bindButtonsDisabledProperty(
                 crudTableView.getTableView().getSelectionModel().selectedItemProperty().isNull());
     }

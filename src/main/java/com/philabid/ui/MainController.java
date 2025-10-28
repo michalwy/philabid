@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-    private final Map<Tab, TableViewController> tabControllerMap = new HashMap<>();
+    private final Map<Tab, RefreshableViewController> tabControllerMap = new HashMap<>();
     // FXML Injected Fields from main.fxml
     @FXML
     private BorderPane rootPane;
@@ -79,10 +79,6 @@ public class MainController implements Initializable {
     private Tab catalogValuesTab;
     @FXML
     private StatusBar statusBar;
-    @FXML
-    private Label welcomeLabel;
-    @FXML
-    private TextArea logTextArea;
     // Injected controllers from included FXML files
     @FXML
     private AuctionItemController auctionItemViewController;
@@ -94,6 +90,8 @@ public class MainController implements Initializable {
     private ArchivedAuctionController archivedAuctionViewController;
     @FXML
     private ValuationViewController valuationViewController;
+    @FXML
+    private DashboardController dashboardViewController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -110,17 +108,6 @@ public class MainController implements Initializable {
         // Initialize UI components
         setupStatusBar();
         setupMenuActions();
-
-        // Add welcome message
-        if (welcomeLabel != null) {
-            welcomeLabel.setText("Welcome to Philabid - Stamp Auction Bidding Assistant");
-        }
-
-        // Setup log area
-        if (logTextArea != null) {
-            logTextArea.setEditable(false);
-            addLogMessage("Application started successfully");
-        }
 
         initializeTabControllerMap();
         updateLocalizedStrings();
@@ -151,10 +138,15 @@ public class MainController implements Initializable {
     private void setupTabListeners() {
         mainTabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab != null) {
-                TableViewController controller = tabControllerMap.get(newTab);
-                if (controller != null) {
+                RefreshableViewController newController = tabControllerMap.get(newTab);
+                if (newController != null) {
                     logger.info("'{}' tab selected, refreshing data.", newTab.getText());
-                    controller.refreshTable();
+                    newController.refresh();
+                }
+
+                RefreshableViewController oldController = tabControllerMap.get(oldTab);
+                if (oldController != null) {
+                    oldController.unload();
                 }
             }
         });
@@ -166,6 +158,7 @@ public class MainController implements Initializable {
         tabControllerMap.put(valuationTab, valuationViewController);
         tabControllerMap.put(auctionItemsTab, auctionItemViewController);
         tabControllerMap.put(catalogValuesTab, catalogValueViewController);
+        tabControllerMap.put(dashboardTab, dashboardViewController);
     }
 
     /**
@@ -302,8 +295,6 @@ public class MainController implements Initializable {
             valuationTab.setText(AppContext.getI18nManager().getString("tab.valuation"));
             auctionItemsTab.setText(AppContext.getI18nManager().getString("tab.auctionItems"));
             catalogValuesTab.setText(AppContext.getI18nManager().getString("tab.catalogValues"));
-
-            welcomeLabel.setText(AppContext.getI18nManager().getString("welcome.message"));
         } catch (Exception e) {
             logger.warn("Error updating localized strings", e);
         }
@@ -325,14 +316,5 @@ public class MainController implements Initializable {
                 "An open-source, multilingual JavaFX desktop application\n" +
                 "for stamp auction bidding assistance.");
         alert.showAndWait();
-    }
-
-    private void addLogMessage(String message) {
-        if (logTextArea != null) {
-            Platform.runLater(() -> {
-                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-                logTextArea.appendText(String.format("[%s] %s%n", timestamp, message));
-            });
-        }
     }
 }

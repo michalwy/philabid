@@ -19,6 +19,8 @@ public class CrudToolbar extends ToolBar {
     private Button editButton;
     @FXML
     private Button deleteButton;
+    @FXML
+    private Button refreshButton;
 
     public CrudToolbar() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/control/CrudToolbar.fxml"));
@@ -45,6 +47,10 @@ public class CrudToolbar extends ToolBar {
         deleteButton.setOnAction(handler);
     }
 
+    public void setRefreshAction(EventHandler<ActionEvent> handler) {
+        refreshButton.setOnAction(handler);
+    }
+    
     public void bindButtonsDisabledProperty(BooleanBinding binding) {
         editButton.disableProperty().bind(binding);
         deleteButton.disableProperty().bind(binding);

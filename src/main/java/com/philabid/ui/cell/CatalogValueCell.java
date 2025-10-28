@@ -12,12 +12,12 @@ import java.util.function.Function;
 public class CatalogValueCell<T> extends MultiCurrencyMonetaryAmountCell<T> {
 
     private final Function<T, MultiCurrencyMonetaryAmount> valueGetter;
-    private final Function<T, Boolean> activeStatueGetter;
+    private final Function<T, Boolean> activeStatusGetter;
 
     public CatalogValueCell(Function<T, MultiCurrencyMonetaryAmount> valueGetter,
                             Function<T, Boolean> activeStatusGetter) {
         this.valueGetter = valueGetter;
-        this.activeStatueGetter = activeStatusGetter;
+        this.activeStatusGetter = activeStatusGetter;
 
         // A simple warning/info icon
         getIcon().setContent(
@@ -33,6 +33,6 @@ public class CatalogValueCell<T> extends MultiCurrencyMonetaryAmountCell<T> {
 
         // Show the icon only if the auction exists and its catalog is inactive
         getIcon().setVisible(
-                !empty && entity != null && valueGetter.apply(entity) != null && !activeStatueGetter.apply(entity));
+                !empty && entity != null && valueGetter.apply(entity) != null && !activeStatusGetter.apply(entity));
     }
 }
