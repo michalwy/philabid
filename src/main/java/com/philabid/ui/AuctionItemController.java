@@ -2,7 +2,7 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.AuctionItem;
-import com.philabid.ui.util.CatalogNumberColumnValue;
+import com.philabid.ui.cell.CatalogNumberColumnValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;

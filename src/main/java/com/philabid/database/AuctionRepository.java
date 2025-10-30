@@ -121,8 +121,16 @@ public class AuctionRepository extends CrudRepository<Auction> {
     }
 
     public Collection<Auction> findArchivedByItemAndCondition(Long auctionItemId, Long conditionId) {
+        return findByItemAndCondition(auctionItemId, conditionId, true);
+    }
+
+    public Collection<Auction> findActiveByItemAndCondition(Long auctionItemId, Long conditionId) {
+        return findByItemAndCondition(auctionItemId, conditionId, false);
+    }
+
+    private Collection<Auction> findByItemAndCondition(Long auctionItemId, Long conditionId, boolean isArchived) {
         return findMany(
-                List.of(new EqualFilterCondition<>("a.archived", true),
+                List.of(new EqualFilterCondition<>("a.archived", isArchived),
                         new EqualFilterCondition<>("a.auction_item_id", auctionItemId),
                         new EqualFilterCondition<>("a.condition_id", conditionId)),
                 List.of(),

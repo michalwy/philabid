@@ -36,4 +36,5 @@ module philabid {
     opens com.philabid.ui.control to javafx.fxml;
     exports com.philabid.database.util;
     opens com.philabid.database.util to javafx.fxml;
+    exports com.philabid.ui.cell;
 }

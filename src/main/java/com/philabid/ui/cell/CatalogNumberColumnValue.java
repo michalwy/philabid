@@ -1,4 +1,4 @@
-package com.philabid.ui.util;
+package com.philabid.ui.cell;
 
 import org.jetbrains.annotations.NotNull;
 

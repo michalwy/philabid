@@ -1,10 +1,7 @@
 package com.philabid.ui.util;
 
 import com.philabid.AppContext;
-import com.philabid.ui.cell.CatalogValueCell;
-import com.philabid.ui.cell.MultiCurrencyMonetaryAmountCell;
-import com.philabid.ui.cell.RightAlignedDateCell;
-import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
+import com.philabid.ui.cell.*;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.TableCell;
@@ -28,6 +25,17 @@ public class TableViewHelpers {
         catalogNumberColumn.setCellValueFactory(
                 CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter));
         catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
+    }
+
+    public static <T> void setCatalogNumberWithWarningColumn(
+            TableColumn<T, CatalogNumberColumnValue> catalogNumberColumn,
+            Function<T, String> catalogNumberGetter,
+            Function<T, Long> orderNumberGetter,
+            Function<T, Boolean> warningGetter) {
+        catalogNumberColumn.setCellValueFactory(
+                CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter));
+        catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
+        catalogNumberColumn.setCellFactory(column -> new CatalogNumberWithWarningItemCell<>(warningGetter));
     }
 
     public static <T> void setConditionColumn(TableColumn<T, String> conditionColumn,

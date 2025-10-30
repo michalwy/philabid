@@ -40,7 +40,8 @@ public class Auction extends BaseModel<Auction> {
     private MultiCurrencyMonetaryAmount recommendedPrice;
 
     private List<Auction> archivedAuctions;
-    private List<Auction> categoryArchivedAuction;
+    private List<Auction> categoryArchivedAuctions;
+    private List<Auction> activeAuctions;
 
     public Auction() {
         this.archived = false;
@@ -255,12 +256,20 @@ public class Auction extends BaseModel<Auction> {
         this.archivedAuctions = archivedAuctions;
     }
 
-    public List<Auction> getCategoryArchivedAuction() {
-        return categoryArchivedAuction;
+    public List<Auction> getCategoryArchivedAuctions() {
+        return categoryArchivedAuctions;
     }
 
-    public void setCategoryArchivedAuction(List<Auction> categoryArchivedAuction) {
-        this.categoryArchivedAuction = categoryArchivedAuction;
+    public void setCategoryArchivedAuctions(List<Auction> categoryArchivedAuctions) {
+        this.categoryArchivedAuctions = categoryArchivedAuctions;
+    }
+
+    public List<Auction> getActiveAuctions() {
+        return activeAuctions;
+    }
+
+    public void setActiveAuctions(List<Auction> activeAuctions) {
+        this.activeAuctions = activeAuctions;
     }
 
     public CurrencyUnit getAuctionHouseCurrency() {

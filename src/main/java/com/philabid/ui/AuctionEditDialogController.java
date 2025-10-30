@@ -1,10 +1,7 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
-import com.philabid.model.Auction;
-import com.philabid.model.AuctionHouse;
-import com.philabid.model.AuctionStatus;
-import com.philabid.model.Condition;
+import com.philabid.model.*;
 import com.philabid.ui.control.AuctionItemSelector;
 import com.philabid.ui.control.MonetaryField;
 import javafx.application.Platform;
@@ -61,6 +58,8 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     private TextField endTimeField;
     @FXML
     private CheckBox archivedCheckBox;
+    @FXML
+    private Label multipleAuctionsWarningLabel;
 
     private boolean saveClicked = false;
     private boolean initiallyArchived;
@@ -140,6 +139,14 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
             }
         });
 
+        conditionComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            verifyActiveAuctions();
+        });
+
+        auctionItemSelector.selectedAuctionItemProperty().addListener((obs, oldVal, newVal) -> {
+            verifyActiveAuctions();
+        });
+
         populateComboBoxes();
     }
 
@@ -206,6 +213,8 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
         }
         archivedCheckBox.setSelected(auction.isArchived());
         initiallyArchived = auction.isArchived();
+
+        verifyActiveAuctions();
     }
 
     public boolean isSaveClicked() {
@@ -305,5 +314,21 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
                 logger.info("Fields populated from URL data.");
             });
         });
+    }
+
+    void verifyActiveAuctions() {
+        AuctionItem auctionItem = auctionItemSelector.selectedAuctionItemProperty().getValue();
+        Condition condition = conditionComboBox.getSelectionModel().getSelectedItem();
+
+        if (auctionItem == null || condition == null) {
+            multipleAuctionsWarningLabel.setVisible(false);
+            return;
+        }
+
+        Collection<Auction> auctions =
+                AppContext.getAuctionService().getActiveAuctionsForItem(auctionItem.getId(), condition.getId());
+
+        multipleAuctionsWarningLabel.setVisible(
+                auctions.stream().anyMatch(a -> !a.getId().equals(getEntity().getId())));
     }
 }

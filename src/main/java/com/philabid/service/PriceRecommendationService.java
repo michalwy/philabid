@@ -40,7 +40,7 @@ public class PriceRecommendationService {
         if (auction.getCatalogValue() == null) {
             return Optional.empty();
         }
-        return auction.getCategoryArchivedAuction().stream()
+        return auction.getCategoryArchivedAuctions().stream()
                 .map(Auction::getArchivedCatalogValuePercentage)
                 .filter(d -> d != null && d > 0)
                 .map(p -> Pair.with(p, 1))

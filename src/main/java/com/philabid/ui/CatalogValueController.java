@@ -2,7 +2,7 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.CatalogValue;
-import com.philabid.ui.util.CatalogNumberColumnValue;
+import com.philabid.ui.cell.CatalogNumberColumnValue;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;

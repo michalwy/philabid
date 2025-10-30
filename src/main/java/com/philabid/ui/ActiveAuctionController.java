@@ -24,8 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import static com.philabid.ui.util.TableViewHelpers.setPriceWithThresholdColumn;
-import static com.philabid.ui.util.TableViewHelpers.setUrlColumn;
+import static com.philabid.ui.util.TableViewHelpers.*;
 
 public class ActiveAuctionController extends BaseAuctionController {
 
@@ -51,6 +50,9 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         setPriceWithThresholdColumn(recommendedPriceColumn, "recommendedPrice", Auction::getCatalogValue,
                 Auction::getCatalogValue);
+
+        setCatalogNumberWithWarningColumn(catalogNumberColumn, Auction::getAuctionItemCatalogNumber,
+                Auction::getAuctionItemOrderNumber, t -> t.getActiveAuctions().size() > 1);
 
         addRowFormatter((row, auction, empty) -> {
             row.getStyleClass().remove("expired-auction");

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Service layer for managing Auctions.
@@ -30,8 +31,14 @@ public class AuctionService extends AbstractCrudService<Auction> {
         Map<Long, List<Auction>> auctionsArchiveMap = auctionRepository.findArchivedForActiveAuctions();
         Map<Pair<Long, Long>, List<Auction>> categoriesArchiveMap =
                 auctionRepository.findArchivedForActiveCategories();
+
+        Map<Pair<Long, Long>, List<Auction>> auctionsActiveMap =
+                auctions.stream()
+                        .collect(Collectors.groupingBy(a -> Pair.with(a.getAuctionItemId(), a.getConditionId())));
+
         auctionsArchiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);
-        auctions.forEach(auction -> enrichAuction(auction, auctionsArchiveMap, categoriesArchiveMap));
+        auctions.forEach(
+                auction -> enrichAuction(auction, auctionsArchiveMap, categoriesArchiveMap, auctionsActiveMap));
         return auctions;
     }
 
@@ -47,6 +54,12 @@ public class AuctionService extends AbstractCrudService<Auction> {
         return auctions;
     }
 
+    public Collection<Auction> getActiveAuctionsForItem(Long auctionItemId, Long conditionId) {
+        Collection<Auction> auctions = auctionRepository.findActiveByItemAndCondition(auctionItemId, conditionId);
+        auctions.forEach(this::enrichAuction);
+        return auctions;
+    }
+
     protected boolean validate(Auction auction) {
         if (auction.getAuctionHouseId() == null || auction.getAuctionItemId() == null ||
                 auction.getConditionId() == null) {
@@ -57,11 +70,12 @@ public class AuctionService extends AbstractCrudService<Auction> {
     }
 
     private void enrichAuction(Auction auction) {
-        enrichAuction(auction, Map.of(), Map.of());
+        enrichAuction(auction, Map.of(), Map.of(), Map.of());
     }
 
     private void enrichAuction(Auction auction, Map<Long, List<Auction>> auctionArchiveMap,
-                               Map<Pair<Long, Long>, List<Auction>> categoryArchiveMap) {
+                               Map<Pair<Long, Long>, List<Auction>> categoryArchiveMap,
+                               Map<Pair<Long, Long>, List<Auction>> activeAuctionsMap) {
         // This is where we calculate derived properties after the main DB query is closed.
         // This prevents database locks by separating read and potential write (cache) operations.
         if (auction.getCurrentPrice() != null) {
@@ -73,8 +87,11 @@ public class AuctionService extends AbstractCrudService<Auction> {
         if (auction.getCatalogValue() != null) {
             auction.setCatalogValue(auction.getCatalogValue().originalAmount());
         }
+        auction.setActiveAuctions(
+                activeAuctionsMap.getOrDefault(Pair.with(auction.getAuctionItemId(), auction.getConditionId()),
+                        List.of()));
         auction.setArchivedAuctions(auctionArchiveMap.getOrDefault(auction.getId(), List.of()));
-        auction.setCategoryArchivedAuction(
+        auction.setCategoryArchivedAuctions(
                 categoryArchiveMap.getOrDefault(Pair.with(auction.getAuctionItemCategoryId(), auction.getConditionId()),
                         List.of()));
         auction.setRecommendedPrice(

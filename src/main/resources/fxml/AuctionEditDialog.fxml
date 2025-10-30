@@ -29,17 +29,21 @@
         <Label text="%auctions.label.condition" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
         <ComboBox fx:id="conditionComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
-        <Label text="%auctions.label.lotId" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-        <TextField fx:id="lotIdField" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        <Label fx:id="multipleAuctionsWarningLabel" text="Active auctions for this item and condition already exist."
+               GridPane.rowIndex="5"
+               GridPane.columnIndex="1" style="-fx-text-fill: orange"/>
 
-        <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-        <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <Label text="%auctions.label.lotId" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+        <TextField fx:id="lotIdField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
-        <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
-        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+        <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+        <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
-        <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
-        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="8">
+        <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+
+        <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="9">
             <DatePicker fx:id="endDatePicker" HBox.hgrow="ALWAYS"/>
             <TextField fx:id="endTimeField" promptText="HH:mm" prefWidth="80"/>
         </HBox>
