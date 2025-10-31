@@ -7,12 +7,12 @@ import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Valuation;
 import com.philabid.model.ValuationEntry;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
+import org.javamoney.moneta.Money;
 import org.javamoney.moneta.function.MonetaryOperators;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.money.CurrencyUnit;
 import javax.money.MonetaryAmount;
 import java.math.RoundingMode;
 import java.util.*;
@@ -61,7 +61,7 @@ public class ValuationService extends VirtualCrudService<Valuation> {
         categoryAveragePercentageEntries.forEach((k, v) -> {
             v.stream()
                     .filter(Objects::nonNull)
-                    .filter(p -> p > 0)
+                    .filter(p -> p > 0 && p < AppContext.getConfigurationService().getMaxPriceCatalogValueMultiplier())
                     .map(p -> Pair.with(p, 1))
                     .reduce((a, b) -> Pair.with(a.getValue0() + b.getValue0(), a.getValue1() + b.getValue1()))
                     .ifPresent(p -> categoryAveragePercentages.put(k, p.getValue0() / p.getValue1()));
@@ -79,11 +79,14 @@ public class ValuationService extends VirtualCrudService<Valuation> {
     }
 
     private void calculateStatistics(Valuation valuation, Map<Pair<Long, Long>, Double> categoryAveragePercentages) {
-        CurrencyUnit defaultCurrency = AppContext.getConfigurationService().getDefaultCurrency();
+        Optional<Pair<MonetaryAmount, MonetaryAmount>> catalogBoundary = getCatalogBoundary(valuation);
+
         valuation.getValuationEntries().stream()
                 .map(ValuationEntry::getPrice)
                 .filter(Objects::nonNull)
                 .map(MultiCurrencyMonetaryAmount::defaultCurrencyAmount)
+                .filter(m -> catalogBoundary.map(cv -> m.isGreaterThan(cv.getValue0()) && m.isLessThan(cv.getValue1()))
+                        .orElse(true))
                 .map(p -> new StatsReductor(p, p, p, 1))
                 .reduce((a, b) -> new StatsReductor(a.sum.add(b.sum), a.min.isLessThan(b.min) ? a.min : b.min,
                         a.max.isGreaterThan(b.max) ? a.max : b.max, a.count() + 1))
@@ -107,6 +110,13 @@ public class ValuationService extends VirtualCrudService<Valuation> {
         }
         AppContext.getPriceRecommendationService().calculateRecommendation(valuation)
                 .ifPresent(valuation::setRecommendedPrice);
+    }
+
+    private Optional<Pair<MonetaryAmount, MonetaryAmount>> getCatalogBoundary(Valuation valuation) {
+        return Optional.ofNullable(valuation.getCatalogValue())
+                .map(MultiCurrencyMonetaryAmount::defaultCurrencyAmount)
+                .map(cv -> Pair.with(Money.of(0, AppContext.getConfigurationService().getDefaultCurrency()),
+                        cv.multiply(AppContext.getConfigurationService().getMaxPriceCatalogValueMultiplier())));
     }
 
     @Override

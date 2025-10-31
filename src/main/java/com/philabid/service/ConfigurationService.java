@@ -209,6 +209,10 @@ public class ConfigurationService {
         return Monetary.getCurrency(defaultCurrencyCode);
     }
 
+    public double getMaxPriceCatalogValueMultiplier() {
+        return 3.0;
+    }
+
     public int getRecommendationAnalysisDays() {
         return getInt("auction.recommendationAnalysisDays", 90);
     }

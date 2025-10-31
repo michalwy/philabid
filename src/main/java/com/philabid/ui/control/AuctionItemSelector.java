@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A custom control for selecting an existing AuctionItem or defining a new one.
@@ -30,6 +31,7 @@ public class AuctionItemSelector extends VBox {
     private static final Logger logger = LoggerFactory.getLogger(AuctionItemSelector.class);
     private final ObjectProperty<AuctionItem> selectedAuctionItem = new SimpleObjectProperty<>(null);
     private final ObjectProperty<Category> selectedCategory = new SimpleObjectProperty<>(null);
+    private final Collection<AuctionItem> allItems = AppContext.getAuctionItemService().getAll();
     @FXML
     private TextField auctionItemField;
     @FXML
@@ -106,11 +108,16 @@ public class AuctionItemSelector extends VBox {
         AutoCompletionBinding<AuctionItemSuggestion> binding = TextFields.bindAutoCompletion(auctionItemField,
                 suggestionRequest -> {
                     String filter = suggestionRequest.getUserText().toLowerCase();
-                    Collection<AuctionItem> allItems = AppContext.getAuctionItemService().getAll();
-                    return allItems.stream()
-                            .filter(item -> item.getCatalogNumber().toLowerCase().contains(filter) ||
-                                    (item.getCategoryName() != null &&
-                                            item.getCategoryName().toLowerCase().contains(filter)))
+                    Stream<AuctionItem> items = allItems.stream();
+
+                    String[] tokens = filter.trim().toLowerCase().split("\\s+");
+                    for (String token : tokens) {
+                        items = items.filter(item -> item.getCatalogNumber().toLowerCase().contains(token) ||
+                                item.getCategoryCode().toLowerCase().contains(token) ||
+                                item.getCategoryName().toLowerCase().contains(token));
+                    }
+
+                    return items
                             .map(AuctionItemSuggestion::new)
                             .collect(Collectors.toList());
                 });
