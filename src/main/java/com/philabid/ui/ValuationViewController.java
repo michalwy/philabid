@@ -4,7 +4,6 @@ import com.philabid.AppContext;
 import com.philabid.model.CatalogValue;
 import com.philabid.model.Valuation;
 import com.philabid.ui.cell.CatalogNumberColumnValue;
-import com.philabid.ui.control.CrudEditDialog;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -142,31 +141,8 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
     }
 
     private EditDialogResult showCatalogValueEditDialog(CatalogValue catalogValue) {
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/fxml/CatalogValueEditDialog.fxml"));
-            loader.setResources(AppContext.getI18nManager().getResourceBundle());
-
-            CrudEditDialog<CatalogValue> page = loader.load();
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Add Catalog Value");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(getTableView().getScene().getWindow());
-            Scene scene = new Scene(page);
-            dialogStage.setScene(scene);
-
-            CatalogValueEditDialogController controller = loader.getController();
-            controller.setDialogStage(dialogStage);
-            controller.setEntity(catalogValue);
-
-            dialogStage.showAndWait();
-
-            return controller.getEditDialogResult();
-        } catch (IOException e) {
-            logger.error("Failed to load the catalog value edit dialog.", e);
-            return null;
-        }
+        return CatalogValueEditDialogController.showCatalogValueEditDialog(getTableView().getScene().getWindow(),
+                catalogValue);
     }
 
     private void handleShowHistoricalAuctions(Valuation selectedItem) {

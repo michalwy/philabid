@@ -47,7 +47,9 @@ public class AuctionRepository extends CrudRepository<Auction> {
             new LongQueryField<>("cond", "id", "condition_id", Auction::setConditionId),
             new StringQueryField<>("cond", "name", "condition_name", Auction::setConditionName),
             new StringQueryField<>("cond", "code", "condition_code", Auction::setConditionCode),
-            new BooleanQueryField<>("cat", "is_active", "catalog_is_active", Auction::setCatalogActive)
+            new BooleanQueryField<>("cat", "is_active", "catalog_is_active", Auction::setCatalogActive),
+            new StringQueryField<>("cat", "name", "catalog_name", Auction::setCatalogName),
+            new IntQueryField<>("cat", "issue_year", Auction::setCatalogIssueYear)
     );
 
     private static final Collection<QueryJoin> JOINS = List.of(

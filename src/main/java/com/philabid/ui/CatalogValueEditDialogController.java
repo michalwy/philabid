@@ -6,17 +6,24 @@ import com.philabid.model.CatalogValue;
 import com.philabid.model.Category;
 import com.philabid.model.Condition;
 import com.philabid.ui.control.AuctionItemSelector;
+import com.philabid.ui.control.CrudEditDialog;
 import com.philabid.ui.control.MonetaryField;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.money.CurrencyUnit;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,6 +46,34 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
     @FXML
     private ComboBox<CurrencyUnit> currencyComboBox;
     private EditDialogResult editDialogResult;
+
+    public static EditDialogResult showCatalogValueEditDialog(Window owner, CatalogValue catalogValue) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(CatalogValueEditDialogController.class.getResource("/fxml/CatalogValueEditDialog.fxml"));
+            loader.setResources(AppContext.getI18nManager().getResourceBundle());
+
+            CrudEditDialog<CatalogValue> page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Add Catalog Value");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(owner);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            CatalogValueEditDialogController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            controller.setEntity(catalogValue);
+
+            dialogStage.showAndWait();
+
+            return controller.getEditDialogResult();
+        } catch (IOException e) {
+            logger.error("Failed to load the catalog value edit dialog.", e);
+            return null;
+        }
+    }
 
     @Override
     protected void initContent() {

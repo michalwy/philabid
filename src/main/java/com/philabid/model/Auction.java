@@ -38,6 +38,8 @@ public class Auction extends BaseModel<Auction> {
     private Double archivedCatalogValuePercentage;
     private boolean catalogActive = false; // Default to true
     private MultiCurrencyMonetaryAmount recommendedPrice;
+    private String catalogName;
+    private Integer catalogIssueYear;
 
     private List<Auction> archivedAuctions;
     private List<Auction> categoryArchivedAuctions;
@@ -214,6 +216,22 @@ public class Auction extends BaseModel<Auction> {
 
     public void setCatalogActive(boolean catalogActive) {
         this.catalogActive = catalogActive;
+    }
+
+    public String getCatalogName() {
+        return catalogName;
+    }
+
+    public void setCatalogName(String catalogName) {
+        this.catalogName = catalogName;
+    }
+
+    public Integer getCatalogIssueYear() {
+        return catalogIssueYear;
+    }
+
+    public void setCatalogIssueYear(Integer catalogIssueYear) {
+        this.catalogIssueYear = catalogIssueYear;
     }
 
     public boolean isArchived() {
