@@ -4,6 +4,7 @@ import com.ibm.icu.util.ULocale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,14 +16,14 @@ import java.util.ResourceBundle;
  * for localized strings.
  */
 public class I18nManager {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(I18nManager.class);
     private static final String BUNDLE_BASE_NAME = "messages";
-    
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final List<ULocale> supportedLocales;
     private ULocale currentLocale;
     private ResourceBundle resourceBundle;
-    private final List<ULocale> supportedLocales;
-    
+
     public I18nManager() {
         // Initialize supported locales
         supportedLocales = new ArrayList<>();
@@ -30,29 +31,28 @@ public class I18nManager {
         supportedLocales.add(ULocale.GERMAN);
         supportedLocales.add(ULocale.FRENCH);
         supportedLocales.add(ULocale.forLanguageTag("pl")); // Polish
-        
+
         // Set default locale
         setLocale(ULocale.getDefault());
     }
-    
+
     /**
      * Sets the current locale and loads the corresponding resource bundle.
-     * 
+     *
      * @param locale the locale to set
      */
     public void setLocale(ULocale locale) {
         this.currentLocale = locale;
-        
+
         try {
             // Convert ULocale to Java Locale for ResourceBundle
             Locale javaLocale = locale.toLocale();
             resourceBundle = ResourceBundle.getBundle(BUNDLE_BASE_NAME, javaLocale);
-            
+
             logger.info("Locale set to: {} ({})", locale.getDisplayName(), locale.toLanguageTag());
-            
         } catch (Exception e) {
             logger.warn("Failed to load resource bundle for locale {}, falling back to default", locale, e);
-            
+
             // Fallback to English
             try {
                 resourceBundle = ResourceBundle.getBundle(BUNDLE_BASE_NAME, Locale.ENGLISH);
@@ -63,10 +63,10 @@ public class I18nManager {
             }
         }
     }
-    
+
     /**
      * Gets a localized string for the given key.
-     * 
+     *
      * @param key the resource key
      * @return localized string or the key itself if not found
      */
@@ -78,11 +78,11 @@ public class I18nManager {
             return key; // Return key as fallback
         }
     }
-    
+
     /**
      * Gets a localized string with parameter substitution.
-     * 
-     * @param key the resource key
+     *
+     * @param key    the resource key
      * @param params parameters to substitute in the string
      * @return formatted localized string
      */
@@ -95,41 +95,45 @@ public class I18nManager {
             return pattern;
         }
     }
-    
+
     /**
      * Gets the current locale.
-     * 
+     *
      * @return current ULocale
      */
     public ULocale getCurrentLocale() {
         return currentLocale;
     }
-    
+
     /**
      * Gets the list of supported locales.
-     * 
+     *
      * @return list of supported ULocales
      */
     public List<ULocale> getSupportedLocales() {
         return new ArrayList<>(supportedLocales);
     }
-    
+
     /**
      * Gets the current resource bundle.
-     * 
+     *
      * @return current ResourceBundle
      */
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
     }
-    
+
     /**
      * Checks if a locale is supported.
-     * 
+     *
      * @param locale the locale to check
      * @return true if supported, false otherwise
      */
     public boolean isLocaleSupported(ULocale locale) {
         return supportedLocales.contains(locale);
+    }
+
+    public DateTimeFormatter getDateTimeFormatter() {
+        return DATE_TIME_FORMATTER;
     }
 }

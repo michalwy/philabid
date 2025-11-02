@@ -12,7 +12,13 @@
         <Insets bottom="10" left="10" right="10" top="10"/>
     </padding>
 
-    <Hyperlink fx:id="urlLink" text="-"/>
+    <HBox>
+        <Hyperlink fx:id="urlLink" text="-"/>
+    </HBox>
+    <HBox>
+        <Label text="Ending: "/>
+        <Label fx:id="endingLabel"/>
+    </HBox>
 
     <Separator>
 

@@ -1,8 +1,10 @@
 package com.philabid.ui.cell;
 
+import com.philabid.AppContext;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.SVGPath;
 
@@ -21,15 +23,19 @@ public class EndingDateCell<T> extends TableCell<T, LocalDateTime> {
     private final HBox graphicBox = new HBox(5);
     private final Label textLabel = new Label();
     private final SVGPath warningIcon = new SVGPath();
+    private final Tooltip tooltip = new Tooltip();
 
     public EndingDateCell() {
-        // A simple clock icon (Material Design)
-        warningIcon.setContent("M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z");
+        warningIcon.setContent(
+                "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-" +
+                        ".8 1.3z");
         warningIcon.getStyleClass().add("ending-soon-icon");
 
         graphicBox.setAlignment(Pos.CENTER_RIGHT);
         graphicBox.getChildren().addAll(warningIcon, textLabel);
         setAlignment(Pos.CENTER_RIGHT);
+
+        textLabel.setTooltip(tooltip);
     }
 
     @Override
@@ -40,6 +46,7 @@ public class EndingDateCell<T> extends TableCell<T, LocalDateTime> {
             setGraphic(null);
         } else {
             textLabel.setText(formatRelativeTime(item));
+            tooltip.setText(item.format(AppContext.getI18nManager().getDateTimeFormatter()));
 
             LocalDateTime now = LocalDateTime.now();
             // Show the icon only for auctions ending within 24 hours

@@ -20,6 +20,8 @@ public class AuctionStateDialogController {
     @FXML
     private Hyperlink urlLink;
     @FXML
+    private Label endingLabel;
+    @FXML
     private MonetaryField currentPrice;
     @FXML
     private MonetaryField maxBid;
@@ -69,6 +71,8 @@ public class AuctionStateDialogController {
         } else {
             urlLink.setDisable(true);
         }
+
+        endingLabel.setText(auction.getEndDate().format(AppContext.getI18nManager().getDateTimeFormatter()));
 
         if (auction.getCurrentPrice() != null) {
             currentPrice.setAmount(auction.getCurrentPrice().originalAmount());
