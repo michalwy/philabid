@@ -6,6 +6,7 @@ import com.philabid.service.CrudService;
 import com.philabid.ui.control.CrudEditDialog;
 import com.philabid.ui.control.CrudTableView;
 import com.philabid.util.TriConsumer;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -158,6 +159,9 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         if (result != null && result.saved()) {
             crudService.save(newEntity);
             refreshTable();
+            if (result.editNext()) {
+                Platform.runLater(this::handleAdd);
+            }
         }
     }
 

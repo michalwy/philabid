@@ -43,6 +43,10 @@ public class ValuationDetails extends VBox {
     @FXML
     private Label avgPricePercentageLabel;
     @FXML
+    private Label medianPriceLabel;
+    @FXML
+    private Label medianPricePercentageLabel;
+    @FXML
     private Label categoryAveragePercentageLabel;
     @FXML
     private Label categoryAveragePriceLabel;
@@ -122,6 +126,11 @@ public class ValuationDetails extends VBox {
                 selectedPrice.set(valuation.getAveragePrice());
             }
         });
+        medianPriceLabel.setOnMouseClicked(event -> {
+            if (valuation != null) {
+                selectedPrice.set(valuation.getMedianPrice());
+            }
+        });
     }
 
     public void setAuctionItem(Long auctionItemId, Long conditionId) {
@@ -139,6 +148,8 @@ public class ValuationDetails extends VBox {
                 valuation.getCatalogValue());
         setMoneyLabel(avgPriceLabel, valuation.getAveragePrice(), valuation.getCategoryAveragePrice(),
                 valuation.getCatalogValue());
+        setMoneyLabel(medianPriceLabel, valuation.getMedianPrice(), valuation.getCategoryAveragePrice(),
+                valuation.getCatalogValue());
         setMoneyLabel(categoryAveragePriceLabel, valuation.getCategoryAveragePrice(),
                 valuation.getCatalogValue(), valuation.getCatalogValue());
         setMoneyLabel(catalogPriceLabel, valuation.getCatalogValue(), null, null);
@@ -151,6 +162,8 @@ public class ValuationDetails extends VBox {
         setPercentageLabel(maxPricePercentageLabel, valuation.getMaxPrice(), valuation.getCatalogValue(),
                 valuation.getCategoryAveragePercentage());
         setPercentageLabel(avgPricePercentageLabel, valuation.getAveragePrice(), valuation.getCatalogValue(),
+                valuation.getCategoryAveragePercentage());
+        setPercentageLabel(medianPricePercentageLabel, valuation.getMedianPrice(), valuation.getCatalogValue(),
                 valuation.getCategoryAveragePercentage());
         setPercentageLabel(recommendedPricePercentageLabel, valuation.getRecommendedPrice(),
                 valuation.getCatalogValue(),

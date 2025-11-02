@@ -17,11 +17,13 @@
         <VBox spacing="5">
             <Label text="Catalog Price:"/>
             <Label text="Min Price:"/>
+            <Label text="Max Price:"/>
             <Label text="Recommended price:"/>
         </VBox>
         <VBox alignment="TOP_RIGHT" spacing="5">
             <Label fx:id="catalogPriceLabel"/>
             <Label fx:id="minPriceLabel"/>
+            <Label fx:id="maxPriceLabel"/>
             <Label fx:id="recommendedPriceLabel"/>
         </VBox>
         <VBox alignment="TOP_RIGHT" spacing="5">
@@ -30,16 +32,19 @@
             </HBox.margin>
             <Label/>
             <Label fx:id="minPricePercentageLabel"/>
+            <Label fx:id="maxPricePercentageLabel"/>
             <Label fx:id="recommendedPricePercentageLabel"/>
         </VBox>
 
         <VBox spacing="5">
             <Label text="Catg. Avg Price:"/>
             <Label text="Avg Price:"/>
+            <Label text="Median Price:"/>
         </VBox>
         <VBox alignment="TOP_RIGHT" spacing="5">
             <Label fx:id="categoryAveragePriceLabel"/>
             <Label fx:id="avgPriceLabel"/>
+            <Label fx:id="medianPriceLabel"/>
         </VBox>
         <VBox alignment="TOP_RIGHT" spacing="5">
             <HBox.margin>
@@ -47,19 +52,7 @@
             </HBox.margin>
             <Label fx:id="categoryAveragePercentageLabel"/>
             <Label fx:id="avgPricePercentageLabel"/>
-        </VBox>
-
-        <VBox spacing="5">
-            <Label/>
-            <Label text="Max Price:"/>
-        </VBox>
-        <VBox alignment="TOP_RIGHT" spacing="5">
-            <Label/>
-            <Label fx:id="maxPriceLabel"/>
-        </VBox>
-        <VBox alignment="TOP_RIGHT" spacing="5">
-            <Label/>
-            <Label fx:id="maxPricePercentageLabel"/>
+            <Label fx:id="medianPricePercentageLabel"/>
         </VBox>
     </HBox>
 </fx:root>

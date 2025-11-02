@@ -34,6 +34,7 @@ public abstract class CrudEditDialogController<T extends BaseModel<T>> {
             if (handleSave()) {
                 result = new EditDialogResult.Builder()
                         .saved(true)
+                        .editNext(entity.getId() == null)
                         .build();
                 dialogStage.close();
             }

@@ -25,6 +25,7 @@ public final class Valuation extends BaseModel<Valuation> {
     private String conditionCode;
     private MultiCurrencyMonetaryAmount catalogValue;
     private MultiCurrencyMonetaryAmount averagePrice;
+    private MultiCurrencyMonetaryAmount medianPrice;
     private MultiCurrencyMonetaryAmount minPrice;
     private MultiCurrencyMonetaryAmount maxPrice;
     private MultiCurrencyMonetaryAmount categoryAveragePrice;
@@ -70,6 +71,14 @@ public final class Valuation extends BaseModel<Valuation> {
 
     public void setAveragePrice(MultiCurrencyMonetaryAmount averagePrice) {
         this.averagePrice = averagePrice;
+    }
+
+    public MultiCurrencyMonetaryAmount getMedianPrice() {
+        return medianPrice;
+    }
+
+    public void setMedianPrice(MultiCurrencyMonetaryAmount medianPrice) {
+        this.medianPrice = medianPrice;
     }
 
     public MultiCurrencyMonetaryAmount getMinPrice() {

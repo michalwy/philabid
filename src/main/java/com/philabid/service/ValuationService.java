@@ -98,6 +98,24 @@ public class ValuationService extends VirtualCrudService<Valuation> {
                     valuation.setAuctionCount(stats.count);
                 });
 
+        List<MonetaryAmount> entries = valuation.getValuationEntries().stream()
+                .map(ValuationEntry::getPrice)
+                .filter(Objects::nonNull)
+                .map(MultiCurrencyMonetaryAmount::defaultCurrencyAmount)
+                .sorted()
+                .toList();
+
+        if (!entries.isEmpty()) {
+            if (entries.size() % 2 != 0) {
+                valuation.setMedianPrice(MultiCurrencyMonetaryAmount.of(entries.get(entries.size() / 2)));
+            } else {
+                MonetaryAmount p1 = entries.get(entries.size() / 2);
+                MonetaryAmount p2 = entries.get(entries.size() / 2 - 1);
+                valuation.setMedianPrice(MultiCurrencyMonetaryAmount.of(
+                        p1.add(p2).divide(2).with(MonetaryOperators.rounding(RoundingMode.HALF_UP, 2))));
+            }
+        }
+
         if (valuation.getCatalogValue() != null) {
             Optional.ofNullable(categoryAveragePercentages.get(
                             Pair.with(valuation.getAuctionItemCategoryId(), valuation.getConditionId())))
