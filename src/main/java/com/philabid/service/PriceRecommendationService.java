@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class PriceRecommendationService {
     public Optional<MultiCurrencyMonetaryAmount> calculateRecommendation(Auction auction) {
-        return calculateRecommendationFromAuctionItem(auction)
+        return calculateRecommendationFromTradingItem(auction)
                 .or(() -> calculateRecommendationFromCategory(auction));
     }
 
@@ -23,7 +23,7 @@ public class PriceRecommendationService {
                 .or(() -> Optional.ofNullable(valuation.getCategoryAveragePrice()));
     }
 
-    private Optional<MultiCurrencyMonetaryAmount> calculateRecommendationFromAuctionItem(Auction auction) {
+    private Optional<MultiCurrencyMonetaryAmount> calculateRecommendationFromTradingItem(Auction auction) {
         Optional<Pair<MonetaryAmount, MonetaryAmount>> catalogBoundary = getCatalogBoundary(auction);
         return auction.getArchivedAuctions().stream()
                 .filter(a -> a.getCurrentPrice() != null)

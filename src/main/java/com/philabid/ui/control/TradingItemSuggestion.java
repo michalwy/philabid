@@ -1,12 +1,12 @@
 package com.philabid.ui.control;
 
-import com.philabid.model.AuctionItem;
+import com.philabid.model.TradingItem;
 
 /**
  * A private wrapper class to control the text displayed in the autocompletion popup.
  * The text field will use the StringConverter, but the popup list will use this class's toString() method.
  */
-public record AuctionItemSuggestion(AuctionItem item) {
+public record TradingItemSuggestion(TradingItem item) {
 
     @Override
     public String toString() {

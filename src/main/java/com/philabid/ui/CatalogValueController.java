@@ -34,10 +34,10 @@ public class CatalogValueController extends FilteredCrudTableViewController<Cata
 
     @Override
     protected void initializeView() {
-        setCategoryColumn(categoryColumn, CatalogValue::getAuctionItemCategoryCode,
-                CatalogValue::getAuctionItemCategoryName);
-        setCatalogNumberColumn(catalogNumberColumn, CatalogValue::getAuctionItemCatalogNumber,
-                CatalogValue::getAuctionItemOrderNumber);
+        setCategoryColumn(categoryColumn, CatalogValue::getTradingItemCategoryCode,
+                CatalogValue::getTradingItemCategoryName);
+        setCatalogNumberColumn(catalogNumberColumn, CatalogValue::getTradingItemCatalogNumber,
+                CatalogValue::getTradingItemOrderNumber);
 
         setCatalogColumn(catalogColumn, CatalogValue::getCatalogName, CatalogValue::getCatalogIssueYear);
         setConditionColumn(conditionColumn, CatalogValue::getConditionCode, CatalogValue::getConditionName);

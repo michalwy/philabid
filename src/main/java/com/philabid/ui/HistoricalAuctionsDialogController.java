@@ -15,8 +15,8 @@ public class HistoricalAuctionsDialogController {
         this.dialogStage = dialogStage;
     }
 
-    public void setAuctionItem(Long auctionItemId, Long conditionId) {
-        valuationDetails.setAuctionItem(auctionItemId, conditionId);
+    public void setTradingItem(Long tradingItemId, Long conditionId) {
+        valuationDetails.setTradingItem(tradingItemId, conditionId);
     }
 
     @FXML

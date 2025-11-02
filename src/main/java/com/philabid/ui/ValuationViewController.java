@@ -54,9 +54,9 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
 
     @Override
     public void initializeView() {
-        setCategoryColumn(categoryColumn, Valuation::getAuctionItemCategoryCode, Valuation::getAuctionItemCategoryName);
-        setCatalogNumberColumn(catalogNumberColumn, Valuation::getAuctionItemCatalogNumber,
-                Valuation::getAuctionItemOrderNumber);
+        setCategoryColumn(categoryColumn, Valuation::getTradingItemCategoryCode, Valuation::getTradingItemCategoryName);
+        setCatalogNumberColumn(catalogNumberColumn, Valuation::getTradingItemCatalogNumber,
+                Valuation::getTradingItemOrderNumber);
         setConditionColumn(conditionColumn, Valuation::getConditionCode, Valuation::getConditionName);
         setCatalogValueColumn(catalogValueColumn, "catalogValue", Valuation::getCatalogValue,
                 Valuation::isCatalogActive);
@@ -115,7 +115,7 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
 
         CatalogValue newCatalogValue = new CatalogValue();
         // Pre-populate with data from the auction
-        newCatalogValue.setAuctionItemId(valuation.getAuctionItemId());
+        newCatalogValue.setTradingItemId(valuation.getTradingItemId());
         newCatalogValue.setConditionId(valuation.getConditionId());
 
         EditDialogResult result = showCatalogValueEditDialog(newCatalogValue);
@@ -129,7 +129,7 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
 
         // Find the existing CatalogValue to edit it
         AppContext.getCatalogValueService()
-                .findByAuctionItemAndCondition(valuation.getAuctionItemId(), valuation.getConditionId())
+                .findByTradingItemAndCondition(valuation.getTradingItemId(), valuation.getConditionId())
                 .ifPresent(catalogValueToUpdate -> {
                     // We want the user to select a new, active catalog, so we don't pre-set the old one.
                     catalogValueToUpdate.setCatalogId(null);
@@ -163,7 +163,7 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
 
             HistoricalAuctionsDialogController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            controller.setAuctionItem(selectedItem.getAuctionItemId(), selectedItem.getConditionId());
+            controller.setTradingItem(selectedItem.getTradingItemId(), selectedItem.getConditionId());
 
             dialogStage.showAndWait();
         } catch (IOException e) {

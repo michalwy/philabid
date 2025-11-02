@@ -14,7 +14,7 @@ import java.util.List;
 public class Auction extends BaseModel<Auction> {
 
     private Long auctionHouseId;
-    private Long auctionItemId;
+    private Long tradingItemId;
     private Long conditionId;
     private String lotId;
     private String url;
@@ -25,11 +25,11 @@ public class Auction extends BaseModel<Auction> {
 
     private String auctionHouseName;
     private CurrencyUnit auctionHouseCurrency;
-    private String auctionItemCatalogNumber;
-    private Long auctionItemOrderNumber;
-    private String auctionItemCategoryName;
-    private String auctionItemCategoryCode;
-    private Long auctionItemCategoryId;
+    private String tradingItemCatalogNumber;
+    private Long tradingItemOrderNumber;
+    private String tradingItemCategoryName;
+    private String tradingItemCategoryCode;
+    private Long tradingItemCategoryId;
     private String conditionName;
     private String conditionCode;
 
@@ -58,12 +58,12 @@ public class Auction extends BaseModel<Auction> {
         this.auctionHouseId = auctionHouseId;
     }
 
-    public Long getAuctionItemId() {
-        return auctionItemId;
+    public Long getTradingItemId() {
+        return tradingItemId;
     }
 
-    public void setAuctionItemId(Long auctionItemId) {
-        this.auctionItemId = auctionItemId;
+    public void setTradingItemId(Long tradingItemId) {
+        this.tradingItemId = tradingItemId;
     }
 
     public Long getConditionId() {
@@ -110,44 +110,44 @@ public class Auction extends BaseModel<Auction> {
         this.endDate = endDate;
     }
 
-    public String getAuctionItemCatalogNumber() {
-        return auctionItemCatalogNumber;
+    public String getTradingItemCatalogNumber() {
+        return tradingItemCatalogNumber;
     }
 
-    public void setAuctionItemCatalogNumber(String auctionItemCatalogNumber) {
-        this.auctionItemCatalogNumber = auctionItemCatalogNumber;
+    public void setTradingItemCatalogNumber(String tradingItemCatalogNumber) {
+        this.tradingItemCatalogNumber = tradingItemCatalogNumber;
     }
 
-    public Long getAuctionItemOrderNumber() {
-        return auctionItemOrderNumber;
+    public Long getTradingItemOrderNumber() {
+        return tradingItemOrderNumber;
     }
 
-    public void setAuctionItemOrder(Long auctionItemOrderNumber) {
-        this.auctionItemOrderNumber = auctionItemOrderNumber;
+    public void setTradingItemOrderNumber(Long tradingItemOrderNumber) {
+        this.tradingItemOrderNumber = tradingItemOrderNumber;
     }
 
-    public String getAuctionItemCategoryName() {
-        return auctionItemCategoryName;
+    public String getTradingItemCategoryName() {
+        return tradingItemCategoryName;
     }
 
-    public void setAuctionItemCategoryName(String auctionItemCategoryName) {
-        this.auctionItemCategoryName = auctionItemCategoryName;
+    public void setTradingItemCategoryName(String tradingItemCategoryName) {
+        this.tradingItemCategoryName = tradingItemCategoryName;
     }
 
-    public String getAuctionItemCategoryCode() {
-        return auctionItemCategoryCode;
+    public String getTradingItemCategoryCode() {
+        return tradingItemCategoryCode;
     }
 
-    public void setAuctionItemCategoryCode(String auctionItemCategoryCode) {
-        this.auctionItemCategoryCode = auctionItemCategoryCode;
+    public void setTradingItemCategoryCode(String tradingItemCategoryCode) {
+        this.tradingItemCategoryCode = tradingItemCategoryCode;
     }
 
-    public Long getAuctionItemCategoryId() {
-        return auctionItemCategoryId;
+    public Long getTradingItemCategoryId() {
+        return tradingItemCategoryId;
     }
 
-    public void setAuctionItemCategoryId(Long auctionItemCategoryId) {
-        this.auctionItemCategoryId = auctionItemCategoryId;
+    public void setTradingItemCategoryId(Long tradingItemCategoryId) {
+        this.tradingItemCategoryId = tradingItemCategoryId;
     }
 
     public String getConditionName() {
@@ -304,7 +304,7 @@ public class Auction extends BaseModel<Auction> {
 
     @Override
     public String getDisplayName() {
-        return this.getLotId() + ": " + this.getAuctionItemCategoryName() + " - " + this.getAuctionItemCatalogNumber() +
+        return this.getLotId() + ": " + this.getTradingItemCategoryName() + " - " + this.getTradingItemCatalogNumber() +
                 " - " + this.getConditionName();
     }
 

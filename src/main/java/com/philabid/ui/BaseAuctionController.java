@@ -72,9 +72,9 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
             }
         });
 
-        setCategoryColumn(categoryColumn, Auction::getAuctionItemCategoryCode, Auction::getAuctionItemCategoryName);
-        setCatalogNumberColumn(catalogNumberColumn, Auction::getAuctionItemCatalogNumber,
-                Auction::getAuctionItemOrderNumber);
+        setCategoryColumn(categoryColumn, Auction::getTradingItemCategoryCode, Auction::getTradingItemCategoryName);
+        setCatalogNumberColumn(catalogNumberColumn, Auction::getTradingItemCatalogNumber,
+                Auction::getTradingItemOrderNumber);
 
         setConditionColumn(conditionColumn, Auction::getConditionCode, Auction::getConditionName);
 

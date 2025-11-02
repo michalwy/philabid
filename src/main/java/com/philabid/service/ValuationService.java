@@ -32,15 +32,15 @@ public class ValuationService extends VirtualCrudService<Valuation> {
         Map<Pair<Long, Long>, List<Double>> categoryAveragePercentageEntries = new HashMap<>();
 
         valuationEntryRepository.findAll(filterConditions, valuationEntry -> {
-            entries.computeIfAbsent(Pair.with(valuationEntry.getAuctionItemId(), valuationEntry.getConditionId()),
+            entries.computeIfAbsent(Pair.with(valuationEntry.getTradingItemId(), valuationEntry.getConditionId()),
                     k -> {
                         Valuation valuation = new Valuation();
-                        valuation.setAuctionItemId(valuationEntry.getAuctionItemId());
-                        valuation.setAuctionItemCatalogNumber(valuationEntry.getAuctionItemCatalogNumber());
-                        valuation.setAuctionItemOrderNumber(valuationEntry.getAuctionItemOrderNumber());
-                        valuation.setAuctionItemCategoryName(valuationEntry.getAuctionItemCategoryName());
-                        valuation.setAuctionItemCategoryCode(valuationEntry.getAuctionItemCategoryCode());
-                        valuation.setAuctionItemCategoryId(valuationEntry.getAuctionItemCategoryId());
+                        valuation.setTradingItemId(valuationEntry.getTradingItemId());
+                        valuation.setTradingItemCatalogNumber(valuationEntry.getTradingItemCatalogNumber());
+                        valuation.setTradingItemOrderNumber(valuationEntry.getTradingItemOrderNumber());
+                        valuation.setTradingItemCategoryName(valuationEntry.getTradingItemCategoryName());
+                        valuation.setTradingItemCategoryCode(valuationEntry.getTradingItemCategoryCode());
+                        valuation.setTradingItemCategoryId(valuationEntry.getTradingItemCategoryId());
                         valuation.setConditionId(valuationEntry.getConditionId());
                         valuation.setConditionName(valuationEntry.getConditionName());
                         valuation.setConditionCode(valuationEntry.getConditionCode());
@@ -52,7 +52,7 @@ public class ValuationService extends VirtualCrudService<Valuation> {
 
         valuationEntryRepository.findAll(List.of(), valuationEntry -> {
             categoryAveragePercentageEntries.computeIfAbsent(
-                    Pair.with(valuationEntry.getAuctionItemCategoryId(), valuationEntry.getConditionId()),
+                    Pair.with(valuationEntry.getTradingItemCategoryId(), valuationEntry.getConditionId()),
                     k -> new ArrayList<>()).add(valuationEntry.getArchivedCatalogValuePercentage());
         });
 
@@ -70,10 +70,10 @@ public class ValuationService extends VirtualCrudService<Valuation> {
         return entries.values().stream().peek(v -> calculateStatistics(v, categoryAveragePercentages)).toList();
     }
 
-    public Optional<Valuation> getForItem(Long auctionItemId, Long conditionId) {
+    public Optional<Valuation> getForItem(Long tradingItemId, Long conditionId) {
         Collection<Valuation> valuations =
-                getAll(List.of(new EqualFilterCondition<>("aiv.auction_item_id", auctionItemId),
-                        new EqualFilterCondition<>("aiv.condition_id", conditionId)));
+                getAll(List.of(new EqualFilterCondition<>("tiv.trading_item_id", tradingItemId),
+                        new EqualFilterCondition<>("tiv.condition_id", conditionId)));
 
         return valuations.stream().findFirst();
     }
@@ -118,7 +118,7 @@ public class ValuationService extends VirtualCrudService<Valuation> {
 
         if (valuation.getCatalogValue() != null) {
             Optional.ofNullable(categoryAveragePercentages.get(
-                            Pair.with(valuation.getAuctionItemCategoryId(), valuation.getConditionId())))
+                            Pair.with(valuation.getTradingItemCategoryId(), valuation.getConditionId())))
                     .ifPresent(d -> {
                         valuation.setCategoryAveragePrice(MultiCurrencyMonetaryAmount.of(
                                 valuation.getCatalogValue().defaultCurrencyAmount().multiply(d)

@@ -5,20 +5,19 @@ import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javax.money.MonetaryAmount;
 
 /**
- * Represents a catalog value for a specific auction item in a given condition.
+ * Represents a catalog value for a specific trading item in a given condition.
  */
 public class CatalogValue extends BaseModel<CatalogValue> {
-
-    private Long auctionItemId;
+    private Long tradingItemId;
     private Long conditionId;
     private Long catalogId;
     private MultiCurrencyMonetaryAmount value;
 
     // Joined fields for display purposes
-    private String auctionItemCatalogNumber;
-    private Long auctionItemOrderNumber;
-    private String auctionItemCategoryName;
-    private String auctionItemCategoryCode;
+    private String tradingItemCatalogNumber;
+    private Long tradingItemOrderNumber;
+    private String tradingItemCategoryName;
+    private String tradingItemCategoryCode;
     private String conditionName;
     private String conditionCode;
     private String catalogName;
@@ -29,12 +28,12 @@ public class CatalogValue extends BaseModel<CatalogValue> {
     }
 
     // Getters and Setters
-    public Long getAuctionItemId() {
-        return auctionItemId;
+    public Long getTradingItemId() {
+        return tradingItemId;
     }
 
-    public void setAuctionItemId(Long auctionItemId) {
-        this.auctionItemId = auctionItemId;
+    public void setTradingItemId(Long tradingItemId) {
+        this.tradingItemId = tradingItemId;
     }
 
     public Long getConditionId() {
@@ -65,12 +64,12 @@ public class CatalogValue extends BaseModel<CatalogValue> {
         this.value = MultiCurrencyMonetaryAmount.of(value);
     }
 
-    public String getAuctionItemCatalogNumber() {
-        return auctionItemCatalogNumber;
+    public String getTradingItemCatalogNumber() {
+        return tradingItemCatalogNumber;
     }
 
-    public void setAuctionItemCatalogNumber(String auctionItemCatalogNumber) {
-        this.auctionItemCatalogNumber = auctionItemCatalogNumber;
+    public void setTradingItemCatalogNumber(String tradingItemCatalogNumber) {
+        this.tradingItemCatalogNumber = tradingItemCatalogNumber;
     }
 
     public String getConditionName() {
@@ -97,20 +96,20 @@ public class CatalogValue extends BaseModel<CatalogValue> {
         this.catalogName = catalogName;
     }
 
-    public String getAuctionItemCategoryCode() {
-        return auctionItemCategoryCode;
+    public String getTradingItemCategoryCode() {
+        return tradingItemCategoryCode;
     }
 
-    public void setAuctionItemCategoryCode(String auctionItemCategoryCode) {
-        this.auctionItemCategoryCode = auctionItemCategoryCode;
+    public void setTradingItemCategoryCode(String tradingItemCategoryCode) {
+        this.tradingItemCategoryCode = tradingItemCategoryCode;
     }
 
-    public String getAuctionItemCategoryName() {
-        return auctionItemCategoryName;
+    public String getTradingItemCategoryName() {
+        return tradingItemCategoryName;
     }
 
-    public void setAuctionItemCategoryName(String auctionItemCategoryName) {
-        this.auctionItemCategoryName = auctionItemCategoryName;
+    public void setTradingItemCategoryName(String tradingItemCategoryName) {
+        this.tradingItemCategoryName = tradingItemCategoryName;
     }
 
     public Integer getCatalogIssueYear() {
@@ -121,16 +120,16 @@ public class CatalogValue extends BaseModel<CatalogValue> {
         this.catalogIssueYear = catalogIssueYear;
     }
 
-    public Long getAuctionItemOrderNumber() {
-        return auctionItemOrderNumber;
+    public Long getTradingItemOrderNumber() {
+        return tradingItemOrderNumber;
     }
 
-    public void setAuctionItemOrderNumber(Long auctionItemOrderNumber) {
-        this.auctionItemOrderNumber = auctionItemOrderNumber;
+    public void setTradingItemOrderNumber(Long tradingItemOrderNumber) {
+        this.tradingItemOrderNumber = tradingItemOrderNumber;
     }
 
     @Override
     public String getDisplayName() {
-        return this.getAuctionItemCatalogNumber() + " - " + this.getConditionName();
+        return this.getTradingItemCatalogNumber() + " - " + this.getConditionName();
     }
 }

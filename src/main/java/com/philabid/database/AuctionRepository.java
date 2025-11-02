@@ -13,8 +13,8 @@ public class AuctionRepository extends CrudRepository<Auction> {
     private static final Collection<QueryField<Auction, ?>> FIELDS = List.of(
             new LongQueryField<>("a", "auction_house_id", Auction::setAuctionHouseId).withEntityValue(
                     Auction::getAuctionHouseId),
-            new LongQueryField<>("a", "auction_item_id", Auction::setAuctionItemId).withEntityValue(
-                    Auction::getAuctionItemId),
+            new LongQueryField<>("a", "trading_item_id", Auction::setTradingItemId).withEntityValue(
+                    Auction::getTradingItemId),
             new LongQueryField<>("a", "condition_id", Auction::setConditionId).withEntityValue(Auction::getConditionId),
             new StringQueryField<>("a", "lot_id", Auction::setLotId).withEntityValue(Auction::getLotId),
             new StringQueryField<>("a", "url", Auction::setUrl).withEntityValue(Auction::getUrl),
@@ -38,12 +38,12 @@ public class AuctionRepository extends CrudRepository<Auction> {
             new InternalQueryField<>("cv", "currency_code", "catalog_currency_code"),
             new MonetaryAmountQueryField<>("cv", "value", "catalog_value", "catalog_currency_code",
                     Auction::setRawCatalogValue),
-            new StringQueryField<>("ai", "catalog_number", "auction_item_catalog_number",
-                    Auction::setAuctionItemCatalogNumber),
-            new LongQueryField<>("ai", "order_number", "auction_item_order_number", Auction::setAuctionItemOrder),
-            new StringQueryField<>("catg", "name", "auction_item_category_name", Auction::setAuctionItemCategoryName),
-            new StringQueryField<>("catg", "code", "auction_item_category_code", Auction::setAuctionItemCategoryCode),
-            new LongQueryField<>("catg", "id", "auction_item_category_id", Auction::setAuctionItemCategoryId),
+            new StringQueryField<>("ti", "catalog_number", "trading_item_catalog_number",
+                    Auction::setTradingItemCatalogNumber),
+            new LongQueryField<>("ti", "order_number", "trading_item_order_number", Auction::setTradingItemOrderNumber),
+            new StringQueryField<>("catg", "name", "trading_item_category_name", Auction::setTradingItemCategoryName),
+            new StringQueryField<>("catg", "code", "trading_item_category_code", Auction::setTradingItemCategoryCode),
+            new LongQueryField<>("catg", "id", "trading_item_category_id", Auction::setTradingItemCategoryId),
             new LongQueryField<>("cond", "id", "condition_id", Auction::setConditionId),
             new StringQueryField<>("cond", "name", "condition_name", Auction::setConditionName),
             new StringQueryField<>("cond", "code", "condition_code", Auction::setConditionCode),
@@ -54,11 +54,11 @@ public class AuctionRepository extends CrudRepository<Auction> {
 
     private static final Collection<QueryJoin> JOINS = List.of(
             new QueryLeftOuterJoin("auction_houses", "ah", "a.auction_house_id = ah.id"),
-            new QueryLeftOuterJoin("auction_items", "ai", "a.auction_item_id = ai.id"),
+            new QueryLeftOuterJoin("trading_items", "ti", "a.trading_item_id = ti.id"),
             new QueryLeftOuterJoin("conditions", "cond", "a.condition_id = cond.id"),
-            new QueryLeftOuterJoin("categories", "catg", "ai.category_id = catg.id"),
+            new QueryLeftOuterJoin("categories", "catg", "ti.category_id = catg.id"),
             new QueryLeftOuterJoin("catalog_values", "cv",
-                    "cv.auction_item_id = a.auction_item_id AND cv.condition_id = a.condition_id"),
+                    "cv.trading_item_id = a.trading_item_id AND cv.condition_id = a.condition_id"),
             new QueryLeftOuterJoin("catalogs", "cat", "cv.catalog_id = cat.id")
     );
 
@@ -89,7 +89,7 @@ public class AuctionRepository extends CrudRepository<Auction> {
                 List.of(new EqualFilterCondition<>("act_a.archived", false)),
                 List.of(new InternalQueryField<>("act_a", "id", "active_id")),
                 List.of(new QueryInnerJoin("auctions", "act_a",
-                        "act_a.auction_item_id = a.auction_item_id " +
+                        "act_a.trading_item_id = a.trading_item_id " +
                                 "AND act_a.condition_id = a.condition_id " +
                                 "AND a.archived = 1")),
                 (rs, e) -> {
@@ -108,13 +108,13 @@ public class AuctionRepository extends CrudRepository<Auction> {
                 List.of(new EqualFilterCondition<>("a.archived", true)),
                 List.of(),
                 List.of(
-                        new QueryInnerJoin("auction_items", "act_ai", "act_ai.category_id = ai.category_id"),
+                        new QueryInnerJoin("trading_items", "act_ti", "act_ti.category_id = ti.category_id"),
                         new QueryInnerJoin("auctions", "act_a",
-                                "act_a.auction_item_id = act_ai.id " +
+                                "act_a.trading_item_id = act_ti.id " +
                                         "AND act_a.condition_id = a.condition_id " +
                                         "AND act_a.archived = 0")),
                 (rs, e) -> {
-                    archiveMap.computeIfAbsent(Pair.with(e.getAuctionItemCategoryId(), e.getConditionId()),
+                    archiveMap.computeIfAbsent(Pair.with(e.getTradingItemCategoryId(), e.getConditionId()),
                             k -> new ArrayList<>()).add(e);
                     return true;
                 }
@@ -122,18 +122,18 @@ public class AuctionRepository extends CrudRepository<Auction> {
         return archiveMap;
     }
 
-    public Collection<Auction> findArchivedByItemAndCondition(Long auctionItemId, Long conditionId) {
-        return findByItemAndCondition(auctionItemId, conditionId, true);
+    public Collection<Auction> findArchivedByItemAndCondition(Long tradingItemId, Long conditionId) {
+        return findByItemAndCondition(tradingItemId, conditionId, true);
     }
 
-    public Collection<Auction> findActiveByItemAndCondition(Long auctionItemId, Long conditionId) {
-        return findByItemAndCondition(auctionItemId, conditionId, false);
+    public Collection<Auction> findActiveByItemAndCondition(Long tradingItemId, Long conditionId) {
+        return findByItemAndCondition(tradingItemId, conditionId, false);
     }
 
-    private Collection<Auction> findByItemAndCondition(Long auctionItemId, Long conditionId, boolean isArchived) {
+    private Collection<Auction> findByItemAndCondition(Long tradingItemId, Long conditionId, boolean isArchived) {
         return findMany(
                 List.of(new EqualFilterCondition<>("a.archived", isArchived),
-                        new EqualFilterCondition<>("a.auction_item_id", auctionItemId),
+                        new EqualFilterCondition<>("a.trading_item_id", tradingItemId),
                         new EqualFilterCondition<>("a.condition_id", conditionId)),
                 List.of(),
                 List.of()

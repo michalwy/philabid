@@ -2,8 +2,8 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.*;
-import com.philabid.ui.control.AuctionItemSelector;
 import com.philabid.ui.control.MonetaryField;
+import com.philabid.ui.control.TradingItemSelector;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -39,7 +39,7 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     @FXML
     private ComboBox<AuctionHouse> auctionHouseComboBox;
     @FXML
-    private AuctionItemSelector auctionItemSelector;
+    private TradingItemSelector tradingItemSelector;
     @FXML
     private ComboBox<Condition> conditionComboBox;
     @FXML
@@ -143,7 +143,7 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
             verifyActiveAuctions();
         });
 
-        auctionItemSelector.selectedAuctionItemProperty().addListener((obs, oldVal, newVal) -> {
+        tradingItemSelector.selectedTradingItemProperty().addListener((obs, oldVal, newVal) -> {
             verifyActiveAuctions();
         });
 
@@ -202,9 +202,9 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
                     .select(AppContext.getAuctionHouseService().getById(auction.getAuctionHouseId())
                             .orElse(null));
         }
-        if (auction.getAuctionItemId() != null) {
-            AppContext.getAuctionItemService().getById(auction.getAuctionItemId())
-                    .ifPresent(auctionItemSelector::setSelectedAuctionItem);
+        if (auction.getTradingItemId() != null) {
+            AppContext.getTradingItemService().getById(auction.getTradingItemId())
+                    .ifPresent(tradingItemSelector::setSelectedTradingItem);
         }
         selectComboBoxValue(conditionComboBox, auction.getConditionId());
         if (auction.getCurrentPrice() != null) {
@@ -224,7 +224,7 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     protected void updateEntity(Auction auction) {
         AuctionHouse selectedAuctionHouse = auctionHouseComboBox.getValue();
         auction.setAuctionHouseId(selectedAuctionHouse.getId());
-        auction.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
+        auction.setTradingItemId(tradingItemSelector.resolveTradingItemId());
         auction.setConditionId(conditionComboBox.getValue().getId());
         auction.setLotId(lotIdField.getText());
         auction.setUrl(urlField.getText());
@@ -265,11 +265,11 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
         if (auctionHouseComboBox.getSelectionModel().getSelectedItem() == null) {
             errors.add(new ValidationError("Auction House is required.", auctionHouseComboBox));
         }
-        if (auctionItemSelector.getText() == null || auctionItemSelector.getText().isBlank()) {
-            errors.add(new ValidationError("Catalog Number is required.", auctionItemSelector));
+        if (tradingItemSelector.getText() == null || tradingItemSelector.getText().isBlank()) {
+            errors.add(new ValidationError("Catalog Number is required.", tradingItemSelector));
         }
-        if (auctionItemSelector.getSelectedAuctionItem() == null && auctionItemSelector.getSelectedCategory() == null) {
-            errors.add(new ValidationError("Category must be selected for a new catalog number.", auctionItemSelector));
+        if (tradingItemSelector.getSelectedTradingItem() == null && tradingItemSelector.getSelectedCategory() == null) {
+            errors.add(new ValidationError("Category must be selected for a new catalog number.", tradingItemSelector));
         }
         if (conditionComboBox.getValue() == null) {
             errors.add(new ValidationError("Condition is required.", conditionComboBox));
@@ -310,23 +310,23 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
                     endTimeField.setText(data.closingDate().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
                 }
                 // After successfully populating, move focus to the next logical field
-                auctionItemSelector.requestFocus();
+                tradingItemSelector.requestFocus();
                 logger.info("Fields populated from URL data.");
             });
         });
     }
 
     void verifyActiveAuctions() {
-        AuctionItem auctionItem = auctionItemSelector.selectedAuctionItemProperty().getValue();
+        TradingItem tradingItem = tradingItemSelector.selectedTradingItemProperty().getValue();
         Condition condition = conditionComboBox.getSelectionModel().getSelectedItem();
 
-        if (auctionItem == null || condition == null) {
+        if (tradingItem == null || condition == null) {
             multipleAuctionsWarningLabel.setVisible(false);
             return;
         }
 
         Collection<Auction> auctions =
-                AppContext.getAuctionService().getActiveAuctionsForItem(auctionItem.getId(), condition.getId());
+                AppContext.getAuctionService().getActiveAuctionsForItem(tradingItem.getId(), condition.getId());
 
         multipleAuctionsWarningLabel.setVisible(
                 auctions.stream().anyMatch(a -> !a.getId().equals(getEntity().getId())));

@@ -5,22 +5,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <CrudEditDialog xmlns:fx="http://javafx.com/fxml/1" fx:id="crudEditDialog"
-                fx:controller="com.philabid.ui.AuctionItemEditDialogController">
+                fx:controller="com.philabid.ui.TradingItemEditDialogController">
     <GridPane hgap="10" vgap="10" xmlns="http://javafx.com/javafx/17.0.2-ea">
         <padding>
             <Insets bottom="10" left="10" right="10" top="10"/>
         </padding>
 
-        <Label text="%auctionItems.label.category" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <Label text="%tradingItems.label.category" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
         <ComboBox fx:id="categoryComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-        <Label text="%auctionItems.label.catalogNumber" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <Label text="%tradingItems.label.catalogNumber" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <TextField fx:id="catalogNumberField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-        <Label text="%auctionItems.label.orderNumber" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <Label text="%tradingItems.label.orderNumber" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
         <TextField fx:id="orderNumberField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-        <Label text="%auctionItems.label.notes" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <Label text="%tradingItems.label.notes" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
         <TextArea fx:id="notesArea" prefRowCount="3" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
         <columnConstraints>

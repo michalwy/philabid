@@ -8,18 +8,18 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A record representing aggregated statistics for a specific auction item and condition.
+ * A record representing aggregated statistics for a specific trading item and condition.
  * This is used to display data in the statistics view.
  */
 public final class Valuation extends BaseModel<Valuation> {
     private final List<ValuationEntry> valuationEntries = new ArrayList<>();
     private Boolean catalogActive = false;
-    private long auctionItemId;
-    private String auctionItemCatalogNumber;
-    private Long auctionItemOrderNumber;
-    private String auctionItemCategoryName;
-    private String auctionItemCategoryCode;
-    private Long auctionItemCategoryId;
+    private long tradingItemId;
+    private String tradingItemCatalogNumber;
+    private Long tradingItemOrderNumber;
+    private String tradingItemCategoryName;
+    private String tradingItemCategoryCode;
+    private Long tradingItemCategoryId;
     private long conditionId;
     private String conditionName;
     private String conditionCode;
@@ -49,12 +49,12 @@ public final class Valuation extends BaseModel<Valuation> {
         this.recommendedPrice = recommendedPrice;
     }
 
-    public Long getAuctionItemCategoryId() {
-        return auctionItemCategoryId;
+    public Long getTradingItemCategoryId() {
+        return tradingItemCategoryId;
     }
 
-    public void setAuctionItemCategoryId(Long auctionItemCategoryId) {
-        this.auctionItemCategoryId = auctionItemCategoryId;
+    public void setTradingItemCategoryId(Long tradingItemCategoryId) {
+        this.tradingItemCategoryId = tradingItemCategoryId;
     }
 
     public MultiCurrencyMonetaryAmount getCategoryAveragePrice() {
@@ -105,12 +105,12 @@ public final class Valuation extends BaseModel<Valuation> {
         this.auctionCount = auctionCount;
     }
 
-    public Long getAuctionItemOrderNumber() {
-        return auctionItemOrderNumber;
+    public Long getTradingItemOrderNumber() {
+        return tradingItemOrderNumber;
     }
 
-    public void setAuctionItemOrderNumber(Long auctionItemOrderNumber) {
-        this.auctionItemOrderNumber = auctionItemOrderNumber;
+    public void setTradingItemOrderNumber(Long tradingItemOrderNumber) {
+        this.tradingItemOrderNumber = tradingItemOrderNumber;
     }
 
     public Boolean isCatalogActive() {
@@ -121,12 +121,12 @@ public final class Valuation extends BaseModel<Valuation> {
         this.catalogActive = catalogActive;
     }
 
-    public String getAuctionItemCategoryCode() {
-        return auctionItemCategoryCode;
+    public String getTradingItemCategoryCode() {
+        return tradingItemCategoryCode;
     }
 
-    public void setAuctionItemCategoryCode(String auctionItemCategoryCode) {
-        this.auctionItemCategoryCode = auctionItemCategoryCode;
+    public void setTradingItemCategoryCode(String tradingItemCategoryCode) {
+        this.tradingItemCategoryCode = tradingItemCategoryCode;
     }
 
     public String getConditionCode() {
@@ -137,28 +137,28 @@ public final class Valuation extends BaseModel<Valuation> {
         this.conditionCode = conditionCode;
     }
 
-    public long getAuctionItemId() {
-        return auctionItemId;
+    public long getTradingItemId() {
+        return tradingItemId;
     }
 
-    public void setAuctionItemId(long auctionItemId) {
-        this.auctionItemId = auctionItemId;
+    public void setTradingItemId(long tradingItemId) {
+        this.tradingItemId = tradingItemId;
     }
 
-    public String getAuctionItemCatalogNumber() {
-        return auctionItemCatalogNumber;
+    public String getTradingItemCatalogNumber() {
+        return tradingItemCatalogNumber;
     }
 
-    public void setAuctionItemCatalogNumber(String auctionItemCatalogNumber) {
-        this.auctionItemCatalogNumber = auctionItemCatalogNumber;
+    public void setTradingItemCatalogNumber(String tradingItemCatalogNumber) {
+        this.tradingItemCatalogNumber = tradingItemCatalogNumber;
     }
 
-    public String getAuctionItemCategoryName() {
-        return auctionItemCategoryName;
+    public String getTradingItemCategoryName() {
+        return tradingItemCategoryName;
     }
 
-    public void setAuctionItemCategoryName(String auctionItemCategoryName) {
-        this.auctionItemCategoryName = auctionItemCategoryName;
+    public void setTradingItemCategoryName(String tradingItemCategoryName) {
+        this.tradingItemCategoryName = tradingItemCategoryName;
     }
 
     public long getConditionId() {
@@ -199,6 +199,6 @@ public final class Valuation extends BaseModel<Valuation> {
 
     @Override
     public String getDisplayName() {
-        return getAuctionItemCatalogNumber();
+        return getTradingItemCatalogNumber();
     }
 }

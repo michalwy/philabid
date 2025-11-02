@@ -5,9 +5,9 @@ import com.philabid.model.Catalog;
 import com.philabid.model.CatalogValue;
 import com.philabid.model.Category;
 import com.philabid.model.Condition;
-import com.philabid.ui.control.AuctionItemSelector;
 import com.philabid.ui.control.CrudEditDialog;
 import com.philabid.ui.control.MonetaryField;
+import com.philabid.ui.control.TradingItemSelector;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -36,7 +36,7 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
 
     private static final Logger logger = LoggerFactory.getLogger(CatalogValueEditDialogController.class);
     @FXML
-    private AuctionItemSelector auctionItemSelector;
+    private TradingItemSelector tradingItemSelector;
     @FXML
     private ComboBox<Condition> conditionComboBox;
     @FXML
@@ -88,7 +88,7 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
             }
         });
 
-        auctionItemSelector.selectedCategoryProperty()
+        tradingItemSelector.selectedCategoryProperty()
                 .addListener((obs, oldVal, newVal) -> autoSelectCatalogAndCurrency(newVal));
 
         populateComboBoxes();
@@ -101,9 +101,9 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
         }
 
         // Pre-select items in ComboBoxes if editing an existing value
-        if (catalogValue.getAuctionItemId() != null) {
-            AppContext.getAuctionItemService().getById(catalogValue.getAuctionItemId())
-                    .ifPresent(auctionItemSelector::setSelectedAuctionItem);
+        if (catalogValue.getTradingItemId() != null) {
+            AppContext.getTradingItemService().getById(catalogValue.getTradingItemId())
+                    .ifPresent(tradingItemSelector::setSelectedTradingItem);
         }
         if (catalogValue.getConditionId() != null) {
             conditionComboBox.getItems().stream().filter(c -> c.getId().equals(catalogValue.getConditionId()))
@@ -127,7 +127,7 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
                 });
             }
         } else {
-            Platform.runLater(() -> auctionItemSelector.requestFocus());
+            Platform.runLater(() -> tradingItemSelector.requestFocus());
         }
     }
 
@@ -155,7 +155,7 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
 
     @Override
     protected void updateEntity(CatalogValue catalogValue) {
-        catalogValue.setAuctionItemId(auctionItemSelector.resolveAuctionItemId());
+        catalogValue.setTradingItemId(tradingItemSelector.resolveTradingItemId());
         catalogValue.setConditionId(conditionComboBox.getSelectionModel().getSelectedItem().getId());
         catalogValue.setCatalogId(catalogComboBox.getSelectionModel().getSelectedItem().getId());
         try {
@@ -187,13 +187,13 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
     protected Collection<ValidationError> validate() {
         List<ValidationError> errors = new ArrayList<>();
 
-        if (auctionItemSelector.getText() == null || auctionItemSelector.getText().isBlank()) {
-            errors.add(new ValidationError("Catalog Number cannot be empty.", auctionItemSelector));
+        if (tradingItemSelector.getText() == null || tradingItemSelector.getText().isBlank()) {
+            errors.add(new ValidationError("Catalog Number cannot be empty.", tradingItemSelector));
         }
 
         // If it's a new item, a category must be selected
-        if (auctionItemSelector.getSelectedAuctionItem() == null && auctionItemSelector.getSelectedCategory() == null) {
-            errors.add(new ValidationError("Category must be selected for a new catalog number.", auctionItemSelector));
+        if (tradingItemSelector.getSelectedTradingItem() == null && tradingItemSelector.getSelectedCategory() == null) {
+            errors.add(new ValidationError("Category must be selected for a new catalog number.", tradingItemSelector));
         }
         if (conditionComboBox.getSelectionModel().getSelectedItem() == null) {
             errors.add(new ValidationError("Condition must be selected.", conditionComboBox));

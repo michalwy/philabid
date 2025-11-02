@@ -60,7 +60,7 @@ public class AuctionStateDialogController {
     public void setAuction(Auction auction) {
         this.auction = auction;
 
-        urlLink.setText(auction.getAuctionItemCatalogNumber() + "  (" + auction.getAuctionItemCategoryName() + ", " +
+        urlLink.setText(auction.getTradingItemCatalogNumber() + "  (" + auction.getTradingItemCategoryName() + ", " +
                 auction.getConditionName() + ")");
         urlLink.setStyle("-fx-font-size: 16;");
         if (auction.getUrl() != null && !auction.getUrl().isBlank()) {
@@ -92,7 +92,7 @@ public class AuctionStateDialogController {
 
         initiallyArchived = auction.isArchived();
 
-        valuationDetails.setAuctionItem(auction.getAuctionItemId(), auction.getConditionId());
+        valuationDetails.setTradingItem(auction.getTradingItemId(), auction.getConditionId());
 
         Platform.runLater(() -> {
             currentPrice.requestFocus();

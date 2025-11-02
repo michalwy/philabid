@@ -49,8 +49,8 @@
             <Tab fx:id="valuationTab" text="Valuation">
                 <fx:include source="ValuationView.fxml" fx:id="valuationView"/>
             </Tab>
-            <Tab fx:id="auctionItemsTab" text="%tab.auctionItems">
-                <fx:include fx:id="auctionItemView" source="AuctionItemView.fxml"/>
+            <Tab fx:id="tradingItemsTab" text="%tab.tradingItems">
+                <fx:include fx:id="tradingItemView" source="TradingItemView.fxml"/>
             </Tab>
             <Tab fx:id="catalogValuesTab" text="%tab.catalogValues">
                 <fx:include fx:id="catalogValueView" source="CatalogValueView.fxml"/>

@@ -12,8 +12,8 @@ import java.util.Optional;
  */
 public class CatalogValueRepository extends CrudRepository<CatalogValue> {
     private static final Collection<QueryField<CatalogValue, ?>> FIELDS = List.of(
-            new LongQueryField<>("auction_item_id", CatalogValue::setAuctionItemId).withEntityValue(
-                    CatalogValue::getAuctionItemId),
+            new LongQueryField<>("trading_item_id", CatalogValue::setTradingItemId).withEntityValue(
+                    CatalogValue::getTradingItemId),
             new LongQueryField<>("condition_id", CatalogValue::setConditionId).withEntityValue(
                     CatalogValue::getConditionId),
             new LongQueryField<>("cv", "catalog_id", CatalogValue::setCatalogId).withEntityValue(
@@ -22,23 +22,23 @@ public class CatalogValueRepository extends CrudRepository<CatalogValue> {
                     CatalogValue::getValue),
             new MonetaryAmountQueryField<CatalogValue>("cv", "value", "currency_code",
                     CatalogValue::setValue).withMultiCurrencyEntityValue(CatalogValue::getValue),
-            new StringQueryField<>("catg", "name", "auction_item_category_name",
-                    CatalogValue::setAuctionItemCategoryName),
-            new StringQueryField<>("catg", "code", "auction_item_category_code",
-                    CatalogValue::setAuctionItemCategoryCode),
+            new StringQueryField<>("catg", "name", "trading_item_category_name",
+                    CatalogValue::setTradingItemCategoryName),
+            new StringQueryField<>("catg", "code", "trading_item_category_code",
+                    CatalogValue::setTradingItemCategoryCode),
             new StringQueryField<>("cat", "name", "catalog_name", CatalogValue::setCatalogName),
             new IntQueryField<>("cat", "issue_year", "catalog_issue_year", CatalogValue::setCatalogIssueYear),
-            new StringQueryField<>("ai", "catalog_number", "auction_item_catalog_number",
-                    CatalogValue::setAuctionItemCatalogNumber),
-            new LongQueryField<>("ai", "order_number", "auction_item_order_number",
-                    CatalogValue::setAuctionItemOrderNumber),
+            new StringQueryField<>("ti", "catalog_number", "trading_item_catalog_number",
+                    CatalogValue::setTradingItemCatalogNumber),
+            new LongQueryField<>("ti", "order_number", "trading_item_order_number",
+                    CatalogValue::setTradingItemOrderNumber),
             new StringQueryField<>("cond", "name", "condition_name", CatalogValue::setConditionName),
             new StringQueryField<>("cond", "code", "condition_code", CatalogValue::setConditionCode)
     );
 
     private static final Collection<QueryJoin> JOINS = List.of(
-            new QueryLeftOuterJoin("auction_items", "ai", "cv.auction_item_id = ai.id"),
-            new QueryLeftOuterJoin("categories", "catg", "ai.category_id = catg.id"),
+            new QueryLeftOuterJoin("trading_items", "ti", "cv.trading_item_id = ti.id"),
+            new QueryLeftOuterJoin("categories", "catg", "ti.category_id = catg.id"),
             new QueryLeftOuterJoin("catalogs", "cat", "cv.catalog_id = cat.id"),
             new QueryLeftOuterJoin("conditions", "cond", "cv.condition_id = cond.id")
     );
@@ -49,9 +49,9 @@ public class CatalogValueRepository extends CrudRepository<CatalogValue> {
         addJoins(JOINS);
     }
 
-    public Optional<CatalogValue> findByAuctionItemAndCondition(long auctionItemId, long conditionId) {
+    public Optional<CatalogValue> findByTradingItemAndCondition(long tradingItemId, long conditionId) {
         return findOne(List.of(
-                new EqualFilterCondition<>("cv.auction_item_id", auctionItemId),
+                new EqualFilterCondition<>("cv.trading_item_id", tradingItemId),
                 new EqualFilterCondition<>("cv.condition_id", conditionId)
         ));
     }

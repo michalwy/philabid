@@ -34,7 +34,7 @@ public class AuctionService extends AbstractCrudService<Auction> {
 
         Map<Pair<Long, Long>, List<Auction>> auctionsActiveMap =
                 auctions.stream()
-                        .collect(Collectors.groupingBy(a -> Pair.with(a.getAuctionItemId(), a.getConditionId())));
+                        .collect(Collectors.groupingBy(a -> Pair.with(a.getTradingItemId(), a.getConditionId())));
 
         auctionsArchiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);
         auctions.forEach(
@@ -48,20 +48,20 @@ public class AuctionService extends AbstractCrudService<Auction> {
         return auctions;
     }
 
-    public Collection<Auction> getArchivedAuctionsForItem(Long auctionItemId, Long conditionId) {
-        Collection<Auction> auctions = auctionRepository.findArchivedByItemAndCondition(auctionItemId, conditionId);
+    public Collection<Auction> getArchivedAuctionsForItem(Long tradingItemId, Long conditionId) {
+        Collection<Auction> auctions = auctionRepository.findArchivedByItemAndCondition(tradingItemId, conditionId);
         auctions.forEach(this::enrichAuction);
         return auctions;
     }
 
-    public Collection<Auction> getActiveAuctionsForItem(Long auctionItemId, Long conditionId) {
-        Collection<Auction> auctions = auctionRepository.findActiveByItemAndCondition(auctionItemId, conditionId);
+    public Collection<Auction> getActiveAuctionsForItem(Long tradingItemId, Long conditionId) {
+        Collection<Auction> auctions = auctionRepository.findActiveByItemAndCondition(tradingItemId, conditionId);
         auctions.forEach(this::enrichAuction);
         return auctions;
     }
 
     protected boolean validate(Auction auction) {
-        if (auction.getAuctionHouseId() == null || auction.getAuctionItemId() == null ||
+        if (auction.getAuctionHouseId() == null || auction.getTradingItemId() == null ||
                 auction.getConditionId() == null) {
             logger.warn("Attempted to save an auction with missing required IDs.");
             return false;
@@ -88,11 +88,11 @@ public class AuctionService extends AbstractCrudService<Auction> {
             auction.setCatalogValue(auction.getCatalogValue().originalAmount());
         }
         auction.setActiveAuctions(
-                activeAuctionsMap.getOrDefault(Pair.with(auction.getAuctionItemId(), auction.getConditionId()),
+                activeAuctionsMap.getOrDefault(Pair.with(auction.getTradingItemId(), auction.getConditionId()),
                         List.of()));
         auction.setArchivedAuctions(auctionArchiveMap.getOrDefault(auction.getId(), List.of()));
         auction.setCategoryArchivedAuctions(
-                categoryArchiveMap.getOrDefault(Pair.with(auction.getAuctionItemCategoryId(), auction.getConditionId()),
+                categoryArchiveMap.getOrDefault(Pair.with(auction.getTradingItemCategoryId(), auction.getConditionId()),
                         List.of()));
         auction.setRecommendedPrice(
                 AppContext.getPriceRecommendationService().calculateRecommendation(auction).orElse(null));

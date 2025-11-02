@@ -58,10 +58,10 @@ public class DashboardController implements RefreshableViewController {
     }
 
     private void setupCatalogValueNeededTable() {
-        setCategoryColumn(catalogValueNeededCategoryColumn, Auction::getAuctionItemCategoryCode,
-                Auction::getAuctionItemCategoryName);
-        setCatalogNumberColumn(catalogValueNeededCatalogNumberColumn, Auction::getAuctionItemCatalogNumber,
-                Auction::getAuctionItemOrderNumber);
+        setCategoryColumn(catalogValueNeededCategoryColumn, Auction::getTradingItemCategoryCode,
+                Auction::getTradingItemCategoryName);
+        setCatalogNumberColumn(catalogValueNeededCatalogNumberColumn, Auction::getTradingItemCatalogNumber,
+                Auction::getTradingItemOrderNumber);
         setConditionColumn(catalogValueNeededConditionColumn, Auction::getConditionCode, Auction::getConditionName);
         setCatalogColumn(catalogValueNeededCatalogColumn, Auction::getCatalogName, Auction::getCatalogIssueYear);
         setCatalogValueColumn(catalogValueNeededCatalogValueColumn, "catalogValue", Auction::getCatalogValue,
@@ -99,10 +99,10 @@ public class DashboardController implements RefreshableViewController {
         if (auction == null) return;
 
         CatalogValue catalogValue = AppContext.getCatalogValueService()
-                .findByAuctionItemAndCondition(auction.getAuctionItemId(), auction.getConditionId())
+                .findByTradingItemAndCondition(auction.getTradingItemId(), auction.getConditionId())
                 .orElse(new CatalogValue());
 
-        catalogValue.setAuctionItemId(auction.getAuctionItemId());
+        catalogValue.setTradingItemId(auction.getTradingItemId());
         catalogValue.setConditionId(auction.getConditionId());
         catalogValue.setCatalogId(null);
 

@@ -25,7 +25,7 @@ public class AppContext {
     private final CatalogService catalogService;
     private final CategoryService categoryService;
     private final ConditionService conditionService;
-    private final AuctionItemService auctionItemService;
+    private final TradingItemService tradingItemService;
     private final AuctionService auctionService;
     private final CatalogValueService catalogValueService;
     private final UrlParsingService urlParsingService;
@@ -47,7 +47,7 @@ public class AppContext {
         CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
         CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
         ConditionRepository conditionRepository = new ConditionRepository(databaseManager);
-        AuctionItemRepository auctionItemRepository = new AuctionItemRepository(databaseManager);
+        TradingItemRepository tradingItemRepository = new TradingItemRepository(databaseManager);
         AuctionRepository auctionRepository = new AuctionRepository(databaseManager);
         CatalogValueRepository catalogValueRepository = new CatalogValueRepository(databaseManager);
         ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository(databaseManager);
@@ -58,7 +58,7 @@ public class AppContext {
         catalogService = new CatalogService(catalogRepository);
         categoryService = new CategoryService(categoryRepository);
         conditionService = new ConditionService(conditionRepository);
-        auctionItemService = new AuctionItemService(auctionItemRepository);
+        tradingItemService = new TradingItemService(tradingItemRepository);
         auctionService = new AuctionService(auctionRepository);
         catalogValueService = new CatalogValueService(catalogValueRepository);
         urlParsingService =
@@ -101,8 +101,8 @@ public class AppContext {
         return get().conditionService;
     }
 
-    public static AuctionItemService getAuctionItemService() {
-        return get().auctionItemService;
+    public static TradingItemService getTradingItemService() {
+        return get().tradingItemService;
     }
 
     public static AuctionService getAuctionService() {

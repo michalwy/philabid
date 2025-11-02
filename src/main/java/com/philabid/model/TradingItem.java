@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 /**
  * Represents an item that can be put up for auction.
  */
-public class AuctionItem extends BaseModel<AuctionItem> {
+public class TradingItem extends BaseModel<TradingItem> {
 
     private final static Pattern ORDER_NUMBER_PATTERN = Pattern.compile("\\d+");
     private Long categoryId;
@@ -21,7 +21,7 @@ public class AuctionItem extends BaseModel<AuctionItem> {
     private Integer catalogIssueYear;
 
     // Constructors
-    public AuctionItem() {
+    public TradingItem() {
     }
 
     public static Long calculateOrderNumber(String catalogNumber) {

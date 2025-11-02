@@ -1,9 +1,9 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
-import com.philabid.model.AuctionItem;
 import com.philabid.model.Catalog;
 import com.philabid.model.Category;
+import com.philabid.model.TradingItem;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -19,12 +19,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
-/**
- * Controller for the auction item edit dialog.
- */
-public class AuctionItemEditDialogController extends CrudEditDialogController<AuctionItem> {
+public class TradingItemEditDialogController extends CrudEditDialogController<TradingItem> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuctionItemEditDialogController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TradingItemEditDialogController.class);
     @FXML
     private ComboBox<Category> categoryComboBox;
     @FXML
@@ -51,7 +48,6 @@ public class AuctionItemEditDialogController extends CrudEditDialogController<Au
         });
 
         populateCategoryComboBox();
-        logger.debug("AuctionItemEditDialogController initialized.");
     }
 
     private void populateCategoryComboBox() {
@@ -61,42 +57,42 @@ public class AuctionItemEditDialogController extends CrudEditDialogController<Au
     }
 
     @Override
-    public void loadEntity(AuctionItem auctionItem) {
-        catalogNumberField.setText(auctionItem.getCatalogNumber());
-        orderNumberField.setText(String.valueOf(auctionItem.getOrderNumber()));
-        notesArea.setText(auctionItem.getNotes());
+    public void loadEntity(TradingItem tradingItem) {
+        catalogNumberField.setText(tradingItem.getCatalogNumber());
+        orderNumberField.setText(String.valueOf(tradingItem.getOrderNumber()));
+        notesArea.setText(tradingItem.getNotes());
 
-        if (auctionItem.getCategoryId() != null && categoryComboBox.getItems() != null) {
+        if (tradingItem.getCategoryId() != null && categoryComboBox.getItems() != null) {
             categoryComboBox.getItems().stream()
-                    .filter(c -> c.getId().equals(auctionItem.getCategoryId()))
+                    .filter(c -> c.getId().equals(tradingItem.getCategoryId()))
                     .findFirst()
                     .ifPresent(categoryComboBox.getSelectionModel()::select);
         }
     }
 
     @Override
-    protected void updateEntity(AuctionItem auctionItem) {
-        auctionItem.setCatalogNumber(catalogNumberField.getText());
-        auctionItem.setOrderNumber(Long.parseLong(orderNumberField.getText()));
-        auctionItem.setNotes(notesArea.getText());
+    protected void updateEntity(TradingItem tradingItem) {
+        tradingItem.setCatalogNumber(catalogNumberField.getText());
+        tradingItem.setOrderNumber(Long.parseLong(orderNumberField.getText()));
+        tradingItem.setNotes(notesArea.getText());
 
         Category selectedCategory = categoryComboBox.getSelectionModel().getSelectedItem();
         if (selectedCategory != null) {
-            auctionItem.setCategoryId(selectedCategory.getId());
+            tradingItem.setCategoryId(selectedCategory.getId());
             // Set catalog info from selected category's catalog
             Catalog associatedCatalog =
                     AppContext.getCatalogService().getById(selectedCategory.getCatalogId()).orElse(null);
             if (associatedCatalog != null) {
-                auctionItem.setCatalogName(associatedCatalog.getName());
-                auctionItem.setCatalogIssueYear(associatedCatalog.getIssueYear());
+                tradingItem.setCatalogName(associatedCatalog.getName());
+                tradingItem.setCatalogIssueYear(associatedCatalog.getIssueYear());
             } else {
-                auctionItem.setCatalogName(null);
-                auctionItem.setCatalogIssueYear(null);
+                tradingItem.setCatalogName(null);
+                tradingItem.setCatalogIssueYear(null);
             }
         } else {
-            auctionItem.setCategoryId(null);
-            auctionItem.setCatalogName(null);
-            auctionItem.setCatalogIssueYear(null);
+            tradingItem.setCategoryId(null);
+            tradingItem.setCatalogName(null);
+            tradingItem.setCatalogIssueYear(null);
         }
     }
 
@@ -108,12 +104,12 @@ public class AuctionItemEditDialogController extends CrudEditDialogController<Au
 
         if (categoryComboBox.getSelectionModel().getSelectedItem() == null) {
             errors.add(new ValidationError(
-                    (bundle != null ? bundle.getString("auctionItems.validation.noCategorySelected") : "No " +
+                    (bundle != null ? bundle.getString("tradingItems.validation.noCategorySelected") : "No " +
                             "category selected."), categoryComboBox));
         }
         if (catalogNumberField.getText() == null || catalogNumberField.getText().trim().isEmpty()) {
             errors.add(new ValidationError(
-                    (bundle != null ? bundle.getString("auctionItems.validation.noCatalogNumber") : "No valid" +
+                    (bundle != null ? bundle.getString("tradingItems.validation.noCatalogNumber") : "No valid" +
                             " catalog number."), catalogNumberField));
         }
 
@@ -127,6 +123,6 @@ public class AuctionItemEditDialogController extends CrudEditDialogController<Au
      * @param catalogNumber The text from the catalog number field.
      */
     private void updateOrderNumberFromCatalogNumber(String catalogNumber) {
-        orderNumberField.setText(AuctionItem.calculateOrderNumber(catalogNumber).toString());
+        orderNumberField.setText(TradingItem.calculateOrderNumber(catalogNumber).toString());
     }
 }

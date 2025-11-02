@@ -51,8 +51,8 @@ public class ActiveAuctionController extends BaseAuctionController {
         setPriceWithThresholdColumn(recommendedPriceColumn, "recommendedPrice", Auction::getCatalogValue,
                 Auction::getCatalogValue);
 
-        setCatalogNumberWithWarningColumn(catalogNumberColumn, Auction::getAuctionItemCatalogNumber,
-                Auction::getAuctionItemOrderNumber, t -> t.getActiveAuctions().stream()
+        setCatalogNumberWithWarningColumn(catalogNumberColumn, Auction::getTradingItemCatalogNumber,
+                Auction::getTradingItemOrderNumber, t -> t.getActiveAuctions().stream()
                         .anyMatch(activeAuction -> !Objects.equals(t.getId(), activeAuction.getId()) &&
                                 activeAuction.isWinningBid()), Auction::isAlreadyPurchased);
 
@@ -123,7 +123,7 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         CatalogValue newCatalogValue = new CatalogValue();
         // Pre-populate with data from the auction
-        newCatalogValue.setAuctionItemId(auction.getAuctionItemId());
+        newCatalogValue.setTradingItemId(auction.getTradingItemId());
         newCatalogValue.setConditionId(auction.getConditionId());
 
         EditDialogResult result = showCatalogValueEditDialog(newCatalogValue);
@@ -137,7 +137,7 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         // Find the existing CatalogValue to edit it
         AppContext.getCatalogValueService()
-                .findByAuctionItemAndCondition(auction.getAuctionItemId(), auction.getConditionId())
+                .findByTradingItemAndCondition(auction.getTradingItemId(), auction.getConditionId())
                 .ifPresent(catalogValueToUpdate -> {
                     // We want the user to select a new, active catalog, so we don't pre-set the old one.
                     catalogValueToUpdate.setCatalogId(null);

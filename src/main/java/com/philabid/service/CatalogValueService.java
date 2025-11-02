@@ -21,7 +21,7 @@ public class CatalogValueService extends AbstractCrudService<CatalogValue> {
     }
 
     protected boolean validate(CatalogValue catalogValue) {
-        if (catalogValue.getAuctionItemId() == null || catalogValue.getConditionId() == null ||
+        if (catalogValue.getTradingItemId() == null || catalogValue.getConditionId() == null ||
                 catalogValue.getCatalogId() == null || catalogValue.getValue() == null) {
             logger.warn("Attempted to save a catalog value with missing required fields.");
             return false;
@@ -29,7 +29,7 @@ public class CatalogValueService extends AbstractCrudService<CatalogValue> {
         return true;
     }
 
-    public Optional<CatalogValue> findByAuctionItemAndCondition(long auctionItemId, long conditionId) {
-        return catalogValueRepository.findByAuctionItemAndCondition(auctionItemId, conditionId);
+    public Optional<CatalogValue> findByTradingItemAndCondition(long tradingItemId, long conditionId) {
+        return catalogValueRepository.findByTradingItemAndCondition(tradingItemId, conditionId);
     }
 }

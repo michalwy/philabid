@@ -74,14 +74,14 @@ public class MainController implements Initializable {
     @FXML
     private Tab valuationTab;
     @FXML
-    private Tab auctionItemsTab;
+    private Tab tradingItemsTab;
     @FXML
     private Tab catalogValuesTab;
     @FXML
     private StatusBar statusBar;
     // Injected controllers from included FXML files
     @FXML
-    private AuctionItemController auctionItemViewController;
+    private TradingItemController tradingItemViewController;
     @FXML
     private CatalogValueController catalogValueViewController;
     @FXML
@@ -156,7 +156,7 @@ public class MainController implements Initializable {
         tabControllerMap.put(activeAuctionsTab, activeAuctionViewController);
         tabControllerMap.put(archivedAuctionsTab, archivedAuctionViewController);
         tabControllerMap.put(valuationTab, valuationViewController);
-        tabControllerMap.put(auctionItemsTab, auctionItemViewController);
+        tabControllerMap.put(tradingItemsTab, tradingItemViewController);
         tabControllerMap.put(catalogValuesTab, catalogValueViewController);
         tabControllerMap.put(dashboardTab, dashboardViewController);
     }
@@ -293,7 +293,7 @@ public class MainController implements Initializable {
             activeAuctionsTab.setText(AppContext.getI18nManager().getString("tab.auctions.active"));
             archivedAuctionsTab.setText(AppContext.getI18nManager().getString("tab.auctions.archived"));
             valuationTab.setText(AppContext.getI18nManager().getString("tab.valuation"));
-            auctionItemsTab.setText(AppContext.getI18nManager().getString("tab.auctionItems"));
+            tradingItemsTab.setText(AppContext.getI18nManager().getString("tab.tradingItems"));
             catalogValuesTab.setText(AppContext.getI18nManager().getString("tab.catalogValues"));
         } catch (Exception e) {
             logger.warn("Error updating localized strings", e);

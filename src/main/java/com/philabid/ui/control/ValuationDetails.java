@@ -133,11 +133,11 @@ public class ValuationDetails extends VBox {
         });
     }
 
-    public void setAuctionItem(Long auctionItemId, Long conditionId) {
+    public void setTradingItem(Long tradingItemId, Long conditionId) {
         historyTable.setItems(FXCollections.observableArrayList(AppContext.getAuctionService()
-                .getArchivedAuctionsForItem(auctionItemId, conditionId)));
+                .getArchivedAuctionsForItem(tradingItemId, conditionId)));
 
-        valuation = AppContext.getValuationService().getForItem(auctionItemId, conditionId).orElse(null);
+        valuation = AppContext.getValuationService().getForItem(tradingItemId, conditionId).orElse(null);
         if (valuation == null) {
             return;
         }

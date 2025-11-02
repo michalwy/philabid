@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.philabid.ui.control.AuctionItemSelector?>
 <?import com.philabid.ui.control.CrudEditDialog?>
 <?import com.philabid.ui.control.MonetaryField?>
+<?import com.philabid.ui.control.TradingItemSelector?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.SVGPath?>
@@ -23,7 +23,7 @@
         <ComboBox fx:id="auctionHouseComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
         <Label text="%auctions.label.item" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.valignment="TOP"/>
-        <AuctionItemSelector fx:id="auctionItemSelector" GridPane.columnIndex="1" GridPane.rowIndex="2"
+        <TradingItemSelector fx:id="tradingItemSelector" GridPane.columnIndex="1" GridPane.rowIndex="2"
                              GridPane.rowSpan="2"/>
 
         <Label text="%auctions.label.condition" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
