@@ -307,4 +307,15 @@ public class Auction extends BaseModel<Auction> {
         return this.getLotId() + ": " + this.getAuctionItemCategoryName() + " - " + this.getAuctionItemCatalogNumber() +
                 " - " + this.getConditionName();
     }
+
+    public boolean isWinningBid() {
+        if (currentPrice == null || maxBid == null) {
+            return false;
+        }
+        return maxBid.defaultCurrencyAmount().isGreaterThanOrEqualTo(currentPrice.defaultCurrencyAmount());
+    }
+
+    public boolean isAlreadyPurchased() {
+        return archivedAuctions != null && archivedAuctions.stream().anyMatch(Auction::isWinningBid);
+    }
 }

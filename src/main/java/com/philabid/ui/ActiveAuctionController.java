@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static com.philabid.ui.util.TableViewHelpers.*;
 
@@ -51,7 +52,9 @@ public class ActiveAuctionController extends BaseAuctionController {
                 Auction::getCatalogValue);
 
         setCatalogNumberWithWarningColumn(catalogNumberColumn, Auction::getAuctionItemCatalogNumber,
-                Auction::getAuctionItemOrderNumber, t -> t.getActiveAuctions().size() > 1);
+                Auction::getAuctionItemOrderNumber, t -> t.getActiveAuctions().stream()
+                        .anyMatch(activeAuction -> !Objects.equals(t.getId(), activeAuction.getId()) &&
+                                activeAuction.isWinningBid()), Auction::isAlreadyPurchased);
 
         addRowFormatter((row, auction, empty) -> {
             row.getStyleClass().remove("expired-auction");

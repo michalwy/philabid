@@ -12,18 +12,25 @@ public class CatalogNumberWithWarningItemCell<T> extends TableCell<T, CatalogNum
 
     private final Label textLabel = new Label();
     private final SVGPath warningIcon = new SVGPath();
+    private final SVGPath criticalIcon = new SVGPath();
 
     private final Function<T, Boolean> warningGetter;
+    private final Function<T, Boolean> criticalGetter;
 
-    public CatalogNumberWithWarningItemCell(Function<T, Boolean> warningGetter) {
+    public CatalogNumberWithWarningItemCell(Function<T, Boolean> warningGetter, Function<T, Boolean> criticalGetter) {
         this.warningGetter = warningGetter;
+        this.criticalGetter = criticalGetter;
 
         warningIcon.setContent(
                 "M10,2c-4.42,0-8,3.58-8,8s3.58,8,8,8s8-3.58,8-8S14.42,2,10,2z M11,16H9v-2h2V16z M11,12H9V6h2V12z");
         warningIcon.getStyleClass().add("warning-icon");
 
+        criticalIcon.setContent(
+                "M10,2c-4.42,0-8,3.58-8,8s3.58,8,8,8s8-3.58,8-8S14.42,2,10,2z M11,16H9v-2h2V16z M11,12H9V6h2V12z");
+        criticalIcon.getStyleClass().add("critical-icon");
+
         HBox graphicBox = new HBox(5);
-        graphicBox.getChildren().addAll(textLabel, warningIcon);
+        graphicBox.getChildren().addAll(textLabel, warningIcon, criticalIcon);
         graphicBox.setAlignment(Pos.CENTER_LEFT);
 
         setGraphic(graphicBox);
@@ -36,12 +43,18 @@ public class CatalogNumberWithWarningItemCell<T> extends TableCell<T, CatalogNum
         textLabel.setText("");
         warningIcon.setVisible(false);
         warningIcon.setManaged(false);
+        criticalIcon.setVisible(false);
+        criticalIcon.setManaged(false);
 
         if (!empty && item != null) {
             textLabel.setText(item.catalogNumber());
             Boolean warning = warningGetter.apply(getTableRow().getItem());
             warningIcon.setVisible(warning);
             warningIcon.setManaged(warning);
+
+            Boolean critical = criticalGetter.apply(getTableRow().getItem());
+            criticalIcon.setVisible(critical);
+            criticalIcon.setManaged(critical);
         }
     }
 }

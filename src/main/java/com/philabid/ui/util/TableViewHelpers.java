@@ -31,11 +31,12 @@ public class TableViewHelpers {
             TableColumn<T, CatalogNumberColumnValue> catalogNumberColumn,
             Function<T, String> catalogNumberGetter,
             Function<T, Long> orderNumberGetter,
-            Function<T, Boolean> warningGetter) {
+            Function<T, Boolean> warningGetter, Function<T, Boolean> criticalGetter) {
         catalogNumberColumn.setCellValueFactory(
                 CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter));
         catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
-        catalogNumberColumn.setCellFactory(column -> new CatalogNumberWithWarningItemCell<>(warningGetter));
+        catalogNumberColumn.setCellFactory(
+                column -> new CatalogNumberWithWarningItemCell<>(warningGetter, criticalGetter));
     }
 
     public static <T> void setConditionColumn(TableColumn<T, String> conditionColumn,
