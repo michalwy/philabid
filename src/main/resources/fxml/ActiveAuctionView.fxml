@@ -11,6 +11,7 @@
         <TableColumn fx:id="catalogNumberColumn" prefWidth="50.0" text="%auctions.column.catalogNumber"/>
         <TableColumn fx:id="conditionColumn" prefWidth="70.0" text="%auctions.column.condition"/>
         <TableColumn fx:id="urlColumn" prefWidth="150.0" text="%auctions.column.url"/>
+        <TableColumn fx:id="statusColumn" prefWidth="50.0" text="Status"/>
         <TableColumn fx:id="maxBidColumn" prefWidth="50.0" text="%auctions.column.maxBid"/>
         <TableColumn fx:id="currentPriceColumn" prefWidth="50.0" text="%auctions.column.price"/>
         <TableColumn fx:id="recommendedPriceColumn" prefWidth="50.0" text="%auctions.column.recommendedPrice"/>

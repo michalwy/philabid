@@ -9,6 +9,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.function.Function;
 
 public class TableViewHelpers {
@@ -37,6 +38,11 @@ public class TableViewHelpers {
         catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
         catalogNumberColumn.setCellFactory(
                 column -> new CatalogNumberWithWarningItemCell<>(warningGetter, criticalGetter));
+    }
+
+    public static <T, V> void setLabelsColumn(TableColumn<T, List<V>> column, String property, int maxLabels) {
+        column.setCellValueFactory(new PropertyValueFactory<>(property));
+        column.setCellFactory(column1 -> new LabelsCell<>(maxLabels));
     }
 
     public static <T> void setConditionColumn(TableColumn<T, String> conditionColumn,

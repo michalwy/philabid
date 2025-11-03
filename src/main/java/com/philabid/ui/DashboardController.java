@@ -161,6 +161,7 @@ public class DashboardController implements RefreshableViewController {
         Collection<Auction> auctions = AppContext.getAuctionService().getActiveAuctions(List.of());
 
         catalogValueNeededTableItems.setAll(auctions.stream().filter(a -> !a.isCatalogActive()).toList());
+        catalogValueNeededTable.sort();
     }
 
     @Override

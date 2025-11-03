@@ -62,12 +62,9 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
                 return;
             }
 
-            if (auction.getMaxBid() != null && auction.getCurrentPrice() != null && auction.getMaxBid().originalAmount()
-                    .isGreaterThanOrEqualTo(auction.getCurrentPrice().originalAmount())) {
+            if (auction.isWinningBid()) {
                 row.getStyleClass().add("winning-auction");
-            } else if (auction.getCurrentPrice() != null && auction.getRecommendedPrice() != null &&
-                    auction.getCurrentPrice().defaultCurrencyAmount()
-                            .isGreaterThan(auction.getRecommendedPrice().defaultCurrencyAmount())) {
+            } else if (auction.isOverpriced()) {
                 row.getStyleClass().add("overpriced-auction");
             }
         });

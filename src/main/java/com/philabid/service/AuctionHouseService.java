@@ -2,9 +2,12 @@ package com.philabid.service;
 
 import com.philabid.database.AuctionHouseRepository;
 import com.philabid.model.AuctionHouse;
+import com.philabid.util.MultiCurrencyMonetaryAmount;
+import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -51,5 +54,30 @@ public class AuctionHouseService extends AbstractCrudService<AuctionHouse> {
             logger.error("Failed to find auction house with name: {}", name, e);
             return Optional.empty();
         }
+    }
+
+    public MultiCurrencyMonetaryAmount getNextBid(Long auctionHouseId, MultiCurrencyMonetaryAmount currentPrice) {
+        long step = 1;
+        BigDecimal current = currentPrice.originalAmount().getNumber().numberValue(BigDecimal.class);
+        if (current.compareTo(BigDecimal.valueOf(10000)) > 0) {
+            step = 250;
+        } else if (current.compareTo(BigDecimal.valueOf(5000)) > 0) {
+            step = 100;
+        } else if (current.compareTo(BigDecimal.valueOf(2500)) > 0) {
+            step = 50;
+        } else if (current.compareTo(BigDecimal.valueOf(1000)) > 0) {
+            step = 25;
+        } else if (current.compareTo(BigDecimal.valueOf(500)) > 0) {
+            step = 15;
+        } else if (current.compareTo(BigDecimal.valueOf(250)) > 0) {
+            step = 10;
+        } else if (current.compareTo(BigDecimal.valueOf(100)) > 0) {
+            step = 5;
+        } else if (current.compareTo(BigDecimal.valueOf(25)) > 0) {
+            step = 2;
+        }
+
+        return MultiCurrencyMonetaryAmount.of(
+                currentPrice.originalAmount().add(Money.of(step, currentPrice.getOriginalCurrency())));
     }
 }

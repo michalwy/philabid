@@ -1,11 +1,13 @@
 package com.philabid.model;
 
+import com.philabid.AppContext;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -317,5 +319,47 @@ public class Auction extends BaseModel<Auction> {
 
     public boolean isAlreadyPurchased() {
         return archivedAuctions != null && archivedAuctions.stream().anyMatch(Auction::isWinningBid);
+    }
+
+    public boolean isOverpriced() {
+        return getCurrentPrice() != null && getRecommendedPrice() != null &&
+                getCurrentPrice().defaultCurrencyAmount().isGreaterThan(getRecommendedPrice().defaultCurrencyAmount());
+    }
+
+    public boolean isNextBidOverpriced() {
+        if (getCurrentPrice() == null || getRecommendedPrice() == null) {
+            return false;
+        }
+        MultiCurrencyMonetaryAmount nextBid =
+                AppContext.getAuctionHouseService().getNextBid(auctionHouseId, getCurrentPrice());
+        return nextBid.defaultCurrencyAmount().isGreaterThan(getRecommendedPrice().defaultCurrencyAmount());
+    }
+
+    public List<AuctionStatus> getAuctionStatuses() {
+        List<AuctionStatus> statuses = new ArrayList<>();
+        if (isWinningBid()) {
+            statuses.add(AuctionStatus.WINNING);
+        }
+        if (isAlreadyPurchased()) {
+            statuses.add(AuctionStatus.OWNED);
+        }
+        if (isFinished()) {
+            statuses.add(AuctionStatus.EXPIRED);
+        }
+        if (isOverpriced()) {
+            statuses.add(AuctionStatus.OVERPRICED);
+        } else if (isNextBidOverpriced() && !isWinningBid()) {
+            statuses.add(AuctionStatus.NEXT_BID_OVERPRICED);
+        }
+        return statuses;
+    }
+
+    public enum AuctionStatus {
+        WINNING,
+        EXPIRED,
+        OVERPRICED,
+        OUTBID,
+        NEXT_BID_OVERPRICED,
+        OWNED
     }
 }

@@ -22,7 +22,7 @@ public abstract class FilteredCrudTableViewController<T extends BaseModel<T>> ex
     @Override
     protected void initializeFilterToolbar() {
         getCrudTableView().addFilter(
-                new CrudTableViewMultiFilter(List.of("ai.catalog_number", "catg.code")));
+                new CrudTableViewMultiFilter(List.of("ti.catalog_number", "catg.code")));
         getCrudTableView().addFilter(new CrudTableViewCategoryFilter());
         getCrudTableView().addFilter(new CrudTableViewConditionFilter());
 

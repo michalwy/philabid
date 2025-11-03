@@ -31,6 +31,8 @@ public class ActiveAuctionController extends BaseAuctionController {
     private static final Logger logger = LoggerFactory.getLogger(ActiveAuctionController.class);
 
     @FXML
+    protected TableColumn<Auction, List<Auction.AuctionStatus>> statusColumn;
+    @FXML
     protected TableColumn<Auction, String> urlColumn;
     @FXML
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> recommendedPriceColumn;
@@ -55,6 +57,8 @@ public class ActiveAuctionController extends BaseAuctionController {
                 Auction::getTradingItemOrderNumber, t -> t.getActiveAuctions().stream()
                         .anyMatch(activeAuction -> !Objects.equals(t.getId(), activeAuction.getId()) &&
                                 activeAuction.isWinningBid()), Auction::isAlreadyPurchased);
+
+        setLabelsColumn(statusColumn, "auctionStatuses", 5);
 
         addRowFormatter((row, auction, empty) -> {
             row.getStyleClass().remove("expired-auction");
