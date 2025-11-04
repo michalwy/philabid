@@ -12,11 +12,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +38,8 @@ public class CrudTableView<T extends BaseModel<T>> extends VBox {
     CrudToolbar crudToolbar;
     @FXML
     ToolBar filterToolbar;
+    @FXML
+    HBox filterHBox;
 
     public CrudTableView() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/control/CrudTableView.fxml"));
@@ -74,7 +75,22 @@ public class CrudTableView<T extends BaseModel<T>> extends VBox {
     public void addFilter(CrudTableViewFilter filter) {
         filters.add(filter);
 
-        filterToolbar.getItems().add(filter.getControl());
+        HBox itemHBox = new HBox(5);
+
+        SVGPath crossIcon = new SVGPath();
+        crossIcon.setContent("M 0 0 L 7 7 M 7 0 L 0 7"); // A simple 'X'
+        crossIcon.setStyle("-fx-stroke: -fx-text-main; -fx-stroke-width: 1.5;");
+
+        Button clearButton = new Button();
+        clearButton.setGraphic(crossIcon);
+        clearButton.setTooltip(new Tooltip("Clear filter"));
+        clearButton.setOnAction((event) -> {
+            filter.clear();
+        });
+
+        itemHBox.getChildren().addAll(filter.getControl(), clearButton);
+
+        filterHBox.getChildren().add(itemHBox);
 
         filter.filterConditionProperty().addListener((observable, oldValue, newValue) -> {
             applyFilters();

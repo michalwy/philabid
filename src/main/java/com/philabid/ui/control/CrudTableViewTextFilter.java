@@ -40,4 +40,9 @@ public abstract class CrudTableViewTextFilter extends CrudTableViewLabeledFilter
     protected String getText() {
         return textField.getText();
     }
+
+    @Override
+    public void clear() {
+        textField.clear();
+    }
 }

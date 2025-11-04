@@ -17,4 +17,6 @@ public abstract class CrudTableViewFilter {
     public ObjectProperty<FilterCondition> filterConditionProperty() {
         return filterCondition;
     }
+
+    public abstract void clear();
 }
