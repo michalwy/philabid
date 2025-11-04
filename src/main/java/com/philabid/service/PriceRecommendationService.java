@@ -10,16 +10,18 @@ import org.javatuples.Pair;
 
 import javax.money.MonetaryAmount;
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class PriceRecommendationService {
     public Optional<MultiCurrencyMonetaryAmount> calculateRecommendation(Auction auction) {
-        return calculateRecommendationFromTradingItem(auction)
+        return calculateMedianRecommendationFromTradingItem(auction)
                 .or(() -> calculateRecommendationFromCategory(auction));
     }
 
     public Optional<MultiCurrencyMonetaryAmount> calculateRecommendation(Valuation valuation) {
-        return Optional.ofNullable(valuation.getAveragePrice())
+        return Optional.ofNullable(valuation.getMedianPrice())
                 .or(() -> Optional.ofNullable(valuation.getCategoryAveragePrice()));
     }
 
@@ -39,6 +41,28 @@ public class PriceRecommendationService {
                 .map(p -> p.getValue0().divide(p.getValue1()))
                 .map(amount -> amount.with(MonetaryOperators.rounding(RoundingMode.HALF_UP, 2)))
                 .map(MultiCurrencyMonetaryAmount::of);
+    }
+
+    private Optional<MultiCurrencyMonetaryAmount> calculateMedianRecommendationFromTradingItem(Auction auction) {
+        List<MonetaryAmount> entries = auction.getArchivedAuctions().stream()
+                .map(Auction::getCurrentPrice)
+                .filter(Objects::nonNull)
+                .map(MultiCurrencyMonetaryAmount::defaultCurrencyAmount)
+                .sorted()
+                .toList();
+
+        if (entries.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (entries.size() % 2 != 0) {
+            return Optional.of(MultiCurrencyMonetaryAmount.of(entries.get(entries.size() / 2)));
+        } else {
+            MonetaryAmount p1 = entries.get(entries.size() / 2);
+            MonetaryAmount p2 = entries.get(entries.size() / 2 - 1);
+            return Optional.of(MultiCurrencyMonetaryAmount.of(
+                    p1.add(p2).divide(2).with(MonetaryOperators.rounding(RoundingMode.HALF_UP, 2))));
+        }
     }
 
     private Optional<MultiCurrencyMonetaryAmount> calculateRecommendationFromCategory(Auction auction) {

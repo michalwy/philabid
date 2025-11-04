@@ -252,6 +252,26 @@
     -fx-text-fill: -fx-text-main;
 }
 
+.user-label {
+    -fx-background-color: gray;
+    -fx-text-fill: -fx-text-light;
+    -fx-padding: 5 15 5 15;
+    -fx-font-size: 0.8em;
+    -fx-background-radius: 5;
+}
+
+.user-label.user-label-overpriced {
+    -fx-background-color: orange;
+}
+
+.user-label.user-label-next-bid-overpriced {
+    -fx-background-color: orange;
+}
+
+.user-label.user-label-winning {
+    -fx-background-color: green;
+}
+
 /* Separators */
 .separator {
     -fx-background-color: -fx-border-main;

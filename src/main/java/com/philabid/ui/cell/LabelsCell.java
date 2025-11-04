@@ -29,12 +29,16 @@ public class LabelsCell<T, V> extends TableCell<T, List<V>> {
         super.updateItem(item, empty);
 
         for (int i = 0; i < labels.size(); i++) {
-            labels.get(i).setVisible(false);
-            labels.get(i).setManaged(false);
+            Label label = labels.get(i);
+            label.setVisible(false);
+            label.setManaged(false);
+            label.getStyleClass().setAll("user-label");
             if (item != null && i < item.size()) {
-                labels.get(i).setVisible(true);
-                labels.get(i).setManaged(true);
-                labels.get(i).setText(item.get(i).toString());
+                V itemValue = item.get(i);
+                label.setVisible(true);
+                label.setManaged(true);
+                label.setText(item.get(i).toString());
+                label.getStyleClass().add("user-label-" + itemValue.toString().toLowerCase().replaceAll("_", "-"));
             }
         }
     }
