@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  * Controller for the Auction House management view (AuctionHouseView.fxml).
  * Handles user interactions for creating, editing, and deleting auction houses.
  */
-public class AuctionHouseController extends SimpleCrudTableViewController<AuctionHouse> {
+public class AuctionHouseController extends ModalCrudTableViewController<AuctionHouse> {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionHouseController.class);
     @FXML

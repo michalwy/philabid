@@ -7,6 +7,7 @@
                fx:controller="com.philabid.ui.ActiveAuctionController" title="%auctions.title">
     <columns>
         <TableColumn fx:id="auctionHouseColumn" prefWidth="70.0" text="%auctions.column.house"/>
+        <TableColumn fx:id="sellerColumn" prefWidth="70.0" text="Seller"/>
         <TableColumn fx:id="categoryColumn" prefWidth="100.0" text="%auctions.column.category"/>
         <TableColumn fx:id="catalogNumberColumn" prefWidth="50.0" text="%auctions.column.catalogNumber"/>
         <TableColumn fx:id="conditionColumn" prefWidth="70.0" text="%auctions.column.condition"/>

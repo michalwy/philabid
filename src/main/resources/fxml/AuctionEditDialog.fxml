@@ -36,20 +36,24 @@
         <Label text="%auctions.label.lotId" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
         <TextField fx:id="lotIdField" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
-        <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
-        <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+        <Label text="Seller:" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+        <TextField fx:id="sellerField" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
 
-        <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
-        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
 
-        <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
-        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="9">
+        <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+        <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+
+        <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="9"/>
+
+        <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
+        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="10">
             <DatePicker fx:id="endDatePicker" HBox.hgrow="ALWAYS"/>
             <TextField fx:id="endTimeField" promptText="HH:mm" prefWidth="80"/>
         </HBox>
 
-        <Label text="%auctions.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
-        <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
+        <Label text="%auctions.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
+        <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="11"/>
 
         <columnConstraints>
             <ColumnConstraints/>

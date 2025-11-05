@@ -5,6 +5,7 @@ import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Auction;
 import com.philabid.ui.cell.CatalogNumberColumnValue;
 import com.philabid.ui.cell.ThresholdMultiCurrencyMonetaryAmountCell;
+import com.philabid.ui.control.CrudTableViewSellerFilter;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -27,6 +28,8 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
     @FXML
     protected TableColumn<Auction, String> auctionHouseColumn;
     @FXML
+    protected TableColumn<Auction, String> sellerColumn;
+    @FXML
     protected TableColumn<Auction, String> categoryColumn;
     @FXML
     protected TableColumn<Auction, CatalogNumberColumnValue> catalogNumberColumn;
@@ -48,6 +51,7 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
     @Override
     protected void initializeView() {
         auctionHouseColumn.setCellValueFactory(new PropertyValueFactory<>("auctionHouseName"));
+        sellerColumn.setCellValueFactory(new PropertyValueFactory<>("sellerName"));
 
         maxBidColumn.setCellValueFactory(new PropertyValueFactory<>("maxBid"));
         maxBidColumn.setCellFactory(column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(
@@ -92,5 +96,11 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
     @Override
     protected String getDialogFXMLResourcePath() {
         return "/fxml/AuctionEditDialog.fxml";
+    }
+
+    @Override
+    protected void initializeFilterToolbar() {
+        getCrudTableView().addFilter(new CrudTableViewSellerFilter());
+        super.initializeFilterToolbar();
     }
 }

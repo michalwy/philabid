@@ -9,6 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import org.javamoney.moneta.Money;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 /**
  * Controller for the auction edit dialog.
@@ -35,7 +38,7 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     private static LocalDateTime lastUsedEndDate;
     // Static field to remember the last used auction house
     private static AuctionHouse lastUsedAuctionHouse;
-
+    private final Collection<Seller> allSellers = AppContext.getSellerService().getAll();
     @FXML
     private ComboBox<AuctionHouse> auctionHouseComboBox;
     @FXML
@@ -44,6 +47,8 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     private ComboBox<Condition> conditionComboBox;
     @FXML
     private TextField lotIdField;
+    @FXML
+    private TextField sellerField;
     @FXML
     private TextField urlField;
     @FXML
@@ -60,9 +65,10 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     private CheckBox archivedCheckBox;
     @FXML
     private Label multipleAuctionsWarningLabel;
-
     private boolean saveClicked = false;
     private boolean initiallyArchived;
+
+    private Seller selectedSeller;
 
     @Override
     protected void initContent() {
@@ -147,7 +153,54 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
             verifyActiveAuctions();
         });
 
+        setupSellerAutocomplete();
+
         populateComboBoxes();
+    }
+
+    private void setupSellerAutocomplete() {
+        sellerField.textProperty().addListener((obs, oldVal, newVal) -> handleSellerTextChange(newVal));
+
+        AutoCompletionBinding<Seller> binding = TextFields.bindAutoCompletion(sellerField,
+                suggestionRequest -> {
+                    String filter = suggestionRequest.getUserText().toLowerCase();
+                    Stream<Seller> sellers = allSellers.stream();
+
+                    String[] tokens = filter.trim().split("\\s+");
+                    for (String token : tokens) {
+                        sellers = sellers.filter(s -> s.getName().toLowerCase().contains(token) ||
+                                (s.getFullName() != null && s.getFullName().toLowerCase().contains(token)));
+                    }
+
+                    List<Seller> s = sellers.toList();
+                    logger.info("Sellers found: {}", s);
+                    return s;
+                });
+
+        binding.setOnAutoCompleted(event -> {
+            selectedSeller = event.getCompletion();
+            sellerField.setText(selectedSeller.getName());
+        });
+    }
+
+    private void handleSellerTextChange(String newText) {
+        if (selectedSeller != null && (newText == null || !newText.equals(selectedSeller.getName()))) {
+            selectedSeller = null;
+        }
+    }
+
+    private Long resolveSellerId() {
+        if (selectedSeller != null) {
+            return selectedSeller.getId();
+        } else if (!sellerField.getText().isBlank()) {
+            Seller newSeller = new Seller();
+            newSeller.setName(sellerField.getText());
+            AppContext.getSellerService().save(newSeller);
+            logger.info("Created new seller with ID: {}", newSeller.getId());
+            return newSeller.getId();
+        } else {
+            return null;
+        }
     }
 
     private void populateComboBoxes() {
@@ -202,6 +255,12 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
                     .select(AppContext.getAuctionHouseService().getById(auction.getAuctionHouseId())
                             .orElse(null));
         }
+        if (auction.getSellerId() != null) {
+            AppContext.getSellerService().getById(auction.getSellerId()).ifPresent(s -> {
+                selectedSeller = s;
+                sellerField.setText(selectedSeller.getName());
+            });
+        }
         if (auction.getTradingItemId() != null) {
             AppContext.getTradingItemService().getById(auction.getTradingItemId())
                     .ifPresent(tradingItemSelector::setSelectedTradingItem);
@@ -224,6 +283,7 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     protected void updateEntity(Auction auction) {
         AuctionHouse selectedAuctionHouse = auctionHouseComboBox.getValue();
         auction.setAuctionHouseId(selectedAuctionHouse.getId());
+        auction.setSellerId(resolveSellerId());
         auction.setTradingItemId(tradingItemSelector.resolveTradingItemId());
         auction.setConditionId(conditionComboBox.getValue().getId());
         auction.setLotId(lotIdField.getText());

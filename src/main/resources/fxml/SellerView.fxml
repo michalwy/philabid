@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.philabid.ui.control.CrudTableView?>
+<?import javafx.scene.control.TableColumn?>
+<CrudTableView xmlns:fx="http://javafx.com/fxml/1" fx:id="crudTableView" spacing="10.0"
+               xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="com.philabid.ui.SellerController"
+               title="%auctionHouses.title">
+    <columns>
+        <TableColumn fx:id="nameColumn" prefWidth="200.0" text="Name"/>
+        <TableColumn fx:id="fullNameColumn" prefWidth="200.0" text="Full Name"/>
+    </columns>
+</CrudTableView>

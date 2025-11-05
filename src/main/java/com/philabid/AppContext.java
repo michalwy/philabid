@@ -22,6 +22,7 @@ public class AppContext {
     private final I18nManager i18nManager;
     private final CurrencyService currencyService;
     private final AuctionHouseService auctionHouseService;
+    private final SellerService sellerService;
     private final CatalogService catalogService;
     private final CategoryService categoryService;
     private final ConditionService conditionService;
@@ -44,6 +45,7 @@ public class AppContext {
         configurationService = new ConfigurationService();
 
         AuctionHouseRepository auctionHouseRepository = new AuctionHouseRepository(databaseManager);
+        SellerRepository sellerRepository = new SellerRepository(databaseManager);
         CatalogRepository catalogRepository = new CatalogRepository(databaseManager);
         CategoryRepository categoryRepository = new CategoryRepository(databaseManager);
         ConditionRepository conditionRepository = new ConditionRepository(databaseManager);
@@ -55,6 +57,7 @@ public class AppContext {
 
         currencyService = new CurrencyService();
         auctionHouseService = new AuctionHouseService(auctionHouseRepository);
+        sellerService = new SellerService(sellerRepository);
         catalogService = new CatalogService(catalogRepository);
         categoryService = new CategoryService(categoryRepository);
         conditionService = new ConditionService(conditionRepository);
@@ -87,6 +90,10 @@ public class AppContext {
 
     public static AuctionHouseService getAuctionHouseService() {
         return get().auctionHouseService;
+    }
+
+    public static SellerService getSellerService() {
+        return get().sellerService;
     }
 
     public static CatalogService getCatalogService() {

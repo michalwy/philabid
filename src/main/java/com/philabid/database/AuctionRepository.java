@@ -13,6 +13,8 @@ public class AuctionRepository extends CrudRepository<Auction> {
     private static final Collection<QueryField<Auction, ?>> FIELDS = List.of(
             new LongQueryField<>("a", "auction_house_id", Auction::setAuctionHouseId).withEntityValue(
                     Auction::getAuctionHouseId),
+            new LongQueryField<>("a", "seller_id", Auction::setSellerId).withEntityValue(
+                    Auction::getSellerId),
             new LongQueryField<>("a", "trading_item_id", Auction::setTradingItemId).withEntityValue(
                     Auction::getTradingItemId),
             new LongQueryField<>("a", "condition_id", Auction::setConditionId).withEntityValue(Auction::getConditionId),
@@ -35,6 +37,8 @@ public class AuctionRepository extends CrudRepository<Auction> {
                     Auction::getArchivedCatalogValuePercentage),
             new StringQueryField<>("ah", "name", "auction_house_name", Auction::setAuctionHouseName),
             new CurrencyQueryField<>("ah", "currency", "auction_house_currency_code", Auction::setAuctionHouseCurrency),
+            new StringQueryField<>("s", "name", "seller_name", Auction::setSellerName),
+            new StringQueryField<>("s", "full_name", "seller_full_name", Auction::setSellerFullName),
             new InternalQueryField<>("cv", "currency_code", "catalog_currency_code"),
             new MonetaryAmountQueryField<>("cv", "value", "catalog_value", "catalog_currency_code",
                     Auction::setRawCatalogValue),
@@ -54,6 +58,7 @@ public class AuctionRepository extends CrudRepository<Auction> {
 
     private static final Collection<QueryJoin> JOINS = List.of(
             new QueryLeftOuterJoin("auction_houses", "ah", "a.auction_house_id = ah.id"),
+            new QueryLeftOuterJoin("sellers", "s", "a.seller_id = s.id"),
             new QueryLeftOuterJoin("trading_items", "ti", "a.trading_item_id = ti.id"),
             new QueryLeftOuterJoin("conditions", "cond", "a.condition_id = cond.id"),
             new QueryLeftOuterJoin("categories", "catg", "ti.category_id = catg.id"),

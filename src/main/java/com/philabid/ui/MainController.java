@@ -58,6 +58,8 @@ public class MainController implements Initializable {
     @FXML
     private MenuItem auctionHousesMenuItem;
     @FXML
+    private MenuItem sellersMenuItem;
+    @FXML
     private MenuItem catalogsMenuItem;
     @FXML
     private MenuItem categoriesMenuItem;
@@ -165,33 +167,14 @@ public class MainController implements Initializable {
      * Sets up menu item actions.
      */
     private void setupMenuActions() {
-        if (exitMenuItem != null) {
-            exitMenuItem.setOnAction(e -> handleExit());
-        }
-
-        if (preferencesMenuItem != null) {
-            preferencesMenuItem.setOnAction(e -> handleShowPreferences());
-        }
-
-        if (aboutMenuItem != null) {
-            aboutMenuItem.setOnAction(e -> handleAbout());
-        }
-
-        if (auctionHousesMenuItem != null) {
-            auctionHousesMenuItem.setOnAction(e -> handleShowAuctionHouses());
-        }
-
-        if (catalogsMenuItem != null) {
-            catalogsMenuItem.setOnAction(e -> handleShowCatalogs());
-        }
-
-        if (categoriesMenuItem != null) {
-            categoriesMenuItem.setOnAction(e -> handleShowCategories());
-        }
-
-        if (conditionsMenuItem != null) {
-            conditionsMenuItem.setOnAction(e -> handleShowConditions());
-        }
+        exitMenuItem.setOnAction(e -> handleExit());
+        preferencesMenuItem.setOnAction(e -> handleShowPreferences());
+        aboutMenuItem.setOnAction(e -> handleAbout());
+        auctionHousesMenuItem.setOnAction(e -> handleShowAuctionHouses());
+        sellersMenuItem.setOnAction(e -> handleShowSellers());
+        catalogsMenuItem.setOnAction(e -> handleShowCatalogs());
+        categoriesMenuItem.setOnAction(e -> handleShowCategories());
+        conditionsMenuItem.setOnAction(e -> handleShowConditions());
     }
 
     private void handleShowPreferences() {
@@ -217,6 +200,17 @@ public class MainController implements Initializable {
             showInModalDialog(view, AppContext.getI18nManager().getString("auctionHouses.title"), new Stage());
         } catch (IOException e) {
             showErrorDialog("Could not open Auction Houses view", e);
+        }
+    }
+
+    private void handleShowSellers() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SellerView.fxml"),
+                    AppContext.getI18nManager().getResourceBundle());
+            Parent view = loader.load();
+            showInModalDialog(view, "Sellers", new Stage());
+        } catch (IOException e) {
+            showErrorDialog("Could not open Sellers view", e);
         }
     }
 

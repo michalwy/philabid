@@ -46,6 +46,10 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
         initializeFilterToolbar();
         setRowFactories();
         setupContextMenu();
+        postInitialize();
+    }
+
+    protected void postInitialize() {
     }
 
     @Override
@@ -153,7 +157,6 @@ public abstract class CrudTableViewController<T extends BaseModel<T>> extends Ta
     }
 
     protected void handleAdd() {
-        logger.info("Add category button clicked.");
         T newEntity = crudService.create();
         EditDialogResult result = showEntityEditDialog(newEntity);
         if (result != null && result.saved()) {

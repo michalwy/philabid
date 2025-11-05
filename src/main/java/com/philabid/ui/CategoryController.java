@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Controller for the Category management view (CategoryView.fxml).
  */
-public class CategoryController extends SimpleCrudTableViewController<Category> {
+public class CategoryController extends ModalCrudTableViewController<Category> {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
     @FXML

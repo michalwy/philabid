@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.philabid.ui.control.CrudEditDialog?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<CrudEditDialog xmlns:fx="http://javafx.com/fxml/1" fx:id="crudEditDialog" xmlns="http://javafx.com/javafx/17.0.2-ea"
+                fx:controller="com.philabid.ui.SellerEditDialogController">
+    <GridPane hgap="10" vgap="10">
+        <padding>
+            <Insets bottom="10" left="10" right="10" top="10"/>
+        </padding>
+
+        <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <Label text="Full Name:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="fullNameField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <Label text="Email" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <Label text="Phone" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <TextField fx:id="phoneField" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    </GridPane>
+</CrudEditDialog>

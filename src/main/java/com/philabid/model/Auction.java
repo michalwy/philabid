@@ -16,6 +16,7 @@ import java.util.List;
 public class Auction extends BaseModel<Auction> {
 
     private Long auctionHouseId;
+    private Long sellerId;
     private Long tradingItemId;
     private Long conditionId;
     private String lotId;
@@ -27,6 +28,8 @@ public class Auction extends BaseModel<Auction> {
 
     private String auctionHouseName;
     private CurrencyUnit auctionHouseCurrency;
+    private String sellerName;
+    private String sellerFullName;
     private String tradingItemCatalogNumber;
     private Long tradingItemOrderNumber;
     private String tradingItemCategoryName;
@@ -58,6 +61,14 @@ public class Auction extends BaseModel<Auction> {
 
     public void setAuctionHouseId(Long auctionHouseId) {
         this.auctionHouseId = auctionHouseId;
+    }
+
+    public Long getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(Long sellerId) {
+        this.sellerId = sellerId;
     }
 
     public Long getTradingItemId() {
@@ -174,6 +185,22 @@ public class Auction extends BaseModel<Auction> {
 
     public void setAuctionHouseName(String auctionHouseName) {
         this.auctionHouseName = auctionHouseName;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
+    }
+
+    public String getSellerFullName() {
+        return sellerFullName;
+    }
+
+    public void setSellerFullName(String sellerFullName) {
+        this.sellerFullName = sellerFullName;
     }
 
     public MultiCurrencyMonetaryAmount getCatalogValue() {
