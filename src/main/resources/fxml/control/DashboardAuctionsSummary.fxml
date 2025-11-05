@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="VBox" spacing="5">
+    <TableView fx:id="tableView" prefHeight="300.0" VBox.vgrow="ALWAYS">
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+        <columns>
+            <TableColumn fx:id="nameColumn" prefWidth="50.0" text="Name"/>
+            <TableColumn fx:id="totalAuctionsColumn" prefWidth="50.0" text="Auctions"/>
+            <TableColumn fx:id="winningAuctionsColumn" prefWidth="50.0" text="Winning Auctions"/>
+            <TableColumn fx:id="currentBidsColumn" prefWidth="50.0" text="Current Bids"/>
+            <TableColumn fx:id="maximumBidsColumn" prefWidth="50.0" text="Max Bids"/>
+
+        </columns>
+    </TableView>
+</fx:root>

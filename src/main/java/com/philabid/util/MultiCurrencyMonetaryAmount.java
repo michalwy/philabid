@@ -1,6 +1,7 @@
 package com.philabid.util;
 
 import com.philabid.AppContext;
+import org.javamoney.moneta.Money;
 import org.jetbrains.annotations.NotNull;
 
 import javax.money.CurrencyUnit;
@@ -16,6 +17,9 @@ import javax.money.MonetaryAmount;
  */
 public record MultiCurrencyMonetaryAmount(MonetaryAmount originalAmount, MonetaryAmount defaultCurrencyAmount)
         implements Comparable<MultiCurrencyMonetaryAmount> {
+
+    public static MultiCurrencyMonetaryAmount ZERO =
+            MultiCurrencyMonetaryAmount.of(Money.of(0, AppContext.getConfigurationService().getDefaultCurrency()));
 
     /**
      * Factory method to create a new instance of MultiCurrencyMonetaryAmount.
@@ -61,5 +65,16 @@ public record MultiCurrencyMonetaryAmount(MonetaryAmount originalAmount, Monetar
     @Override
     public int compareTo(@NotNull MultiCurrencyMonetaryAmount o) {
         return defaultCurrencyAmount.compareTo(o.defaultCurrencyAmount);
+    }
+
+    public MultiCurrencyMonetaryAmount add(MultiCurrencyMonetaryAmount other) {
+        if (other == null) {
+            return this;
+        }
+        if (getOriginalCurrency().equals(other.getOriginalCurrency())) {
+            return MultiCurrencyMonetaryAmount.of(originalAmount.add(other.originalAmount));
+        } else {
+            return MultiCurrencyMonetaryAmount.of(defaultCurrencyAmount.add(other.defaultCurrencyAmount));
+        }
     }
 }

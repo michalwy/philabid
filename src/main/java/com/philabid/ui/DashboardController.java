@@ -4,12 +4,14 @@ import com.philabid.AppContext;
 import com.philabid.model.Auction;
 import com.philabid.model.CatalogValue;
 import com.philabid.ui.cell.CatalogNumberColumnValue;
+import com.philabid.ui.control.DashboardAuctionsSummary;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,13 @@ public class DashboardController implements RefreshableViewController {
     private TableColumn<Auction, String> catalogValueNeededCatalogColumn;
     @FXML
     private TableColumn<Auction, MultiCurrencyMonetaryAmount> catalogValueNeededCatalogValueColumn;
+
+    @FXML
+    private DashboardAuctionsSummary summaryBySeller;
+    @FXML
+    private DashboardAuctionsSummary summaryByCategory;
+    @FXML
+    private DashboardAuctionsSummary summaryByCondition;
 
     @FXML
     private void initialize() {
@@ -114,7 +123,7 @@ public class DashboardController implements RefreshableViewController {
 
             final int selectedIndex = catalogValueNeededTable.getSelectionModel().getSelectedIndex();
 
-            refreshTables();
+            refresh();
 
             Platform.runLater(() -> {
                 catalogValueNeededTable.getSelectionModel().select(selectedIndex);
@@ -154,11 +163,15 @@ public class DashboardController implements RefreshableViewController {
                         AppContext.getConfigurationService().getDefaultCurrency().getCurrencyCode())
                 .orElse(""));
 
-        refreshTables();
+        refreshTables(auctions);
     }
 
-    public void refreshTables() {
-        Collection<Auction> auctions = AppContext.getAuctionService().getActiveAuctions(List.of());
+    public void refreshTables(Collection<Auction> auctions) {
+
+        summaryBySeller.setAuctions(auctions, a -> Pair.with(a.getSellerId(), a.getSellerName()));
+        summaryByCategory.setAuctions(auctions,
+                a -> Pair.with(a.getTradingItemCategoryId(), a.getTradingItemCategoryName()));
+        summaryByCondition.setAuctions(auctions, a -> Pair.with(a.getConditionId(), a.getConditionName()));
 
         catalogValueNeededTableItems.setAll(auctions.stream().filter(a -> !a.isCatalogActive()).toList());
         catalogValueNeededTable.sort();
