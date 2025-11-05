@@ -269,7 +269,7 @@
 }
 
 .user-label.user-label-winning {
-    -fx-background-color: green;
+    -fx-background-color: rgba(46, 168, 46, 0.61);
 }
 
 /* Separators */
