@@ -95,7 +95,12 @@ public class ActiveAuctionController extends BaseAuctionController {
         updateCatalogValueItem.setOnAction(
                 event -> handleUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
-        return List.of(showHistoricalAuctions, archiveItem, addCatalogValueItem, updateCatalogValueItem);
+        MenuItem showAuctionsForThisItemItem = new MenuItem("Show auctions for this item");
+        showAuctionsForThisItemItem.setOnAction(
+                event -> filterToItem(getTableView().getSelectionModel().getSelectedItem()));
+
+        return List.of(showHistoricalAuctions, archiveItem, addCatalogValueItem, updateCatalogValueItem,
+                showAuctionsForThisItemItem);
     }
 
     @Override
@@ -209,5 +214,12 @@ public class ActiveAuctionController extends BaseAuctionController {
     @Override
     protected void handleDoubleClick() {
         handleEditState(getTableView().getSelectionModel().getSelectedItem());
+    }
+
+    private void filterToItem(Auction auction) {
+        transactionalRefresh(() -> {
+            getCategoryFilter().select(auction.getTradingItemCategoryId());
+            getMultiFilter().setText(auction.getTradingItemCatalogNumber());
+        });
     }
 }

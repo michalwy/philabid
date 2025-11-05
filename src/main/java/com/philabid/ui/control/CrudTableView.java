@@ -40,6 +40,8 @@ public class CrudTableView<T extends BaseModel<T>> extends VBox {
     ToolBar filterToolbar;
     @FXML
     HBox filterHBox;
+    @FXML
+    Button clearAllButton;
 
     public CrudTableView() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/control/CrudTableView.fxml"));
@@ -51,6 +53,10 @@ public class CrudTableView<T extends BaseModel<T>> extends VBox {
             fxmlLoader.load();
             filterToolbar.setVisible(false);
             filterToolbar.setManaged(false);
+
+            clearAllButton.setOnAction(event -> {
+                clearAllFilters();
+            });
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
@@ -139,5 +145,9 @@ public class CrudTableView<T extends BaseModel<T>> extends VBox {
 
     public void sort() {
         tableView.sort();
+    }
+
+    public void clearAllFilters() {
+        filters.forEach(CrudTableViewFilter::clear);
     }
 }

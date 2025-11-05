@@ -12,6 +12,7 @@ public abstract class CrudTableViewTextFilter extends CrudTableViewLabeledFilter
     protected final javafx.scene.control.TextField textField = new javafx.scene.control.TextField();
 
     private final PauseTransition debounceTimer;
+    private boolean immediateSet = false;
 
     public CrudTableViewTextFilter(String labelText) {
         super(labelText);
@@ -24,10 +25,20 @@ public abstract class CrudTableViewTextFilter extends CrudTableViewLabeledFilter
         super.initialize();
 
         // When the timer finishes, update the filter condition
-        debounceTimer.setOnFinished(event -> filterConditionProperty().set(getFilterCondition()));
+        debounceTimer.setOnFinished(event -> propagateFilterCondition());
 
         // On every text change, restart the timer
-        textField.textProperty().addListener((observable, oldValue, newValue) -> debounceTimer.playFromStart());
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (immediateSet) {
+                propagateFilterCondition();
+            } else {
+                debounceTimer.playFromStart();
+            }
+        });
+    }
+
+    private void propagateFilterCondition() {
+        filterConditionProperty().set(getFilterCondition());
     }
 
     @Override
@@ -41,8 +52,18 @@ public abstract class CrudTableViewTextFilter extends CrudTableViewLabeledFilter
         return textField.getText();
     }
 
+    public void setText(String text) {
+        immediateRefresh(() -> textField.setText(text));
+    }
+
     @Override
     public void clear() {
-        textField.clear();
+        immediateRefresh(textField::clear);
+    }
+
+    protected void immediateRefresh(Runnable runnable) {
+        immediateSet = true;
+        runnable.run();
+        immediateSet = false;
     }
 }

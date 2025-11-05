@@ -10,6 +10,11 @@ import java.util.Collection;
 import java.util.List;
 
 public abstract class FilteredCrudTableViewController<T extends BaseModel<T>> extends CrudTableViewController<T> {
+    private final CrudTableViewMultiFilter multiFilter =
+            new CrudTableViewMultiFilter(List.of("ti.catalog_number", "catg.code"));
+    private final CrudTableViewCategoryFilter categoryFilter = new CrudTableViewCategoryFilter();
+    private final CrudTableViewConditionFilter conditionFilter = new CrudTableViewConditionFilter();
+
     protected FilteredCrudTableViewController(CrudService<T> crudService) {
         super(crudService);
     }
@@ -21,13 +26,24 @@ public abstract class FilteredCrudTableViewController<T extends BaseModel<T>> ex
 
     @Override
     protected void initializeFilterToolbar() {
-        getCrudTableView().addFilter(
-                new CrudTableViewMultiFilter(List.of("ti.catalog_number", "catg.code")));
-        getCrudTableView().addFilter(new CrudTableViewCategoryFilter());
-        getCrudTableView().addFilter(new CrudTableViewConditionFilter());
+        getCrudTableView().addFilter(multiFilter);
+        getCrudTableView().addFilter(categoryFilter);
+        getCrudTableView().addFilter(conditionFilter);
 
         getCrudTableView().getFilterConditions().addListener((observable, oldValue, newValue) -> {
-            refreshTable();
+            refresh();
         });
+    }
+
+    protected CrudTableViewMultiFilter getMultiFilter() {
+        return multiFilter;
+    }
+
+    protected CrudTableViewCategoryFilter getCategoryFilter() {
+        return categoryFilter;
+    }
+
+    protected CrudTableViewConditionFilter getConditionFilter() {
+        return conditionFilter;
     }
 }

@@ -14,12 +14,12 @@ public abstract class CrudTableViewComboBoxFilter<T extends BaseModel<T>> extend
 
     protected final ComboBox<T> comboBox = new ComboBox<>();
     private final String filterField;
-    private final AbstractCrudService<T> crudService;
+    private final Collection<T> allItems;
 
     public CrudTableViewComboBoxFilter(String labelText, String filterField, AbstractCrudService<T> crudService) {
         super(labelText);
         this.filterField = filterField;
-        this.crudService = crudService;
+        this.allItems = crudService.getAll();
     }
 
     @Override
@@ -31,7 +31,7 @@ public abstract class CrudTableViewComboBoxFilter<T extends BaseModel<T>> extend
     public void initialize() {
         super.initialize();
 
-        comboBox.setItems(FXCollections.observableArrayList(crudService.getAll()));
+        comboBox.setItems(FXCollections.observableArrayList(allItems));
 
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             filterConditionProperty().set(
@@ -42,5 +42,16 @@ public abstract class CrudTableViewComboBoxFilter<T extends BaseModel<T>> extend
     @Override
     public void clear() {
         comboBox.getSelectionModel().clearSelection();
+    }
+
+    public void select(T entity) {
+        comboBox.getSelectionModel().select(entity);
+    }
+
+    public void select(Long id) {
+        allItems.stream()
+                .filter(i -> i.getId().equals(id))
+                .findAny()
+                .ifPresent(this::select);
     }
 }
