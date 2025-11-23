@@ -20,6 +20,8 @@ public class ValuationEntryRepository extends VirtualViewCrudRepository<Valuatio
                     ValuationEntry::setTradingItemCategoryName),
             new StringQueryField<>("catg", "code", "trading_item_category_code",
                     ValuationEntry::setTradingItemCategoryCode),
+            new LongQueryField<>("catg", "order_number", "trading_item_category_order_number",
+                    ValuationEntry::setTradingItemCategoryOrderNumber),
             new LongQueryField<>("catg", "id", "trading_item_category_id", ValuationEntry::setTradingItemCategoryId),
             new CurrencyQueryField<>("cv", "currency_code", "catalog_currency_code", null),
             new MonetaryAmountQueryField<>("cv", "value", "catalog_value", "catalog_currency_code",

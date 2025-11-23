@@ -18,6 +18,7 @@ public class CatalogValue extends BaseModel<CatalogValue> {
     private Long tradingItemOrderNumber;
     private String tradingItemCategoryName;
     private String tradingItemCategoryCode;
+    private Long tradingItemCategoryOrderNumber;
     private String conditionName;
     private String conditionCode;
     private String catalogName;
@@ -110,6 +111,14 @@ public class CatalogValue extends BaseModel<CatalogValue> {
 
     public void setTradingItemCategoryName(String tradingItemCategoryName) {
         this.tradingItemCategoryName = tradingItemCategoryName;
+    }
+
+    public Long getTradingItemCategoryOrderNumber() {
+        return tradingItemCategoryOrderNumber;
+    }
+
+    public void setTradingItemCategoryOrderNumber(Long tradingItemCategoryOrderNumber) {
+        this.tradingItemCategoryOrderNumber = tradingItemCategoryOrderNumber;
     }
 
     public Integer getCatalogIssueYear() {

@@ -27,6 +27,8 @@ public class CatalogValueRepository extends CrudRepository<CatalogValue> {
                     CatalogValue::setTradingItemCategoryName),
             new StringQueryField<>("catg", "code", "trading_item_category_code",
                     CatalogValue::setTradingItemCategoryCode),
+            new LongQueryField<>("catg", "order_number", "trading_item_order_number",
+                    CatalogValue::setTradingItemCategoryOrderNumber),
             new StringQueryField<>("cat", "name", "catalog_name", CatalogValue::setCatalogName),
             new IntQueryField<>("cat", "issue_year", "catalog_issue_year", CatalogValue::setCatalogIssueYear),
             new StringQueryField<>("ti", "catalog_number", "trading_item_catalog_number",

@@ -14,6 +14,7 @@ public final class ValuationEntry extends BaseModel<ValuationEntry> {
     private Long tradingItemOrderNumber;
     private String tradingItemCategoryName;
     private String tradingItemCategoryCode;
+    private Long tradingItemCategoryOrderNumber;
     private Long tradingItemCategoryId;
     private long conditionId;
     private String conditionName;
@@ -53,6 +54,14 @@ public final class ValuationEntry extends BaseModel<ValuationEntry> {
 
     public void setTradingItemCategoryCode(String tradingItemCategoryCode) {
         this.tradingItemCategoryCode = tradingItemCategoryCode;
+    }
+
+    public Long getTradingItemCategoryOrderNumber() {
+        return tradingItemCategoryOrderNumber;
+    }
+
+    public void setTradingItemCategoryOrderNumber(Long tradingItemCategoryOrderNumber) {
+        this.tradingItemCategoryOrderNumber = tradingItemCategoryOrderNumber;
     }
 
     public Long getTradingItemOrderNumber() {

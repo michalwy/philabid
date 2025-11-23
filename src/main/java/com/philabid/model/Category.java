@@ -7,6 +7,7 @@ public class Category extends BaseModel<Category> {
 
     private String name;
     private String code;
+    private Long orderNumber;
     private Long catalogId;
 
     private String catalogName;
@@ -31,6 +32,17 @@ public class Category extends BaseModel<Category> {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Long getOrderNumber() {
+        if (orderNumber == null) {
+            return 0L;
+        }
+        return orderNumber;
+    }
+
+    public void setOrderNumber(Long orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
     public Long getCatalogId() {

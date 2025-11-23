@@ -38,6 +38,9 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     private static LocalDateTime lastUsedEndDate;
     // Static field to remember the last used auction house
     private static AuctionHouse lastUsedAuctionHouse;
+
+    private static Seller lastUsedSeller;
+
     private final Collection<Seller> allSellers = AppContext.getSellerService().getAll();
     @FXML
     private ComboBox<AuctionHouse> auctionHouseComboBox;
@@ -243,10 +246,22 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
             if (lastUsedAuctionHouse != null) {
                 auctionHouseComboBox.getSelectionModel().select(lastUsedAuctionHouse);
             }
+
+            if (lastUsedSeller != null) {
+                selectedSeller = lastUsedSeller;
+                sellerField.setText(selectedSeller.getName());
+            }
         } else { // It's an existing auction
             // Set date and time from the existing auction object
             endDatePicker.setValue(auction.getEndDate().toLocalDate());
             endTimeField.setText(auction.getEndDate().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+
+            if (auction.getSellerId() != null) {
+                AppContext.getSellerService().getById(auction.getSellerId()).ifPresent(s -> {
+                    selectedSeller = s;
+                    sellerField.setText(selectedSeller.getName());
+                });
+            }
         }
 
         // Select items in ComboBoxes
@@ -254,12 +269,6 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
             auctionHouseComboBox.getSelectionModel()
                     .select(AppContext.getAuctionHouseService().getById(auction.getAuctionHouseId())
                             .orElse(null));
-        }
-        if (auction.getSellerId() != null) {
-            AppContext.getSellerService().getById(auction.getSellerId()).ifPresent(s -> {
-                selectedSeller = s;
-                sellerField.setText(selectedSeller.getName());
-            });
         }
         if (auction.getTradingItemId() != null) {
             AppContext.getTradingItemService().getById(auction.getTradingItemId())
@@ -315,6 +324,7 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
         // Remember the date for the next time
         lastUsedEndDate = newEndDate;
         lastUsedAuctionHouse = selectedAuctionHouse;
+        lastUsedSeller = selectedSeller;
 
         saveClicked = true;
     }

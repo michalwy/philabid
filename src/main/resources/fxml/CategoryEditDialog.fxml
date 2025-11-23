@@ -17,9 +17,12 @@
         <Label text="%categories.label.code" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <TextField fx:id="codeField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-        <Label text="%categories.label.catalog" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-        <ComboBox fx:id="catalogComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        
+        <Label text="Ordering Number" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <TextField fx:id="orderNumberField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <Label text="%categories.label.catalog" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="catalogComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
         <columnConstraints>
             <ColumnConstraints/>
             <ColumnConstraints hgrow="ALWAYS"/>

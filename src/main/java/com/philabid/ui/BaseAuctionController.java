@@ -81,7 +81,7 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
 
         setCategoryColumn(categoryColumn, Auction::getTradingItemCategoryCode, Auction::getTradingItemCategoryName);
         setCatalogNumberColumn(catalogNumberColumn, Auction::getTradingItemCatalogNumber,
-                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryCode);
+                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryOrderNumber);
 
         setConditionColumn(conditionColumn, Auction::getConditionCode, Auction::getConditionName);
 

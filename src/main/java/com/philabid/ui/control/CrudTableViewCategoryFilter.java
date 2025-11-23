@@ -9,6 +9,6 @@ import java.util.List;
 public class CrudTableViewCategoryFilter extends CrudTableViewComboBoxFilter<Category> {
     public CrudTableViewCategoryFilter() {
         super("Category:", "catg.id", AppContext.getCategoryService(),
-                List.of(new QueryOrder("catg", "code", QueryOrder.Direction.ASC)));
+                List.of(new QueryOrder("catg", "order_number", QueryOrder.Direction.ASC)));
     }
 }

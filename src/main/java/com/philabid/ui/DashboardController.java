@@ -70,7 +70,7 @@ public class DashboardController implements RefreshableViewController {
         setCategoryColumn(catalogValueNeededCategoryColumn, Auction::getTradingItemCategoryCode,
                 Auction::getTradingItemCategoryName);
         setCatalogNumberColumn(catalogValueNeededCatalogNumberColumn, Auction::getTradingItemCatalogNumber,
-                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryCode);
+                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryOrderNumber);
         setConditionColumn(catalogValueNeededConditionColumn, Auction::getConditionCode, Auction::getConditionName);
         setCatalogColumn(catalogValueNeededCatalogColumn, Auction::getCatalogName, Auction::getCatalogIssueYear);
         setCatalogValueColumn(catalogValueNeededCatalogValueColumn, "catalogValue", Auction::getCatalogValue,

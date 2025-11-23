@@ -49,6 +49,8 @@ public class AuctionRepository extends CrudRepository<Auction> {
             new LongQueryField<>("ti", "order_number", "trading_item_order_number", Auction::setTradingItemOrderNumber),
             new StringQueryField<>("catg", "name", "trading_item_category_name", Auction::setTradingItemCategoryName),
             new StringQueryField<>("catg", "code", "trading_item_category_code", Auction::setTradingItemCategoryCode),
+            new LongQueryField<>("catg", "order_number", "trading_item_category_order_number",
+                    Auction::setTradingItemCategoryOrderNumber),
             new LongQueryField<>("catg", "id", "trading_item_category_id", Auction::setTradingItemCategoryId),
             new LongQueryField<>("cond", "id", "condition_id", Auction::setConditionId),
             new StringQueryField<>("cond", "name", "condition_name", Auction::setConditionName),

@@ -13,6 +13,8 @@ public class CategoryRepository extends CrudRepository<Category> {
     private static final Collection<QueryField<Category, ?>> FIELDS = List.of(
             new StringQueryField<>("catg", "name", Category::setName).withEntityValue(Category::getName),
             new StringQueryField<>("catg", "code", Category::setCode).withEntityValue(Category::getCode),
+            new LongQueryField<>("catg", "order_number", Category::setOrderNumber).withEntityValue(
+                    Category::getOrderNumber),
             new LongQueryField<>("catg", "catalog_id", Category::setCatalogId).withEntityValue(Category::getCatalogId),
             new StringQueryField<>("cat", "name", "catalog_name", Category::setCatalogName),
             new IntQueryField<>("cat", "issue_year", "catalog_issue_year", Category::setCatalogIssueYear)

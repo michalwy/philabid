@@ -3,6 +3,7 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.model.Catalog;
 import com.philabid.model.Category;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -26,11 +27,18 @@ public class CategoryEditDialogController extends CrudEditDialogController<Categ
     @FXML
     private TextField codeField;
     @FXML
+    private TextField orderNumberField;
+    @FXML
     private ComboBox<Catalog> catalogComboBox;
 
     @Override
     protected void initContent() {
         populateCatalogComboBox();
+
+        Platform.runLater(() -> {
+            orderNumberField.requestFocus();
+        });
+
         logger.debug("CategoryEditDialogController initialized.");
     }
 
@@ -38,6 +46,7 @@ public class CategoryEditDialogController extends CrudEditDialogController<Categ
     protected void loadEntity(Category category) {
         nameField.setText(category.getName());
         codeField.setText(category.getCode());
+        orderNumberField.setText(category.getOrderNumber().toString());
 
         if (category.getCatalogId() != null && catalogComboBox.getItems() != null) {
             catalogComboBox.getItems().stream()
@@ -69,6 +78,7 @@ public class CategoryEditDialogController extends CrudEditDialogController<Categ
     protected void updateEntity(Category category) {
         category.setName(nameField.getText());
         category.setCode(codeField.getText());
+        category.setOrderNumber(Long.parseLong(orderNumberField.getText()));
 
         Catalog selectedCatalog = catalogComboBox.getSelectionModel().getSelectedItem();
         if (selectedCatalog != null) {

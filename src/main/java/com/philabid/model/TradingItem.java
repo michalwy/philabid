@@ -17,6 +17,7 @@ public class TradingItem extends BaseModel<TradingItem> {
     // Fields for joined data from Category and Catalog
     private String categoryName;
     private String categoryCode;
+    private Long categoryOrderNumber;
     private String catalogName;
     private Integer catalogIssueYear;
 
@@ -94,6 +95,14 @@ public class TradingItem extends BaseModel<TradingItem> {
 
     public void setCatalogName(String catalogName) {
         this.catalogName = catalogName;
+    }
+
+    public Long getCategoryOrderNumber() {
+        return categoryOrderNumber;
+    }
+
+    public void setCategoryOrderNumber(Long categoryOrderNumber) {
+        this.categoryOrderNumber = categoryOrderNumber;
     }
 
     public Integer getCatalogIssueYear() {

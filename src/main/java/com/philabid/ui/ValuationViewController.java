@@ -50,7 +50,7 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
     public void initializeView() {
         setCategoryColumn(categoryColumn, Valuation::getTradingItemCategoryCode, Valuation::getTradingItemCategoryName);
         setCatalogNumberColumn(catalogNumberColumn, Valuation::getTradingItemCatalogNumber,
-                Valuation::getTradingItemOrderNumber, Valuation::getTradingItemCategoryCode);
+                Valuation::getTradingItemOrderNumber, Valuation::getTradingItemCategoryOrderNumber);
         setConditionColumn(conditionColumn, Valuation::getConditionCode, Valuation::getConditionName);
         setCatalogValueColumn(catalogValueColumn, "catalogValue", Valuation::getCatalogValue,
                 Valuation::isCatalogActive);

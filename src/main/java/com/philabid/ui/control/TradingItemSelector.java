@@ -1,6 +1,7 @@
 package com.philabid.ui.control;
 
 import com.philabid.AppContext;
+import com.philabid.database.util.query.QueryOrder;
 import com.philabid.model.Category;
 import com.philabid.model.TradingItem;
 import javafx.application.Platform;
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,7 +103,8 @@ public class TradingItemSelector extends VBox {
 
     private void populateComboBoxes() {
         categoryComboBox.setItems(
-                FXCollections.observableArrayList(AppContext.getCategoryService().getAll()));
+                FXCollections.observableArrayList(AppContext.getCategoryService()
+                        .getAll(List.of(), List.of(new QueryOrder("catg", "order_number", QueryOrder.Direction.ASC)))));
     }
 
     private void setupTradingItemAutocomplete() {

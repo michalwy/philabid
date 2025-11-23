@@ -20,6 +20,8 @@ public class CategoryController extends ModalCrudTableViewController<Category> {
     @FXML
     private TableColumn<Category, String> codeColumn;
     @FXML
+    private TableColumn<Category, Long> orderNumberColumn;
+    @FXML
     private TableColumn<Category, String> catalogColumn;
 
     public CategoryController() {
@@ -30,6 +32,7 @@ public class CategoryController extends ModalCrudTableViewController<Category> {
     protected void initializeView() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
+        orderNumberColumn.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
 
         // Custom cell value factory to display formatted catalog name and year
         catalogColumn.setCellValueFactory(cellData -> {
@@ -37,6 +40,9 @@ public class CategoryController extends ModalCrudTableViewController<Category> {
             return new SimpleStringProperty(String.format("%s (%d)", category.getCatalogName(),
                     category.getCatalogIssueYear()));
         });
+
+        orderNumberColumn.setSortType(TableColumn.SortType.ASCENDING);
+        getTableView().getSortOrder().add(orderNumberColumn);
     }
 
     @Override

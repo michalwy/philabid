@@ -8,6 +8,7 @@
     <columns>
         <TableColumn fx:id="nameColumn" prefWidth="250.0" text="%categories.column.name"/>
         <TableColumn fx:id="codeColumn" prefWidth="100.0" text="%categories.column.code"/>
+        <TableColumn fx:id="orderNumberColumn" prefWidth="100.0" text="Ordering Number"/>
         <TableColumn fx:id="catalogColumn" prefWidth="200.0" text="%categories.column.catalog"/>
     </columns>
 </CrudTableView>

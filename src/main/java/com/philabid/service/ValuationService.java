@@ -41,6 +41,7 @@ public class ValuationService extends VirtualCrudService<Valuation> {
                         valuation.setTradingItemOrderNumber(valuationEntry.getTradingItemOrderNumber());
                         valuation.setTradingItemCategoryName(valuationEntry.getTradingItemCategoryName());
                         valuation.setTradingItemCategoryCode(valuationEntry.getTradingItemCategoryCode());
+                        valuation.setTradingItemCategoryOrderNumber(valuationEntry.getTradingItemCategoryOrderNumber());
                         valuation.setTradingItemCategoryId(valuationEntry.getTradingItemCategoryId());
                         valuation.setConditionId(valuationEntry.getConditionId());
                         valuation.setConditionName(valuationEntry.getConditionName());

@@ -13,12 +13,13 @@ public class TradingItemRepository extends CrudRepository<TradingItem> {
     private static final Collection<QueryField<TradingItem, ?>> FIELDS = List.of(
             new StringQueryField<>("catalog_number", TradingItem::setCatalogNumber).withEntityValue(
                     TradingItem::getCatalogNumber),
-            new LongQueryField<>("order_number", TradingItem::setOrderNumber).withEntityValue(
+            new LongQueryField<>("ti", "order_number", TradingItem::setOrderNumber).withEntityValue(
                     TradingItem::getOrderNumber),
             new StringQueryField<>("notes", TradingItem::setNotes).withEntityValue(TradingItem::getNotes),
             new LongQueryField<>("category_id", TradingItem::setCategoryId).withEntityValue(TradingItem::getCategoryId),
             new StringQueryField<>("catg", "name", "category_name", TradingItem::setCategoryName),
             new StringQueryField<>("catg", "code", "category_code", TradingItem::setCategoryCode),
+            new LongQueryField<>("catg", "order_number", "category_order_number", TradingItem::setCategoryOrderNumber),
             new StringQueryField<>("cat", "name", "catalog_name", TradingItem::setCatalogName),
             new IntQueryField<>("cat", "issue_year", "catalog_issue_year", TradingItem::setCatalogIssueYear)
     );

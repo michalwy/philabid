@@ -54,7 +54,7 @@ public class ActiveAuctionController extends BaseAuctionController {
                 Auction::getCatalogValue);
 
         setCatalogNumberWithWarningColumn(catalogNumberColumn, Auction::getTradingItemCatalogNumber,
-                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryCode,
+                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryOrderNumber,
                 t -> t.getActiveAuctions().stream()
                         .anyMatch(activeAuction -> !Objects.equals(t.getId(), activeAuction.getId()) &&
                                 activeAuction.isWinningBid()), Auction::isAlreadyPurchased);

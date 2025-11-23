@@ -34,6 +34,7 @@ public class Auction extends BaseModel<Auction> {
     private Long tradingItemOrderNumber;
     private String tradingItemCategoryName;
     private String tradingItemCategoryCode;
+    private Long tradingItemCategoryOrderNumber;
     private Long tradingItemCategoryId;
     private String conditionName;
     private String conditionCode;
@@ -153,6 +154,14 @@ public class Auction extends BaseModel<Auction> {
 
     public void setTradingItemCategoryCode(String tradingItemCategoryCode) {
         this.tradingItemCategoryCode = tradingItemCategoryCode;
+    }
+
+    public Long getTradingItemCategoryOrderNumber() {
+        return tradingItemCategoryOrderNumber;
+    }
+
+    public void setTradingItemCategoryOrderNumber(Long tradingItemCategoryOrderNumber) {
+        this.tradingItemCategoryOrderNumber = tradingItemCategoryOrderNumber;
     }
 
     public Long getTradingItemCategoryId() {
