@@ -1,6 +1,6 @@
 package com.philabid.database;
 
-import com.philabid.database.util.*;
+import com.philabid.database.util.query.*;
 import com.philabid.model.Category;
 
 import java.util.Collection;

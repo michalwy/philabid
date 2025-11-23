@@ -1,4 +1,4 @@
-package com.philabid.database.util;
+package com.philabid.database.util.query;
 
 import java.util.Collection;
 import java.util.List;

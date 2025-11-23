@@ -138,7 +138,7 @@ public class CrudTableView<T extends BaseModel<T>> extends VBox {
     public void bindButtonsDisabledProperty(BooleanBinding binding) {
         crudToolbar.bindButtonsDisabledProperty(binding);
     }
-
+    
     public void setItems(ObservableList<T> items) {
         tableView.setItems(items);
     }

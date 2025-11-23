@@ -37,7 +37,7 @@ public class LabelsCell<T, V> extends TableCell<T, List<V>> {
                 V itemValue = item.get(i);
                 label.setVisible(true);
                 label.setManaged(true);
-                label.setText(item.get(i).toString());
+                label.setText(item.get(i).toString().replaceAll("_", " ").toLowerCase());
                 label.getStyleClass().add("user-label-" + itemValue.toString().toLowerCase().replaceAll("_", "-"));
             }
         }

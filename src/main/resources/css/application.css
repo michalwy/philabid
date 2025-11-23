@@ -136,6 +136,10 @@
     -fx-background-color: -fx-overpriced-color;
 }
 
+.table-row-cell.outbid-auction .max-bid {
+    -fx-opacity: 0.2;
+}
+
 .table-row-cell.winning-auction:selected, .table-row-cell.overpriced-auction:selected {
     -fx-background-color: -fx-accent-primary;
     -fx-text-fill: -fx-text-light;

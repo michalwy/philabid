@@ -70,10 +70,11 @@ public final class CellValueFactoryProvider {
      */
     public static <T> Callback<TableColumn.CellDataFeatures<T, CatalogNumberColumnValue>,
             ObservableValue<CatalogNumberColumnValue>> forCatalogNumber(
-            Function<T, String> catalogNumberGetter, Function<T, Long> orderNumberGetter) {
+            Function<T, String> catalogNumberGetter, Function<T, Long> orderNumberGetter,
+            Function<T, String> categoryCodeGetter) {
         return cellData -> new SimpleObjectProperty<>(
                 new CatalogNumberColumnValue(catalogNumberGetter.apply(cellData.getValue()),
-                        orderNumberGetter.apply(cellData.getValue())));
+                        orderNumberGetter.apply(cellData.getValue()), categoryCodeGetter.apply(cellData.getValue())));
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.philabid.database;
 
-import com.philabid.database.util.*;
+import com.philabid.database.util.EqualFilterCondition;
+import com.philabid.database.util.FilterCondition;
+import com.philabid.database.util.query.*;
 import com.philabid.model.Auction;
 import org.javatuples.Pair;
 
@@ -92,6 +94,7 @@ public class AuctionRepository extends CrudRepository<Auction> {
 
         findMany(
                 List.of(new EqualFilterCondition<>("act_a.archived", false)),
+                List.of(),
                 List.of(new InternalQueryField<>("act_a", "id", "active_id")),
                 List.of(new QueryInnerJoin("auctions", "act_a",
                         "act_a.trading_item_id = a.trading_item_id " +
@@ -111,6 +114,7 @@ public class AuctionRepository extends CrudRepository<Auction> {
 
         findMany(
                 List.of(new EqualFilterCondition<>("a.archived", true)),
+                List.of(),
                 List.of(),
                 List.of(
                         new QueryInnerJoin("trading_items", "act_ti", "act_ti.category_id = ti.category_id"),
@@ -140,6 +144,7 @@ public class AuctionRepository extends CrudRepository<Auction> {
                 List.of(new EqualFilterCondition<>("a.archived", isArchived),
                         new EqualFilterCondition<>("a.trading_item_id", tradingItemId),
                         new EqualFilterCondition<>("a.condition_id", conditionId)),
+                List.of(),
                 List.of(),
                 List.of()
         );

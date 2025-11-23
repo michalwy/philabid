@@ -4,6 +4,7 @@ import com.philabid.AppContext;
 import com.philabid.database.ValuationEntryRepository;
 import com.philabid.database.util.EqualFilterCondition;
 import com.philabid.database.util.FilterCondition;
+import com.philabid.database.util.query.QueryOrder;
 import com.philabid.model.Valuation;
 import com.philabid.model.ValuationEntry;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
@@ -27,11 +28,11 @@ public class ValuationService extends VirtualCrudService<Valuation> {
         this.valuationEntryRepository = valuationEntryRepository;
     }
 
-    public Collection<Valuation> getAll(Collection<FilterCondition> filterConditions) {
+    public Collection<Valuation> getAll(Collection<FilterCondition> filterConditions, Collection<QueryOrder> orders) {
         Map<Pair<Long, Long>, Valuation> entries = new HashMap<>();
         Map<Pair<Long, Long>, List<Double>> categoryAveragePercentageEntries = new HashMap<>();
 
-        valuationEntryRepository.findAll(filterConditions, valuationEntry -> {
+        valuationEntryRepository.findAll(filterConditions, orders, valuationEntry -> {
             entries.computeIfAbsent(Pair.with(valuationEntry.getTradingItemId(), valuationEntry.getConditionId()),
                     k -> {
                         Valuation valuation = new Valuation();
@@ -50,7 +51,7 @@ public class ValuationService extends VirtualCrudService<Valuation> {
                     }).addValuationEntry(valuationEntry);
         });
 
-        valuationEntryRepository.findAll(List.of(), valuationEntry -> {
+        valuationEntryRepository.findAll(List.of(), orders, valuationEntry -> {
             categoryAveragePercentageEntries.computeIfAbsent(
                     Pair.with(valuationEntry.getTradingItemCategoryId(), valuationEntry.getConditionId()),
                     k -> new ArrayList<>()).add(valuationEntry.getArchivedCatalogValuePercentage());

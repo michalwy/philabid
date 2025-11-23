@@ -28,12 +28,14 @@ public class AuctionService extends AbstractCrudService<Auction> {
 
     public Collection<Auction> getActiveAuctions(Collection<FilterCondition> filterConditions) {
         Collection<Auction> auctions = auctionRepository.findAllActive(filterConditions);
+        Collection<Auction> allActiveAuctions = auctionRepository.findAllActive(List.of());
+        allActiveAuctions.forEach(this::enrichAuction);
         Map<Long, List<Auction>> auctionsArchiveMap = auctionRepository.findArchivedForActiveAuctions();
         Map<Pair<Long, Long>, List<Auction>> categoriesArchiveMap =
                 auctionRepository.findArchivedForActiveCategories();
 
         Map<Pair<Long, Long>, List<Auction>> auctionsActiveMap =
-                auctions.stream()
+                allActiveAuctions.stream()
                         .collect(Collectors.groupingBy(a -> Pair.with(a.getTradingItemId(), a.getConditionId())));
 
         auctionsArchiveMap.values().stream().flatMap(List::stream).forEach(this::enrichAuction);

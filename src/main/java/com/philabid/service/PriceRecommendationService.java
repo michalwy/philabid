@@ -17,12 +17,14 @@ import java.util.Optional;
 public class PriceRecommendationService {
     public Optional<MultiCurrencyMonetaryAmount> calculateRecommendation(Auction auction) {
         return calculateMedianRecommendationFromTradingItem(auction)
-                .or(() -> calculateRecommendationFromCategory(auction));
+                .or(() -> calculateRecommendationFromCategory(auction))
+                .map(r -> r.isGreaterThan(auction.getCatalogValue()) ? auction.getCatalogValue() : r);
     }
 
     public Optional<MultiCurrencyMonetaryAmount> calculateRecommendation(Valuation valuation) {
         return Optional.ofNullable(valuation.getMedianPrice())
-                .or(() -> Optional.ofNullable(valuation.getCategoryAveragePrice()));
+                .or(() -> Optional.ofNullable(valuation.getCategoryAveragePrice()))
+                .map(r -> r.isGreaterThan(valuation.getCatalogValue()) ? valuation.getCatalogValue() : r);
     }
 
     private Optional<MultiCurrencyMonetaryAmount> calculateRecommendationFromTradingItem(Auction auction) {

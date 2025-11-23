@@ -1,6 +1,7 @@
 package com.philabid.database;
 
-import com.philabid.database.util.*;
+import com.philabid.database.util.EqualFilterCondition;
+import com.philabid.database.util.query.*;
 import com.philabid.model.CatalogValue;
 
 import java.util.Collection;

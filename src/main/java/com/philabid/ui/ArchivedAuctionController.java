@@ -9,6 +9,8 @@ import javafx.scene.control.TableColumn;
 import java.util.Collection;
 import java.util.List;
 
+import static com.philabid.ui.ValuationDialogController.showValuationDialog;
+
 public class ArchivedAuctionController extends BaseAuctionController {
 
     @Override
@@ -23,5 +25,15 @@ public class ArchivedAuctionController extends BaseAuctionController {
     @Override
     public Collection<Auction> loadAuctions(Collection<FilterCondition> filterConditions) {
         return AppContext.getAuctionService().getArchivedAuctions(filterConditions);
+    }
+
+    @Override
+    protected void handleDoubleClick() {
+        Auction auction = getTableView().getSelectionModel().getSelectedItem();
+        if (auction == null) {
+            return;
+        }
+        showValuationDialog(getTableView().getScene().getWindow(), auction.getTradingItemId(),
+                auction.getConditionId());
     }
 }

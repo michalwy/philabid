@@ -37,7 +37,7 @@ public class CatalogValueController extends FilteredCrudTableViewController<Cata
         setCategoryColumn(categoryColumn, CatalogValue::getTradingItemCategoryCode,
                 CatalogValue::getTradingItemCategoryName);
         setCatalogNumberColumn(catalogNumberColumn, CatalogValue::getTradingItemCatalogNumber,
-                CatalogValue::getTradingItemOrderNumber);
+                CatalogValue::getTradingItemOrderNumber, CatalogValue::getTradingItemCategoryCode);
 
         setCatalogColumn(catalogColumn, CatalogValue::getCatalogName, CatalogValue::getCatalogIssueYear);
         setConditionColumn(conditionColumn, CatalogValue::getConditionCode, CatalogValue::getConditionName);

@@ -1,6 +1,7 @@
 package com.philabid.ui.control;
 
 import com.philabid.database.util.EntityFilterCondition;
+import com.philabid.database.util.query.QueryOrder;
 import com.philabid.model.BaseModel;
 import com.philabid.service.AbstractCrudService;
 import javafx.collections.FXCollections;
@@ -17,9 +18,14 @@ public abstract class CrudTableViewComboBoxFilter<T extends BaseModel<T>> extend
     private final Collection<T> allItems;
 
     public CrudTableViewComboBoxFilter(String labelText, String filterField, AbstractCrudService<T> crudService) {
+        this(labelText, filterField, crudService, List.of());
+    }
+
+    public CrudTableViewComboBoxFilter(String labelText, String filterField, AbstractCrudService<T> crudService,
+                                       Collection<QueryOrder> orders) {
         super(labelText);
         this.filterField = filterField;
-        this.allItems = crudService.getAll();
+        this.allItems = crudService.getAll(List.of(), orders);
     }
 
     @Override

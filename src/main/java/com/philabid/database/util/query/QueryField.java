@@ -1,5 +1,6 @@
-package com.philabid.database.util;
+package com.philabid.database.util.query;
 
+import com.philabid.database.util.ResultSetValueAccessor;
 import com.philabid.model.BaseModel;
 
 import java.sql.PreparedStatement;

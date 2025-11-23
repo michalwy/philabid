@@ -37,4 +37,6 @@ module philabid {
     exports com.philabid.database.util;
     opens com.philabid.database.util to javafx.fxml;
     exports com.philabid.ui.cell;
+    exports com.philabid.database.util.query;
+    opens com.philabid.database.util.query to javafx.fxml;
 }

@@ -3,7 +3,6 @@ package com.philabid.ui;
 import com.philabid.AppContext;
 import com.philabid.database.util.FilterCondition;
 import com.philabid.model.Auction;
-import com.philabid.model.CatalogValue;
 import com.philabid.ui.cell.EndingDateCell;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
@@ -24,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+import static com.philabid.ui.CatalogValueEditDialogController.addOrUpdateCatalogValue;
 import static com.philabid.ui.util.TableViewHelpers.*;
 
 public class ActiveAuctionController extends BaseAuctionController {
@@ -54,7 +54,8 @@ public class ActiveAuctionController extends BaseAuctionController {
                 Auction::getCatalogValue);
 
         setCatalogNumberWithWarningColumn(catalogNumberColumn, Auction::getTradingItemCatalogNumber,
-                Auction::getTradingItemOrderNumber, t -> t.getActiveAuctions().stream()
+                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryCode,
+                t -> t.getActiveAuctions().stream()
                         .anyMatch(activeAuction -> !Objects.equals(t.getId(), activeAuction.getId()) &&
                                 activeAuction.isWinningBid()), Auction::isAlreadyPurchased);
 
@@ -89,11 +90,11 @@ public class ActiveAuctionController extends BaseAuctionController {
 
         MenuItem addCatalogValueItem = new MenuItem("Add Catalog Value...");
         addCatalogValueItem.setOnAction(
-                event -> handleAddCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
+                event -> handleAddOrUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
         MenuItem updateCatalogValueItem = new MenuItem("Update Catalog Value...");
         updateCatalogValueItem.setOnAction(
-                event -> handleUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
+                event -> handleAddOrUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
         MenuItem showAuctionsForThisItemItem = new MenuItem("Show auctions for this item");
         showAuctionsForThisItemItem.setOnAction(
@@ -127,34 +128,12 @@ public class ActiveAuctionController extends BaseAuctionController {
                 });
     }
 
-    private void handleAddCatalogValue(Auction auction) {
+    private void handleAddOrUpdateCatalogValue(Auction auction) {
         if (auction == null) return;
-
-        CatalogValue newCatalogValue = new CatalogValue();
-        // Pre-populate with data from the auction
-        newCatalogValue.setTradingItemId(auction.getTradingItemId());
-        newCatalogValue.setConditionId(auction.getConditionId());
-
-        EditDialogResult result = showCatalogValueEditDialog(newCatalogValue);
-        if (result != null && result.saved()) {
-            refreshTable(); // Refresh to show the new value
+        if (addOrUpdateCatalogValue(getTableView().getScene().getWindow(), auction.getTradingItemId(),
+                auction.getConditionId())) {
+            refreshTable();
         }
-    }
-
-    private void handleUpdateCatalogValue(Auction auction) {
-        if (auction == null) return;
-
-        // Find the existing CatalogValue to edit it
-        AppContext.getCatalogValueService()
-                .findByTradingItemAndCondition(auction.getTradingItemId(), auction.getConditionId())
-                .ifPresent(catalogValueToUpdate -> {
-                    // We want the user to select a new, active catalog, so we don't pre-set the old one.
-                    catalogValueToUpdate.setCatalogId(null);
-                    EditDialogResult result = showCatalogValueEditDialog(catalogValueToUpdate);
-                    if (result != null && result.saved()) {
-                        refreshTable();
-                    }
-                });
     }
 
     private void handleEditState(Auction selectedAuction) {
@@ -204,11 +183,6 @@ public class ActiveAuctionController extends BaseAuctionController {
         } catch (IOException e) {
             logger.error("Failed to load Archive Auction dialog.", e);
         }
-    }
-
-    private EditDialogResult showCatalogValueEditDialog(CatalogValue catalogValue) {
-        return CatalogValueEditDialogController.showCatalogValueEditDialog(getTableView().getScene().getWindow(),
-                catalogValue);
     }
 
     @Override

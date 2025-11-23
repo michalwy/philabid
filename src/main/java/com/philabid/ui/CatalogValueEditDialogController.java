@@ -47,6 +47,21 @@ public class CatalogValueEditDialogController extends CrudEditDialogController<C
     private ComboBox<CurrencyUnit> currencyComboBox;
     private EditDialogResult editDialogResult;
 
+    public static boolean addOrUpdateCatalogValue(Window owner, Long tradingItemId, Long conditionId) {
+        CatalogValue catalogValue = AppContext.getCatalogValueService()
+                .findByTradingItemAndCondition(tradingItemId, conditionId)
+                .orElseGet(() -> {
+                    CatalogValue newCatalogValue = new CatalogValue();
+                    newCatalogValue.setTradingItemId(tradingItemId);
+                    newCatalogValue.setConditionId(conditionId);
+                    return newCatalogValue;
+                });
+
+        catalogValue.setCatalogId(null);
+        EditDialogResult result = showCatalogValueEditDialog(owner, catalogValue);
+        return result != null && result.saved();
+    }
+
     public static EditDialogResult showCatalogValueEditDialog(Window owner, CatalogValue catalogValue) {
         try {
             FXMLLoader loader = new FXMLLoader();

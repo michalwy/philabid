@@ -1,6 +1,8 @@
 package com.philabid.database;
 
-import com.philabid.database.util.*;
+import com.philabid.database.util.EqualFilterCondition;
+import com.philabid.database.util.FilterCondition;
+import com.philabid.database.util.query.*;
 import com.philabid.model.BaseModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,11 +172,20 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
     }
 
     public Collection<T> findAll(Collection<FilterCondition> filterConditions) {
-        return findMany(filterConditions, List.of(), List.of());
+        return findMany(filterConditions, List.of(), List.of(), List.of());
     }
 
     public void findAll(Collection<FilterCondition> filterConditions, Consumer<T> consumer) {
-        findMany(filterConditions, List.of(), List.of(), (rs, e) -> {
+        findAll(filterConditions, List.of(), consumer);
+    }
+
+    public Collection<T> findAll(Collection<FilterCondition> filterConditions, Collection<QueryOrder> orders) {
+        return findMany(filterConditions, orders, List.of(), List.of());
+    }
+
+    public void findAll(Collection<FilterCondition> filterConditions, Collection<QueryOrder> orders,
+                        Consumer<T> consumer) {
+        findMany(filterConditions, orders, List.of(), List.of(), (rs, e) -> {
             consumer.accept(e);
             return true;
         });
@@ -192,26 +203,26 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
         return findOne(List.of(new EqualFilterCondition<>((tableAlias != null ? tableAlias : tableName) + ".id", id)));
     }
 
-    public Collection<T> findMany(Collection<FilterCondition> filterConditions,
+    public Collection<T> findMany(Collection<FilterCondition> filterConditions, Collection<QueryOrder> orders,
                                   Collection<QueryField<T, ?>> additionalFields,
                                   Collection<QueryJoin> additionalJoins) {
         List<T> entities = new ArrayList<>();
-        findMany(filterConditions, additionalFields, additionalJoins, (rs, e) -> {
+        findMany(filterConditions, orders, additionalFields, additionalJoins, (rs, e) -> {
             entities.add(e);
             return true;
         });
         return entities;
     }
 
-    public void findMany(Collection<FilterCondition> filterConditions,
+    public void findMany(Collection<FilterCondition> filterConditions, Collection<QueryOrder> orders,
                          Collection<QueryField<T, ?>> additionalFields,
                          Collection<QueryJoin> additionalJoins, EntityConsumer<T> consumer) {
-        doFindQuery(filterConditions, additionalFields, additionalJoins, consumer);
+        doFindQuery(filterConditions, additionalFields, additionalJoins, orders, consumer);
     }
 
     public Optional<T> findOne(Collection<FilterCondition> filterConditions) {
         List<T> entities = new ArrayList<>();
-        doFindQuery(filterConditions, List.of(), List.of(), (rs, e) -> {
+        doFindQuery(filterConditions, List.of(), List.of(), List.of(), (rs, e) -> {
             entities.add(e);
             return false;
         });
@@ -220,6 +231,7 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
 
     private void doFindQuery(Collection<FilterCondition> filterConditions,
                              Collection<QueryField<T, ?>> additionalFields, Collection<QueryJoin> additionalJoins,
+                             Collection<QueryOrder> orders,
                              EntityConsumer<T> consumer) {
         QueryBuilder.QueryBuildResult<T> query = new QueryBuilder<T>()
                 .select(fields)
@@ -228,6 +240,7 @@ public abstract class CrudRepository<T extends BaseModel<T>> {
                 .join(joins)
                 .join(additionalJoins)
                 .where(filterConditions)
+                .order(orders)
                 .build();
 
         try (Connection conn = databaseManager.getConnection();

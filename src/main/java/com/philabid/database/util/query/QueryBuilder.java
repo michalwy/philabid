@@ -1,5 +1,6 @@
-package com.philabid.database.util;
+package com.philabid.database.util.query;
 
+import com.philabid.database.util.FilterCondition;
 import com.philabid.model.BaseModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ public class QueryBuilder<T extends BaseModel<T>> {
     private final Collection<QueryField<T, ?>> fields = new ArrayList<>();
     private final Collection<FilterCondition> filterConditions = new ArrayList<>();
     private final Collection<QueryJoin> joins = new ArrayList<>();
+    private final Collection<QueryOrder> orders = new ArrayList<>();
     private QueryType queryType;
     private String fromTable;
     private String fromAlias;
@@ -68,6 +70,16 @@ public class QueryBuilder<T extends BaseModel<T>> {
         return this;
     }
 
+    public QueryBuilder<T> order(QueryOrder order) {
+        orders.add(order);
+        return this;
+    }
+
+    public QueryBuilder<T> order(Collection<QueryOrder> orders) {
+        this.orders.addAll(orders);
+        return this;
+    }
+
     public QueryBuildResult<T> build() {
         Collection<String> fieldNames = fields.stream().map(QueryField::toSql).toList();
 
@@ -85,7 +97,14 @@ public class QueryBuilder<T extends BaseModel<T>> {
                 .map(fc -> "AND " + fc.getSqlText())
                 .collect(Collectors.joining(" ", "WHERE 1=1 ", ""));
 
-        String sql = String.join(" ", selectClause, fromClause, joinClause, whereClause);
+        String orderClause = orders.stream()
+                .map(QueryOrder::getSqlText)
+                .collect(Collectors.joining(" "));
+        if (!orderClause.isBlank()) {
+            orderClause = "ORDER BY " + orderClause;
+        }
+
+        String sql = String.join(" ", selectClause, fromClause, joinClause, whereClause, orderClause);
 
         logger.debug("SQL: {}", sql);
         logger.debug("Params: {}", params);

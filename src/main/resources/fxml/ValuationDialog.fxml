@@ -6,7 +6,7 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" spacing="10" xmlns="http://javafx.com/javafx/17.0.2-ea"
-      fx:controller="com.philabid.ui.HistoricalAuctionsDialogController">
+      fx:controller="com.philabid.ui.ValuationDialogController">
     <padding>
         <Insets bottom="10" left="10" right="10" top="10"/>
     </padding>

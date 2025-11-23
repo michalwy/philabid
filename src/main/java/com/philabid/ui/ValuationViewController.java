@@ -1,26 +1,20 @@
 package com.philabid.ui;
 
 import com.philabid.AppContext;
-import com.philabid.model.CatalogValue;
 import com.philabid.model.Valuation;
 import com.philabid.ui.cell.CatalogNumberColumnValue;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
+import static com.philabid.ui.CatalogValueEditDialogController.addOrUpdateCatalogValue;
 import static com.philabid.ui.util.TableViewHelpers.*;
 
 public class ValuationViewController extends FilteredCrudTableViewController<Valuation> {
@@ -56,7 +50,7 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
     public void initializeView() {
         setCategoryColumn(categoryColumn, Valuation::getTradingItemCategoryCode, Valuation::getTradingItemCategoryName);
         setCatalogNumberColumn(catalogNumberColumn, Valuation::getTradingItemCatalogNumber,
-                Valuation::getTradingItemOrderNumber);
+                Valuation::getTradingItemOrderNumber, Valuation::getTradingItemCategoryCode);
         setConditionColumn(conditionColumn, Valuation::getConditionCode, Valuation::getConditionName);
         setCatalogValueColumn(catalogValueColumn, "catalogValue", Valuation::getCatalogValue,
                 Valuation::isCatalogActive);
@@ -80,15 +74,15 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
     protected List<MenuItem> getContextMenuItems() {
         MenuItem showHistoricalAuctions = new MenuItem("Show historical auctions...");
         showHistoricalAuctions.setOnAction(
-                event -> handleShowHistoricalAuctions(getTableView().getSelectionModel().getSelectedItem()));
+                event -> handleShowValuation(getTableView().getSelectionModel().getSelectedItem()));
 
         MenuItem addCatalogValueItem = new MenuItem("Add Catalog Value...");
         addCatalogValueItem.setOnAction(
-                event -> handleAddCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
+                event -> handleAddOrUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
         MenuItem updateCatalogValueItem = new MenuItem("Update Catalog Value...");
         updateCatalogValueItem.setOnAction(
-                event -> handleUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
+                event -> handleAddOrUpdateCatalogValue(getTableView().getSelectionModel().getSelectedItem()));
 
         return List.of(showHistoricalAuctions, addCatalogValueItem, updateCatalogValueItem);
     }
@@ -110,65 +104,16 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
                         selected.getCatalogValue() != null && !selected.isCatalogActive()));
     }
 
-    private void handleAddCatalogValue(Valuation valuation) {
+    private void handleAddOrUpdateCatalogValue(Valuation valuation) {
         if (valuation == null) return;
-
-        CatalogValue newCatalogValue = new CatalogValue();
-        // Pre-populate with data from the auction
-        newCatalogValue.setTradingItemId(valuation.getTradingItemId());
-        newCatalogValue.setConditionId(valuation.getConditionId());
-
-        EditDialogResult result = showCatalogValueEditDialog(newCatalogValue);
-        if (result != null && result.saved()) {
-            refreshTable(); // Refresh to show the new value
+        if (addOrUpdateCatalogValue(getTableView().getScene().getWindow(), valuation.getTradingItemId(),
+                valuation.getConditionId())) {
+            refreshTable();
         }
     }
 
-    private void handleUpdateCatalogValue(Valuation valuation) {
-        if (valuation == null) return;
-
-        // Find the existing CatalogValue to edit it
-        AppContext.getCatalogValueService()
-                .findByTradingItemAndCondition(valuation.getTradingItemId(), valuation.getConditionId())
-                .ifPresent(catalogValueToUpdate -> {
-                    // We want the user to select a new, active catalog, so we don't pre-set the old one.
-                    catalogValueToUpdate.setCatalogId(null);
-                    EditDialogResult result = showCatalogValueEditDialog(catalogValueToUpdate);
-                    if (result != null && result.saved()) {
-                        refreshTable();
-                    }
-                });
-    }
-
-    private EditDialogResult showCatalogValueEditDialog(CatalogValue catalogValue) {
-        return CatalogValueEditDialogController.showCatalogValueEditDialog(getTableView().getScene().getWindow(),
-                catalogValue);
-    }
-
-    private void handleShowHistoricalAuctions(Valuation selectedItem) {
-        if (selectedItem == null) {
-            return;
-        }
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/HistoricalAuctionsDialog.fxml"));
-            loader.setResources(AppContext.getI18nManager().getResourceBundle());
-            VBox page = loader.load();
-
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Historical Auctions");
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.initOwner(getTableView().getScene().getWindow());
-            dialogStage.setScene(new Scene(page));
-
-            HistoricalAuctionsDialogController controller = loader.getController();
-            controller.setDialogStage(dialogStage);
-            controller.setTradingItem(selectedItem.getTradingItemId(), selectedItem.getConditionId());
-
-            dialogStage.showAndWait();
-        } catch (IOException e) {
-            logger.error("Failed to load Archive Auction dialog.", e);
-        }
+    private void handleShowValuation(Valuation selectedItem) {
+        ValuationDialogController.showValuationDialog(getTableView().getScene().getWindow(), selectedItem);
     }
 
     @Override
@@ -178,6 +123,6 @@ public class ValuationViewController extends FilteredCrudTableViewController<Val
 
     @Override
     protected void handleDoubleClick() {
-        handleShowHistoricalAuctions(getTableView().getSelectionModel().getSelectedItem());
+        handleShowValuation(getTableView().getSelectionModel().getSelectedItem());
     }
 }

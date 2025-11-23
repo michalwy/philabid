@@ -1,6 +1,7 @@
 package com.philabid.service;
 
 import com.philabid.database.util.FilterCondition;
+import com.philabid.database.util.query.QueryOrder;
 import com.philabid.model.BaseModel;
 
 import java.util.Collection;
@@ -17,10 +18,14 @@ public abstract class CrudService<T extends BaseModel<T>> {
     public abstract boolean delete(Long id);
 
     public Collection<T> getAll() {
-        return getAll(List.of());
+        return getAll(List.of(), List.of());
     }
 
-    public abstract Collection<T> getAll(Collection<FilterCondition> filterConditions);
+    public Collection<T> getAll(Collection<FilterCondition> filterConditions) {
+        return getAll(filterConditions, List.of());
+    }
+
+    public abstract Collection<T> getAll(Collection<FilterCondition> filterConditions, Collection<QueryOrder> orders);
 
     public abstract Optional<T> getById(Long id);
 }

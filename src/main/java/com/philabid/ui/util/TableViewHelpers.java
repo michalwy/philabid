@@ -22,9 +22,10 @@ public class TableViewHelpers {
 
     public static <T> void setCatalogNumberColumn(TableColumn<T, CatalogNumberColumnValue> catalogNumberColumn,
                                                   Function<T, String> catalogNumberGetter,
-                                                  Function<T, Long> orderNumberGetter) {
+                                                  Function<T, Long> orderNumberGetter,
+                                                  Function<T, String> categoryCodeGetter) {
         catalogNumberColumn.setCellValueFactory(
-                CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter));
+                CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter, categoryCodeGetter));
         catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
     }
 
@@ -32,9 +33,10 @@ public class TableViewHelpers {
             TableColumn<T, CatalogNumberColumnValue> catalogNumberColumn,
             Function<T, String> catalogNumberGetter,
             Function<T, Long> orderNumberGetter,
+            Function<T, String> categoryCodeGetter,
             Function<T, Boolean> warningGetter, Function<T, Boolean> criticalGetter) {
         catalogNumberColumn.setCellValueFactory(
-                CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter));
+                CellValueFactoryProvider.forCatalogNumber(catalogNumberGetter, orderNumberGetter, categoryCodeGetter));
         catalogNumberColumn.setComparator(CatalogNumberColumnValue.SORT_COMPARATOR);
         catalogNumberColumn.setCellFactory(
                 column -> new CatalogNumberWithWarningItemCell<>(warningGetter, criticalGetter));

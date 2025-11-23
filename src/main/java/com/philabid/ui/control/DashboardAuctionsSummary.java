@@ -70,12 +70,10 @@ public class DashboardAuctionsSummary extends VBox {
                         Collector.of(AuctionsSummaryEntry::new,
                                 (a, b) -> {
                                     a.totalAuctions += 1;
-                                    if (b.getMaxBid() != null) {
-                                        a.maximumBids = a.maximumBids.add(b.getMaxBid());
-                                    }
                                     if (b.isWinningBid()) {
                                         a.winningAuctions += 1;
                                         a.currentBids = a.currentBids.add(b.getCurrentPrice());
+                                        a.maximumBids = a.maximumBids.add(b.getMaxBid());
                                     }
                                 },
                                 (a, b) -> {

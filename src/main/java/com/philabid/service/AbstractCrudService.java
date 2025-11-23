@@ -2,6 +2,7 @@ package com.philabid.service;
 
 import com.philabid.database.CrudRepository;
 import com.philabid.database.util.FilterCondition;
+import com.philabid.database.util.query.QueryOrder;
 import com.philabid.model.BaseModel;
 
 import java.util.Collection;
@@ -32,8 +33,8 @@ public abstract class AbstractCrudService<T extends BaseModel<T>> extends CrudSe
         return crudRepository.delete(id);
     }
 
-    public final Collection<T> getAll(Collection<FilterCondition> filterConditions) {
-        return crudRepository.findAll(filterConditions);
+    public final Collection<T> getAll(Collection<FilterCondition> filterConditions, Collection<QueryOrder> orders) {
+        return crudRepository.findAll(filterConditions, orders);
     }
 
     public Optional<T> getById(Long id) {

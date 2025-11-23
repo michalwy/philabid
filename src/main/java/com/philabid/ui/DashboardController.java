@@ -70,7 +70,7 @@ public class DashboardController implements RefreshableViewController {
         setCategoryColumn(catalogValueNeededCategoryColumn, Auction::getTradingItemCategoryCode,
                 Auction::getTradingItemCategoryName);
         setCatalogNumberColumn(catalogValueNeededCatalogNumberColumn, Auction::getTradingItemCatalogNumber,
-                Auction::getTradingItemOrderNumber);
+                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryCode);
         setConditionColumn(catalogValueNeededConditionColumn, Auction::getConditionCode, Auction::getConditionName);
         setCatalogColumn(catalogValueNeededCatalogColumn, Auction::getCatalogName, Auction::getCatalogIssueYear);
         setCatalogValueColumn(catalogValueNeededCatalogValueColumn, "catalogValue", Auction::getCatalogValue,
@@ -100,7 +100,11 @@ public class DashboardController implements RefreshableViewController {
             return row;
         });
 
+        catalogValueNeededCatalogNumberColumn.setSortType(TableColumn.SortType.ASCENDING);
+
         catalogValueNeededTable.setItems(catalogValueNeededTableItems);
+        catalogValueNeededTable.getSortOrder().setAll(List.of(catalogValueNeededCatalogNumberColumn));
+        catalogValueNeededTable.sort();
     }
 
     private void handleCatalogValueNeededTableDoubleClick() {

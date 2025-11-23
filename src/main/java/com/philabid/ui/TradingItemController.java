@@ -30,7 +30,8 @@ public class TradingItemController extends FilteredCrudTableViewController<Tradi
     @Override
     protected void initializeView() {
         setCategoryColumn(categoryColumn, TradingItem::getCategoryCode, TradingItem::getCategoryName);
-        setCatalogNumberColumn(catalogNumberColumn, TradingItem::getCatalogNumber, TradingItem::getOrderNumber);
+        setCatalogNumberColumn(catalogNumberColumn, TradingItem::getCatalogNumber, TradingItem::getOrderNumber,
+                TradingItem::getCategoryCode);
 
         notesColumn.setCellValueFactory(new PropertyValueFactory<>("notes"));
 

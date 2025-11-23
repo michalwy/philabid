@@ -3,6 +3,7 @@ package com.philabid.ui.cell;
 import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.scene.control.Label;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -13,10 +14,17 @@ public class ThresholdMultiCurrencyMonetaryAmountCell<T> extends MultiCurrencyMo
 
     public ThresholdMultiCurrencyMonetaryAmountCell(Function<T, MultiCurrencyMonetaryAmount> warningThresholdGetter,
                                                     Function<T, MultiCurrencyMonetaryAmount> criticalThresholdGetter) {
+        this(warningThresholdGetter, criticalThresholdGetter, List.of());
+    }
+
+    public ThresholdMultiCurrencyMonetaryAmountCell(Function<T, MultiCurrencyMonetaryAmount> warningThresholdGetter,
+                                                    Function<T, MultiCurrencyMonetaryAmount> criticalThresholdGetter,
+                                                    Collection<String> additionalStyleClasses) {
         super((value, row, labels) -> {
 
             removeStyleClassFromLabels(CRITICAL_THRESHOLD_STYLE_CLASS, labels);
             removeStyleClassFromLabels(WARNING_THRESHOLD_STYLE_CLASS, labels);
+            additionalStyleClasses.forEach(styleClass -> removeStyleClassFromLabels(styleClass, labels));
 
             if (row == null || value == null) return;
 
@@ -30,6 +38,8 @@ public class ThresholdMultiCurrencyMonetaryAmountCell<T> extends MultiCurrencyMo
                     value.defaultCurrencyAmount().isGreaterThan(warningThreshold.defaultCurrencyAmount())) {
                 applyStyleClassToLabels(WARNING_THRESHOLD_STYLE_CLASS, labels);
             }
+
+            additionalStyleClasses.forEach(styleClass -> applyStyleClassToLabels(styleClass, labels));
         });
     }
 

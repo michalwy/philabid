@@ -1,9 +1,9 @@
 package com.philabid.database;
 
-import com.philabid.database.util.CurrencyQueryField;
 import com.philabid.database.util.EqualFilterCondition;
-import com.philabid.database.util.QueryField;
-import com.philabid.database.util.StringQueryField;
+import com.philabid.database.util.query.CurrencyQueryField;
+import com.philabid.database.util.query.QueryField;
+import com.philabid.database.util.query.StringQueryField;
 import com.philabid.model.AuctionHouse;
 
 import java.sql.SQLException;

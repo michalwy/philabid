@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 import static com.philabid.ui.util.TableViewHelpers.*;
 
@@ -56,11 +57,12 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
         maxBidColumn.setCellValueFactory(new PropertyValueFactory<>("maxBid"));
         maxBidColumn.setCellFactory(column -> new ThresholdMultiCurrencyMonetaryAmountCell<>(
                 Auction::getRecommendedPrice,
-                Auction::getCatalogValue));
+                Auction::getCatalogValue, List.of("max-bid")));
 
         addRowFormatter((row, auction, empty) -> {
             row.getStyleClass().remove("winning-auction");
             row.getStyleClass().remove("overpriced-auction");
+            row.getStyleClass().remove("outbid-auction");
 
             if (empty || auction == null) {
                 return;
@@ -68,14 +70,18 @@ public abstract class BaseAuctionController extends FilteredCrudTableViewControl
 
             if (auction.isWinningBid()) {
                 row.getStyleClass().add("winning-auction");
-            } else if (auction.isOverpriced()) {
+            } else if (auction.isOverpriced() || auction.isNextBidOverpriced()) {
                 row.getStyleClass().add("overpriced-auction");
+            }
+
+            if (!auction.isWinningBid() && auction.getMaxBid() != null) {
+                row.getStyleClass().add("outbid-auction");
             }
         });
 
         setCategoryColumn(categoryColumn, Auction::getTradingItemCategoryCode, Auction::getTradingItemCategoryName);
         setCatalogNumberColumn(catalogNumberColumn, Auction::getTradingItemCatalogNumber,
-                Auction::getTradingItemOrderNumber);
+                Auction::getTradingItemOrderNumber, Auction::getTradingItemCategoryCode);
 
         setConditionColumn(conditionColumn, Auction::getConditionCode, Auction::getConditionName);
 

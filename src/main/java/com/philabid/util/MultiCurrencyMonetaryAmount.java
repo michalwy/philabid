@@ -77,4 +77,15 @@ public record MultiCurrencyMonetaryAmount(MonetaryAmount originalAmount, Monetar
             return MultiCurrencyMonetaryAmount.of(defaultCurrencyAmount.add(other.defaultCurrencyAmount));
         }
     }
+
+    public boolean isGreaterThan(MultiCurrencyMonetaryAmount other) {
+        if (other == null) {
+            return false;
+        }
+        if (getOriginalCurrency().equals(other.getOriginalCurrency())) {
+            return originalAmount.compareTo(other.originalAmount) > 0;
+        } else {
+            return defaultCurrencyAmount.compareTo(other.defaultCurrencyAmount) > 0;
+        }
+    }
 }
