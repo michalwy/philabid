@@ -88,7 +88,7 @@ public class AuctionStateDialogController {
             maxBidCurrencyLabel.setText(auction.getAuctionHouseCurrency().getCurrencyCode());
         }
 
-        archivedCheckBox.setSelected(auction.isArchived() || auction.isFinished());
+        archivedCheckBox.setSelected(auction.isArchived());
 
         initiallyArchived = auction.isArchived();
 
