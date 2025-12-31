@@ -17,6 +17,7 @@ import org.javamoney.moneta.Money;
 
 public class AuctionStateDialogController {
 
+    private static boolean lastArchiveIfFinished = true;
     @FXML
     private Hyperlink urlLink;
     @FXML
@@ -30,14 +31,13 @@ public class AuctionStateDialogController {
     @FXML
     private Label currencyLabel;
     @FXML
-    private CheckBox archivedCheckBox;
+    private CheckBox archiveIfFinishedCheckBox;
     @FXML
     private Button sendMaxBidButton;
     @FXML
     private Button refreshMaxBidButton;
     @FXML
     private ValuationDetails valuationDetails;
-
     private Stage dialogStage;
     private Auction auction;
     private EditDialogResult editDialogResult;
@@ -88,7 +88,7 @@ public class AuctionStateDialogController {
             maxBidCurrencyLabel.setText(auction.getAuctionHouseCurrency().getCurrencyCode());
         }
 
-        archivedCheckBox.setSelected(auction.isArchived());
+        archiveIfFinishedCheckBox.setSelected(lastArchiveIfFinished);
 
         initiallyArchived = auction.isArchived();
 
@@ -142,11 +142,13 @@ public class AuctionStateDialogController {
             auction.setMaxBid(null);
         }
 
-        if (!initiallyArchived && archivedCheckBox.isSelected() && auction.getCatalogValue() != null) {
-            setArchivedValues();
+        if (auction.isFinished() && archiveIfFinishedCheckBox.isSelected()) {
+            auction.setArchived(true);
+            if (!initiallyArchived && auction.getCatalogValue() != null) {
+                setArchivedValues();
+            }
         }
-
-        auction.setArchived(archivedCheckBox.isSelected());
+        lastArchiveIfFinished = archiveIfFinishedCheckBox.isSelected();
 
         return true;
     }

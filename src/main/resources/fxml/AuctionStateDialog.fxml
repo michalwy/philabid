@@ -59,7 +59,7 @@
 
     </HBox>
 
-    <CheckBox fx:id="archivedCheckBox" text="Archived"/>
+    <CheckBox fx:id="archiveIfFinishedCheckBox" text="Archive if finished"/>
 
     <ButtonBar>
         <buttons>
