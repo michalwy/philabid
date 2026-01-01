@@ -151,4 +151,14 @@ public class AuctionRepository extends CrudRepository<Auction> {
                 List.of()
         );
     }
+
+    public Collection<Auction> findByAuctionHouseAndLotId(Long auctionHouseId, String lotId) {
+        return findMany(
+                List.of(new EqualFilterCondition<>("a.auction_house_id", auctionHouseId),
+                        new EqualFilterCondition<>("a.lot_id", lotId)),
+                List.of(),
+                List.of(),
+                List.of()
+        );
+    }
 }

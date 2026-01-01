@@ -25,6 +25,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -68,6 +69,8 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     private CheckBox archivedCheckBox;
     @FXML
     private Label multipleAuctionsWarningLabel;
+    @FXML
+    private Label auctionExistsWarningLabel;
     private boolean saveClicked = false;
     private boolean initiallyArchived;
 
@@ -154,6 +157,14 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
 
         tradingItemSelector.selectedTradingItemProperty().addListener((obs, oldVal, newVal) -> {
             verifyActiveAuctions();
+        });
+
+        auctionHouseComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            verifyAuctionExists();
+        });
+
+        lotIdField.textProperty().addListener((obs, oldVal, newVal) -> {
+            verifyAuctionExists();
         });
 
         setupSellerAutocomplete();
@@ -386,7 +397,7 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
         });
     }
 
-    void verifyActiveAuctions() {
+    private void verifyActiveAuctions() {
         TradingItem tradingItem = tradingItemSelector.selectedTradingItemProperty().getValue();
         Condition condition = conditionComboBox.getSelectionModel().getSelectedItem();
 
@@ -400,5 +411,19 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
 
         multipleAuctionsWarningLabel.setVisible(
                 auctions.stream().anyMatch(a -> !a.getId().equals(getEntity().getId())));
+    }
+
+    private void verifyAuctionExists() {
+        String lotId = lotIdField.getText();
+        AuctionHouse auctionHouse = auctionHouseComboBox.getSelectionModel().getSelectedItem();
+
+        if (!Objects.isNull(auctionHouse)) {
+            boolean exists =
+                    AppContext.getAuctionService().getByAuctionHouseAndLotId(auctionHouse.getId(), lotId).stream()
+                            .anyMatch(a -> !Objects.equals(a.getId(), getEntity().getId()));
+            auctionExistsWarningLabel.setVisible(exists);
+        } else {
+            auctionExistsWarningLabel.setVisible(false);
+        }
     }
 }

@@ -62,6 +62,10 @@ public class AuctionService extends AbstractCrudService<Auction> {
         return auctions;
     }
 
+    public Collection<Auction> getByAuctionHouseAndLotId(Long auctionHouseId, String lotId) {
+        return auctionRepository.findByAuctionHouseAndLotId(auctionHouseId, lotId);
+    }
+
     protected boolean validate(Auction auction) {
         if (auction.getAuctionHouseId() == null || auction.getTradingItemId() == null ||
                 auction.getConditionId() == null) {
