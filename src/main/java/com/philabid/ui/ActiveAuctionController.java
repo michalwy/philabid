@@ -36,6 +36,8 @@ public class ActiveAuctionController extends BaseAuctionController {
     protected TableColumn<Auction, String> urlColumn;
     @FXML
     protected TableColumn<Auction, MultiCurrencyMonetaryAmount> recommendedPriceColumn;
+    @FXML
+    protected TableColumn<Auction, MultiCurrencyMonetaryAmount> startingPriceColumn;
 
     @Override
     public Collection<Auction> loadAuctions(Collection<FilterCondition> filterConditions) {
@@ -51,6 +53,9 @@ public class ActiveAuctionController extends BaseAuctionController {
         endDateColumn.setCellFactory(column -> new EndingDateCell<>());
 
         setPriceWithThresholdColumn(recommendedPriceColumn, "recommendedPrice", Auction::getCatalogValue,
+                Auction::getCatalogValue);
+
+        setPriceWithThresholdColumn(startingPriceColumn, "startingPrice", Auction::getRecommendedPrice,
                 Auction::getCatalogValue);
 
         setCatalogNumberWithWarningColumn(catalogNumberColumn, Auction::getTradingItemCatalogNumber,

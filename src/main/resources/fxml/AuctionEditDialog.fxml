@@ -47,17 +47,20 @@
         <Label text="%auctions.label.price" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
         <MonetaryField fx:id="priceField" GridPane.columnIndex="1" GridPane.rowIndex="9"/>
 
-        <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
-        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
+        <Label text="Starting Price:" GridPane.columnIndex="0" GridPane.rowIndex="10"/>
+        <MonetaryField fx:id="startingPriceField" GridPane.columnIndex="1" GridPane.rowIndex="10"/>
 
-        <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
-        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="11">
+        <Label text="%auctions.label.currency" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
+        <ComboBox fx:id="currencyComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="11"/>
+
+        <Label text="%auctions.label.endDate" GridPane.columnIndex="0" GridPane.rowIndex="12"/>
+        <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="12">
             <DatePicker fx:id="endDatePicker" HBox.hgrow="ALWAYS"/>
             <TextField fx:id="endTimeField" promptText="HH:mm" prefWidth="80"/>
         </HBox>
 
-        <Label text="%auctions.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="12"/>
-        <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="12"/>
+        <Label text="%auctions.label.archived" GridPane.columnIndex="0" GridPane.rowIndex="13"/>
+        <CheckBox fx:id="archivedCheckBox" text="" GridPane.columnIndex="1" GridPane.rowIndex="13"/>
 
         <columnConstraints>
             <ColumnConstraints/>

@@ -87,6 +87,9 @@ public class AuctionService extends AbstractCrudService<Auction> {
         if (auction.getCurrentPrice() != null) {
             auction.setCurrentPrice(auction.getCurrentPrice().originalAmount());
         }
+        if (auction.getStartingPrice() != null) {
+            auction.setStartingPrice(auction.getStartingPrice().originalAmount());
+        }
         if (auction.getMaxBid() != null) {
             auction.setMaxBid(auction.getMaxBid().originalAmount());
         }

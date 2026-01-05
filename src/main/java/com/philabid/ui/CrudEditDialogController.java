@@ -96,6 +96,10 @@ public abstract class CrudEditDialogController<T extends BaseModel<T>> {
         return result;
     }
 
+    protected boolean isNewEntity() {
+        return getEntity().getId() == null;
+    }
+
     protected record ValidationError(String message, Parent control) {
     }
 }

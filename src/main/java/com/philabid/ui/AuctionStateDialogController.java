@@ -2,13 +2,10 @@ package com.philabid.ui;
 
 import com.philabid.AppContext;
 import com.philabid.model.Auction;
-import com.philabid.service.AllegroApiService;
 import com.philabid.ui.control.MonetaryField;
 import com.philabid.ui.control.ValuationDetails;
-import com.philabid.util.MultiCurrencyMonetaryAmount;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -29,13 +26,13 @@ public class AuctionStateDialogController {
     @FXML
     private Label maxBidCurrencyLabel;
     @FXML
+    private MonetaryField startingPrice;
+    @FXML
+    private Label startingPriceCurrencyLabel;
+    @FXML
     private Label currencyLabel;
     @FXML
     private CheckBox archiveIfFinishedCheckBox;
-    @FXML
-    private Button sendMaxBidButton;
-    @FXML
-    private Button refreshMaxBidButton;
     @FXML
     private ValuationDetails valuationDetails;
     private Stage dialogStage;
@@ -78,14 +75,21 @@ public class AuctionStateDialogController {
             currentPrice.setAmount(auction.getCurrentPrice().originalAmount());
             currencyLabel.setText(auction.getCurrentPrice().getOriginalCurrency().getCurrencyCode());
         } else {
-            currencyLabel.setText(auction.getAuctionHouseCurrency().getCurrencyCode());
+            currencyLabel.setText(auction.getCurrency().getCurrencyCode());
         }
 
         if (auction.getMaxBid() != null) {
             maxBid.setAmount(auction.getMaxBid().originalAmount());
             maxBidCurrencyLabel.setText(auction.getMaxBid().getOriginalCurrency().getCurrencyCode());
         } else {
-            maxBidCurrencyLabel.setText(auction.getAuctionHouseCurrency().getCurrencyCode());
+            maxBidCurrencyLabel.setText(auction.getCurrency().getCurrencyCode());
+        }
+
+        if (auction.getStartingPrice() != null) {
+            startingPrice.setAmount(auction.getStartingPrice().originalAmount());
+            startingPriceCurrencyLabel.setText(auction.getStartingPrice().getOriginalCurrency().getCurrencyCode());
+        } else {
+            startingPriceCurrencyLabel.setText(auction.getCurrency().getCurrencyCode());
         }
 
         archiveIfFinishedCheckBox.setSelected(lastArchiveIfFinished);
@@ -125,21 +129,21 @@ public class AuctionStateDialogController {
         }
 
         if (!currentPrice.isEmpty()) {
-            MultiCurrencyMonetaryAmount oldCurrentPrice = auction.getCurrentPrice();
-            auction.setCurrentPrice(
-                    Money.of(currentPrice.getAmount(),
-                            oldCurrentPrice != null ? oldCurrentPrice.getOriginalCurrency() :
-                                    auction.getAuctionHouseCurrency()));
+            auction.setCurrentPrice(Money.of(currentPrice.getAmount(), auction.getCurrency()));
         } else {
             auction.setCurrentPrice(null);
         }
 
         if (!maxBid.isEmpty()) {
-            MultiCurrencyMonetaryAmount oldMaxBid = auction.getMaxBid();
-            auction.setMaxBid(Money.of(maxBid.getAmount(),
-                    oldMaxBid != null ? oldMaxBid.getOriginalCurrency() : auction.getAuctionHouseCurrency()));
+            auction.setMaxBid(Money.of(maxBid.getAmount(), auction.getCurrency()));
         } else {
             auction.setMaxBid(null);
+        }
+
+        if (!startingPrice.isEmpty()) {
+            auction.setStartingPrice(Money.of(startingPrice.getAmount(), auction.getCurrency()));
+        } else {
+            auction.setStartingPrice(null);
         }
 
         if (auction.isFinished() && archiveIfFinishedCheckBox.isSelected()) {
@@ -170,25 +174,5 @@ public class AuctionStateDialogController {
 
     private boolean isInputValid() {
         return true;
-    }
-
-    @FXML
-    private void handleSendMaxBid() {
-        AppContext.getAllegroApiService()
-                .sendBid(auction.getLotId(), Money.of(maxBid.getAmount(), auction.getAuctionHouseCurrency()))
-                .ifPresent(this::updateBidDetails);
-    }
-
-    @FXML
-    private void handleRefreshMaxBid() {
-        AppContext.getAllegroApiService().getBidDetails(auction.getLotId())
-                .ifPresent(this::updateBidDetails);
-    }
-
-    private void updateBidDetails(AllegroApiService.BidDetails details) {
-        currentPrice.setAmount(details.auction().currentPrice().asMultiCurrency().originalAmount());
-        currencyLabel.setText(details.auction().currentPrice().currency());
-        maxBid.setAmount(details.maxAmount().asMultiCurrency().originalAmount());
-        maxBidCurrencyLabel.setText(details.maxAmount().currency());
     }
 }

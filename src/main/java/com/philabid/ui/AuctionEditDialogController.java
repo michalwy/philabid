@@ -58,6 +58,8 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
     @FXML
     private MonetaryField priceField;
     @FXML
+    private MonetaryField startingPriceField;
+    @FXML
     private Button fetchUrlButton;
     @FXML
     private ComboBox<CurrencyUnit> currencyComboBox;
@@ -167,6 +169,12 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
             verifyAuctionExists();
         });
 
+        priceField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (isNewEntity()) {
+                startingPriceField.setAmount(priceField.getAmount());
+            }
+        });
+
         setupSellerAutocomplete();
 
         populateComboBoxes();
@@ -246,6 +254,9 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
         if (auction.getCurrentPrice() != null) {
             priceField.setAmount(auction.getCurrentPrice().originalAmount());
         }
+        if (auction.getStartingPrice() != null) {
+            startingPriceField.setAmount(auction.getStartingPrice().originalAmount());
+        }
 
         if (auction.getId() == null) { // It's a new auction
             // Use the last saved date/time, or the current date/time if none exists
@@ -286,9 +297,8 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
                     .ifPresent(tradingItemSelector::setSelectedTradingItem);
         }
         selectComboBoxValue(conditionComboBox, auction.getConditionId());
-        if (auction.getCurrentPrice() != null) {
-            selectComboBoxValue(currencyComboBox,
-                    auction.getCurrentPrice().originalAmount().getCurrency().getCurrencyCode());
+        if (auction.getCurrency() != null) {
+            selectComboBoxValue(currencyComboBox, auction.getCurrency().getCurrencyCode());
         }
         archivedCheckBox.setSelected(auction.isArchived());
         initiallyArchived = auction.isArchived();
@@ -310,6 +320,10 @@ public class AuctionEditDialogController extends CrudEditDialogController<Auctio
         auction.setUrl(urlField.getText());
         BigDecimal currentPrice = priceField.getAmount();
         auction.setCurrentPrice(currentPrice != null ? Money.of(currentPrice, currencyComboBox.getValue()) : null);
+        BigDecimal startingPrice = startingPriceField.getAmount();
+        auction.setStartingPrice(startingPrice != null ? Money.of(startingPrice, currencyComboBox.getValue()) : null);
+
+        auction.setCurrency(currencyComboBox.getValue());
 
         LocalDate localDate = endDatePicker.getValue();
         LocalDateTime newEndDate = null;

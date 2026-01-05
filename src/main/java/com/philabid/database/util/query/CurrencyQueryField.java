@@ -10,7 +10,13 @@ import java.util.function.BiConsumer;
 public class CurrencyQueryField<T extends BaseModel<T>> extends QueryField<T, CurrencyUnit> {
     public CurrencyQueryField(String table, String fieldName, String alias,
                               BiConsumer<T, CurrencyUnit> valueConsumer) {
-        super(table, fieldName, alias, (r, name) -> Monetary.getCurrency(r.getString(name)), valueConsumer,
+        super(table, fieldName, alias, (r, name) -> {
+                    String currencyCode = r.getString(name);
+                    if (currencyCode == null) {
+                        return null;
+                    }
+                    return Monetary.getCurrency(currencyCode);
+                }, valueConsumer,
                 (stmt, index, value) -> {
                     stmt.setString(index, value.getCurrencyCode());
                 });

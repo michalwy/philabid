@@ -22,8 +22,10 @@ public class AuctionRepository extends CrudRepository<Auction> {
             new LongQueryField<>("a", "condition_id", Auction::setConditionId).withEntityValue(Auction::getConditionId),
             new StringQueryField<>("a", "lot_id", Auction::setLotId).withEntityValue(Auction::getLotId),
             new StringQueryField<>("a", "url", Auction::setUrl).withEntityValue(Auction::getUrl),
-            new CurrencyQueryField<Auction>("a", "currency_code", null).withMultiCurrencyEntityValue(
-                    Auction::getCurrentPrice),
+            new CurrencyQueryField<Auction>("a", "currency_code", Auction::setCurrency).withEntityValue(
+                    Auction::getCurrency),
+            new MonetaryAmountQueryField<>("a", "starting_price", "currency_code",
+                    Auction::setRawStartingPrice).withMultiCurrencyEntityValue(Auction::getStartingPrice),
             new MonetaryAmountQueryField<>("a", "current_price", "currency_code",
                     Auction::setRawCurrentPrice).withMultiCurrencyEntityValue(Auction::getCurrentPrice),
             new MonetaryAmountQueryField<>("a", "max_bid", "currency_code",

@@ -21,8 +21,10 @@ public class Auction extends BaseModel<Auction> {
     private Long conditionId;
     private String lotId;
     private String url;
+    private MultiCurrencyMonetaryAmount startingPrice;
     private MultiCurrencyMonetaryAmount currentPrice;
     private MultiCurrencyMonetaryAmount maxBid;
+    private CurrencyUnit currency;
     private LocalDateTime endDate;
     private boolean archived;
 
@@ -114,6 +116,18 @@ public class Auction extends BaseModel<Auction> {
 
     public void setRawCurrentPrice(MonetaryAmount currentPrice) {
         this.currentPrice = MultiCurrencyMonetaryAmount.of(currentPrice, null);
+    }
+
+    public MultiCurrencyMonetaryAmount getStartingPrice() {
+        return startingPrice;
+    }
+
+    public void setStartingPrice(MonetaryAmount startingPrice) {
+        this.startingPrice = MultiCurrencyMonetaryAmount.of(startingPrice);
+    }
+
+    public void setRawStartingPrice(MonetaryAmount startingPrice) {
+        this.startingPrice = MultiCurrencyMonetaryAmount.of(startingPrice, null);
     }
 
     public LocalDateTime getEndDate() {
@@ -336,8 +350,16 @@ public class Auction extends BaseModel<Auction> {
         this.auctionHouseCurrency = auctionHouseCurrency;
     }
 
+    public CurrencyUnit getCurrency() {
+        return currency;
+    }
+
     public void setCurrency(String currencyCode) {
-        this.auctionHouseCurrency = Monetary.getCurrency(currencyCode);
+        this.currency = Monetary.getCurrency(currencyCode);
+    }
+
+    public void setCurrency(CurrencyUnit currency) {
+        this.currency = currency;
     }
 
     @Override
@@ -358,8 +380,16 @@ public class Auction extends BaseModel<Auction> {
     }
 
     public boolean isOverpriced() {
-        return getCurrentPrice() != null && getRecommendedPrice() != null &&
-                getCurrentPrice().defaultCurrencyAmount().isGreaterThan(getRecommendedPrice().defaultCurrencyAmount());
+        if (getRecommendedPrice() == null || (getCurrentPrice() == null && getStartingPrice() == null)) {
+            return false;
+        }
+        if (getCurrentPrice() != null) {
+            return getCurrentPrice().defaultCurrencyAmount()
+                    .isGreaterThan(getRecommendedPrice().defaultCurrencyAmount());
+        } else {
+            return getStartingPrice().defaultCurrencyAmount()
+                    .isGreaterThan(getRecommendedPrice().defaultCurrencyAmount());
+        }
     }
 
     public boolean isNextBidOverpriced() {
